@@ -11,3 +11,33 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.sidebar {
+    margin-top: 0;
+    margin: 0;
+    width: 200px;
+    overflow: auto;
+    height: 100%;
+    float: left;
+    color: black;
+}
+.sidebar ul li a {
+    display: block;
+    padding: 16px;
+    text-decoration: none;
+}
+.sidebar ul li a:visited {
+    color: black;
+}
+.sidebar ul li a.active {
+    background-color: aquamarine;
+    color: #000
+}
+.sidebar ul li a:hover:not(.active) {
+  background-color: #555;
+  color: white;
+}
+.sidebar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
