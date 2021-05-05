@@ -2,7 +2,7 @@ import React from 'react';
 import "../Css/Homepage.css"
 
 
-class ThreadArcs extends React.Component {
+class PlanetVis extends React.Component {
     render () {
         return (
             <div> 
@@ -14,4 +14,4 @@ class ThreadArcs extends React.Component {
     }
 }
 
-export default ThreadArcs;
+export default PlanetVis;
