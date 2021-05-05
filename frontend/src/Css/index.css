@@ -15,13 +15,13 @@ code {
 .page  {
     padding-top: 0px;
     margin-top: 0px;
-    margin-left: 220px;
+    margin-left: 200px;
     overflow: hidden;
 }
 
 .sidebar {
     margin: 0;
-    border-right: 6px solid #Ab87ff;
+    border-right: 6px solid #FFBA49;
     width: 200px;
     overflow: auto;
     height: 100vh;
@@ -46,7 +46,7 @@ code {
     text-decoration: none;
 }
 .sidebar ul li button.active {
-    background-color: #Ab87ff;
+    background-color: #FFBA49;
     font-weight: bold;
     font-size:large;
     text-align: left;
@@ -56,7 +56,8 @@ code {
 .sidebar ul li button:hover:not(.active, .image) {
   background-color: #555;
   text-decoration: none;
-  text-align: center;
+  text-align: left;
+  padding-left: 20%;
   font-size:large;
   color: #F9F5FF;
 }

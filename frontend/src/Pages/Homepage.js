@@ -9,10 +9,11 @@ class HomePage extends React.Component {
             <div class="first"> 
                 <h1> Welcome to the homepage of the Amazing DBL team! </h1>
                 <p>This page is still in testing phase. If you have any remarks, please do let us know.</p>
+                <p></p>
             </div>
 
             <div class="second">
-                <img src="https://i.imgur.com/OXhppnI.png" alt = "Banner picure" ></img>
+                <img src="../Images/DBL_Banner.png" alt = "Banner picure" ></img>
             </div>
             </div>
 

@@ -5,16 +5,25 @@ body {
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #FFE4D3;
+    background-color: #efefef;
   }
 
-  h1 {color:#050401;
+  .first h1 {color:#050401;
     text-align:left;
+    }
+
+    div.first {
+        margin-left:20px;
+    }
+  
+    div.second{
+        position:absolute;
+        bottom:100px;
     }
 
   .second img {
       float: center;
       align-self: center;
       height: 40vh;
-      width: 100vw;
+      width: 89vw;
   }
