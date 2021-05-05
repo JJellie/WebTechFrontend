@@ -20,20 +20,26 @@ code {
     float: left;
     color: black;
 }
-.sidebar ul li a {
-    display: block;
+
+.sidebar ul li button {
+    width: 200px;
     padding: 16px;
+    display: block;
+    border: none;
     text-decoration: none;
 }
-.sidebar ul li a:visited {
+.sidebar ul li button:visited {
     color: black;
+    text-decoration: none;
 }
-.sidebar ul li a.active {
+.sidebar ul li button.active {
     background-color: aquamarine;
+    text-decoration: none;
     color: #000
 }
-.sidebar ul li a:hover:not(.active) {
+.sidebar ul li button:hover:not(.active) {
   background-color: #555;
+  text-decoration: none;
   color: white;
 }
 .sidebar ul {
