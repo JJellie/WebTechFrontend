@@ -12,7 +12,9 @@ body {
     text-align:left;
     }
 
-  img {
-      float: right;
+  .second img {
+      float: center;
       align-self: center;
+      height: 40vh;
+      width: 100vw;
   }
