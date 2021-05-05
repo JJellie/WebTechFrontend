@@ -62,7 +62,7 @@ class NavBar extends React.Component {
                 <Route exact path="/about">
                     <About />
                 </Route>
-                <Route exact path="/Vis">
+                <Route exact path="/vis">
                     <Vis />
                 </Route>
                 <Route exact path="/contact">
