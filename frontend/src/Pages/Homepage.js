@@ -1,5 +1,6 @@
 import React from 'react';
-import "../Css/Homepage.css"
+import "../Css/Homepage.css";
+import Banner from "../Images/DBL_Banner.png";
 
 
 class HomePage extends React.Component {
@@ -13,7 +14,7 @@ class HomePage extends React.Component {
             </div>
 
             <div class="second">
-                <img src="../Images/DBL_Banner.png" alt = "Banner picure" ></img>
+                <img src={Banner} alt = "Banner picure" ></img>
             </div>
             </div>
 
