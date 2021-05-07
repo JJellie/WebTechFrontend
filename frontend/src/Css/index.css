@@ -21,7 +21,7 @@ code {
 
 .sidebar {
     margin: 0;
-    border-right: 6px solid #FFBA49;
+    border-right: 6px solid #20A4F3;
     width: 200px;
     overflow: auto;
     height: 100vh;
@@ -46,7 +46,7 @@ code {
     text-decoration: none;
 }
 .sidebar ul li button.active {
-    background-color: #FFBA49;
+    background-color: #20A4F3;
     font-weight: bold;
     font-size:large;
     text-align: left;

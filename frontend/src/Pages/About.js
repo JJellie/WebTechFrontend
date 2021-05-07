@@ -6,7 +6,10 @@ class About extends React.Component {
     render() {    
         return (
             <div> 
+            <div class="text">
                 <p>Test</p>
+            </div>
+                
             </div>
             );
     }    
