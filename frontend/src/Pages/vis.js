@@ -8,7 +8,9 @@ class Vis extends React.Component {
     render() {
         return (
             <div>
+                
                 <ThreadArcs />
+
                 <PlanetVis />
             </div>
         );

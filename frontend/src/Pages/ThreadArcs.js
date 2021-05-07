@@ -58,6 +58,31 @@ class ThreadArcs extends React.Component {
     }
  
     render () {
+        function raphaelRender() {
+            let testSet = [96, 77]
+            var canvas = Raphael(300, 100, 200, 600);
+            let circles = [];
+            let numbers = [];
+            for(let j = 0; j < 2; j++) {
+                if(!numbers.includes(testSet[j])){
+                    circles.push(canvas.circle(100, j*100+10, 10))
+                    numbers.push(testSet[j])
+                    circles[j].attr("fill", "#000");
+                    circles[j].click(() => {
+                        canvas.remove();
+                    });
+                    circles[j].hover(() => {
+                        circles[j].attr("fill", "#f00")
+                    }, () => {
+                        circles[j].attr('fill', "#000")
+                    });
+                }
+            }
+            canvas.rect(100, 10, 50, 1)
+            canvas.rect(150, 10, 1, 100)
+            canvas.rect(100, 110, 50, 1)
+            
+        }
         return (
             <div> 
                 <h1> Threadarcs </h1>

@@ -46,7 +46,7 @@ class NavBar extends React.Component {
     render() {
         return (    
         <Router>
-            <div class = "sidebar">
+            <div className = "sidebar">
             <ul>
                 <li><button  className="image"><img src={Logo} alt="company logo" width="168" height="168"></img></button></li>
                 <li><Link to="/"><button onClick={() => this.updateState('home')}  className={this.state.home}><span>Home</span></button></Link></li>
@@ -55,7 +55,7 @@ class NavBar extends React.Component {
                 <li><Link to="/contact"><button onClick={() => this.updateState('contact')}  className={this.state.contact}>Contact</button></Link></li>
             </ul>
             </div>
-            <div class = "page">
+            <div className = "page">
             <Switch>
                 <Route exact path="/">
                     <HomePage />    
