@@ -1,5 +1,5 @@
 import React from 'react';
-import "../Css/Homepage.css";
+import "../Css/visual.css";
 //import $, { data } from 'jquery'
 //import DataFrame from 'dataframe-js';
 //import './enron-v1Shortened.csv';
@@ -19,10 +19,11 @@ class ThreadArcs extends React.Component {
                     }
                 }
             }
-            let canvas = Raphael(document.getElementById('test'), (numbers.length+1)*100, (numbers.length+1)*100);
+            let canvas = Raphael(document.getElementById('test'), (numbers.length+1)*100, (numbers.length-2)*100);
+          
             numbers.sort(function(a, b){return a - b});
             for(let j = 0; j < numbers.length; j++) {
-                    circles.push(canvas.circle(j*100+50, numbers.length*50, 10))
+                    circles.push(canvas.circle(j*100+50, (numbers.length-2)*100 -25, 10))
                     circles[j].attr("fill", "#fff");
                     circles[j].attr("stroke-width", "3");
                     circles[j].click(() => {
@@ -50,11 +51,12 @@ class ThreadArcs extends React.Component {
                 let circ1 = circles[numbers.indexOf(lowest)];
                 let circ2 = circles[numbers.indexOf(highest)]
                 let distance =  (circ2.attr('cx') - circ1.attr('cx')) 
-                var curve1 = canvas.path("M "+ circ1.attr('cx') +"," + (circ1.attr('cy')+10) + " A"+ distance/2 +"," + distance/2 + " 0 0,1 " + circ2.attr('cx') 
+                var curve1 = canvas.path("M "+ circ1.attr('cx') +"," + (circ1.attr('cy')-10) + " A"+ distance/2 +"," + distance/2 + " 0 0,1 " + circ2.attr('cx') 
                 +"," + (circ2.attr('cy')-10)).attr({"stroke-width": 3, "stroke": "#259",});
                 curve1.toBack();
                 curves.push(curve1)
-            }        
+            }   
+            canvas.canvas.className.baseVal += 'canvas';     
     }
  
     render () {
