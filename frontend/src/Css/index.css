@@ -33,7 +33,6 @@ code {
 .sidebar ul li button {
     width: 200px;
     padding: 16px;
-    display: block;
     border: none;
     color: #F9F5FF;
     font-size:large;
@@ -53,6 +52,7 @@ code {
     text-decoration: none;
     color: #000;
 }
+
 .sidebar ul li button:hover:not(.active, .image) {
   background-color: #555;
   text-decoration: none;
