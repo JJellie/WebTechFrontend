@@ -31,11 +31,22 @@ class ThreadArcs extends React.Component {
                     circles[j].hover(() => {
                         circles[j].attr({"fill" :' #f00'});
                         circles[j].animate({"r": 20}, 100);
-                        //curves[j].animate({'stroke-width': 6}, 100);
+                        for(let i = 0; i < curves.length; i++) {
+                            if (curves[i].data("from") === numbers[j]) {
+                            curves[i].animate({'stroke-width': 6}, 100);
+                            circles[numbers.indexOf(curves[i].data("to"))].animate({"r":15}, 100)
+                            }
+                        }
+                        
                     }, () => {
                         circles[j].attr('fill', "#fff");
                         circles[j].animate({"r": 10}, 100);
-                        //curves[j].animate({'stroke-width': 3}, 100);
+                        for(let i = 0; i < curves.length; i++) {
+                            if (curves[i].data("from") === numbers[j]) {
+                            curves[i].animate({'stroke-width': 3}, 100);
+                            circles[numbers.indexOf(curves[i].data("to"))].animate({"r":10}, 100)
+                            }
+                        }
                     });
             }
             for(let i = 0; i < testSet.length; i++) {
@@ -50,10 +61,11 @@ class ThreadArcs extends React.Component {
                 let circ1 = circles[numbers.indexOf(lowest)];
                 let circ2 = circles[numbers.indexOf(highest)]
                 let distance =  (circ2.attr('cx') - circ1.attr('cx')) 
-                var curve1 = canvas.path("M "+ circ1.attr('cx') +"," + (circ1.attr('cy')-10) + " A"+ distance/2 +"," + distance/2 + " 0 0,1 " + circ2.attr('cx') 
+                var curve = canvas.path("M "+ circ1.attr('cx') +"," + (circ1.attr('cy')-10) + " A"+ distance/2 +"," + distance/2 + " 0 0,1 " + circ2.attr('cx') 
                 +"," + (circ2.attr('cy')-10)).attr({"stroke-width": 3, "stroke": "#259",});
-                curve1.toBack();
-                curves.push(curve1)
+                curve.data({"from": lowest, "to": highest})
+                curve.toBack();
+                curves.push(curve)
             }   
             canvas.canvas.className.baseVal += 'canvas';     
     }
