@@ -27,6 +27,8 @@ div.text{
 .header h1 {
     padding-left:8%;
     color: #2773d9;
+    word-wrap: break-word;
+    white-space: normal;
 }
 .generalInfo{
     margin-top: 2%;
@@ -50,6 +52,7 @@ div.text{
     overflow: hidden;
     border-style: solid;
     border-radius: 16px;
+    
 }
 .AM p {
     padding: 10px;
@@ -64,9 +67,13 @@ div.text{
     margin-left: 30%;
     font-family: 'Courier New', Courier, monospace;
     color: #2773d9;
+    word-wrap: break-word;
+    white-space: normal;
 }
 .AM h1 {
     margin-left: 20%;
     font-family: 'Courier New', Courier, monospace;
     color: #2773d9;
+    word-wrap: break-word;
+    white-space: normal;
 }
