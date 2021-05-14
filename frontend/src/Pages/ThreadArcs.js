@@ -63,7 +63,6 @@ class ThreadArcs extends React.Component {
        
         return (
             <div> 
-                <h1> Threadarcs </h1>
                 <div id = "test"></div>  
             </div>
             );
