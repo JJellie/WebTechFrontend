@@ -22,8 +22,10 @@ body {
     }
 
   .second img {
-      float: center;
+      float: left;
       align-self: center;
       height: 40vh;
       width: 86vw;
+      margin-left: 0.8%;
+      margin-top: -35%;
   }
