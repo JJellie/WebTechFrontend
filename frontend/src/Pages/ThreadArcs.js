@@ -22,32 +22,34 @@ class ThreadArcs extends React.Component {
             let canvas = Raphael(document.getElementById('test'), (numbers.length+1)*100, (numbers.length-2)*100);
             numbers.sort(function(a, b){return a - b});
             for(let j = 0; j < numbers.length; j++) {
-                    circles.push(canvas.circle(j*100+50, (numbers.length-2)*100 -25, 10))
-                    circles[j].attr("fill", "#fff");
-                    circles[j].attr("stroke-width", "3");
-                    circles[j].click(() => {
-                        alert(numbers[j])
-                    })
-                    circles[j].hover(() => {
-                        circles[j].attr({"fill" :' #f00'});
-                        circles[j].animate({"r": 20}, 100);
-                        for(let i = 0; i < curves.length; i++) {
-                            if (curves[i].data("from") === numbers[j]) {
-                            curves[i].animate({'stroke-width': 6}, 100);
-                            circles[numbers.indexOf(curves[i].data("to"))].animate({"r":15}, 100)
-                            }
+                let circle = canvas.circle(j*100+50, (numbers.length-2)*100 -25, 10)
+                circle.data({"id": numbers[j]})
+                circles.push(circle)
+                circles[j].attr("fill", "#fff");
+                circles[j].attr("stroke-width", "3");
+                circles[j].click(() => {
+                    alert(circles[j].data("id"))
+                })
+                circles[j].hover(() => {
+                    circles[j].attr({"fill" :' #f00'});
+                    circles[j].animate({"r": 20}, 100);
+                    for(let i = 0; i < curves.length; i++) {
+                        if (curves[i].data("from") === numbers[j]) {
+                        curves[i].animate({'stroke-width': 6}, 100);
+                        circles[numbers.indexOf(curves[i].data("to"))].animate({"r":15}, 100)
                         }
-                        
-                    }, () => {
-                        circles[j].attr('fill', "#fff");
-                        circles[j].animate({"r": 10}, 100);
-                        for(let i = 0; i < curves.length; i++) {
-                            if (curves[i].data("from") === numbers[j]) {
-                            curves[i].animate({'stroke-width': 3}, 100);
-                            circles[numbers.indexOf(curves[i].data("to"))].animate({"r":10}, 100)
-                            }
+                    }
+                    
+                }, () => {
+                    circles[j].attr('fill', "#fff");
+                    circles[j].animate({"r": 10}, 100);
+                    for(let i = 0; i < curves.length; i++) {
+                        if (curves[i].data("from") === numbers[j]) {
+                        curves[i].animate({'stroke-width': 3}, 100);
+                        circles[numbers.indexOf(curves[i].data("to"))].animate({"r":10}, 100)
                         }
-                    });
+                    }
+                });
             }
             for(let i = 0; i < testSet.length; i++) {
                 let lowest = testSet[i][0];
