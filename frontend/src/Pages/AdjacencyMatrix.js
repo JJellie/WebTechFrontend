@@ -1,6 +1,7 @@
 import React from 'react';
 import "../Css/visual.css"
 import Raphael from 'raphael';
+import "../Css/vis2.css";
 
 function componentToHex(c) {
     var hex = c.toString(16);
@@ -42,12 +43,14 @@ class AdjacencyMatrix extends React.Component {
     componentDidMount() {
         const MAXWIDTH = 600;
         const MAXHEIGHT = 600;
+        const MATRIXHEADERWIDTH = 50;
 
         // Test Set
         let nodeOrdering = [7,2,6,1,0,4,5,8,9,3];
         let edges = {
             "1-0" : 1,
-            "9-0" : 1
+            "9-0" : 1,
+            "4-3" : 1
         };
 
         let edgeHash = {};
@@ -77,55 +80,64 @@ class AdjacencyMatrix extends React.Component {
             {"email" : "lavorato@enron.com",        "jobtitle" : 'Employee',        "firstname" : 'Lavorato',   "lastname" : ''},
             {"email" : "jeff.dasovich@enron.com",   "jobtitle" : 'Employee',        "firstname" : 'Jeff',       "lastname" : 'Dasovich'},
         ];
-        // last row of nodeHash is for the default message of the information textbox
         
         let squares = [];
 
-        let canvas = Raphael(document.getElementById('test0'), MAXWIDTH, MAXHEIGHT);
-        let cellWidth = MAXWIDTH / (nodeOrdering.length + 1);
-        let cellHeight = MAXHEIGHT / (nodeOrdering.length + 1);
+        let canvas = Raphael(document.getElementById('block0'), MAXWIDTH+MATRIXHEADERWIDTH, MAXHEIGHT+MATRIXHEADERWIDTH);
+        let cellWidth = MAXWIDTH / (nodeOrdering.length);
+        let cellHeight = MAXHEIGHT / (nodeOrdering.length);
 
-        function rowColumnHover(i, j, width, color) {
-            for(let k = 0; k < nodeOrdering.length; k++) {
-                squares[k * nodeOrdering.length+j].attr({ "stroke-width": width, "stroke": color });
-                squares[i * nodeOrdering.length+k].attr({ "stroke-width": width, "stroke": color });
-            }
-        }
-
+        
         // 2 for loops looping through all cells in the adjacency matrix
         for(let i = 0; i < nodeOrdering.length; i++) {
             for(let j = 0; j < nodeOrdering.length; j++) {
                 let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
-                console.log(id);
-                squares.push(canvas.rect(cellWidth + (j * cellWidth), cellHeight + (i * cellHeight), cellWidth, cellHeight));
+                squares.push(canvas.rect(MATRIXHEADERWIDTH+(j * cellWidth), MATRIXHEADERWIDTH+(i * cellHeight), cellWidth, cellHeight));
                 squares[i * nodeOrdering.length+j].attr("fill", colorCoding(edgeHash[id]));
-                
             }
         }
+          
+        let rowHighlight = canvas.rect(0,0, MAXWIDTH, cellHeight);
+        let columnHighlight = canvas.rect(0,0, cellWidth, MAXHEIGHT);
+        rowHighlight.attr({"stroke-width" : 3})
+        columnHighlight.attr({"stroke-width" : 3})
+        rowHighlight.hide();
+        columnHighlight.hide();
+        let matrix = canvas.rect(0,0, MAXWIDTH, MAXHEIGHT);
+        matrix.hide();
+        matrix.hover(
+            () => {
+                rowHighlight.show();
+                columnHighlight.show();
+                matrix.hide();
+                matrix.show();
+            },
+            () => {
+                rowHighlight.hide();
+                columnHighlight.hide();   
+            }
+        );
 
         // 2 for loops looping through all cells in the adjacency matrix
         for(let i = 0; i < nodeOrdering.length; i++) {
             for(let j = 0; j < nodeOrdering.length; j++) {
                 let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
+                
+                
                 squares[i * nodeOrdering.length+j].hover(
                     () => {
-                        for(let k = 0; k < nodeOrdering.length; k++) {
-                            squares[k * nodeOrdering.length+j].attr({ "stroke-width": 3, "stroke": "black" });
-                            squares[i * nodeOrdering.length+k].attr({ "stroke-width": 3, "stroke": "black" }); 
-                        }
+                        rowHighlight.attr({"x" : 0, "y" : (i * cellHeight)})
+                        columnHighlight.attr({"x" : (j * cellWidth), "y" : 0})
                         this.setState({ hoveredCell : [nodeHash[nodeOrdering[i]]['email'], nodeHash[nodeOrdering[j]]['email']]})
                     },
                     () => {
-                        for(let k = 0; k < nodeOrdering.length; k++) {
-                            squares[k * nodeOrdering.length+j].attr({ "stroke-width": 1, "stroke": "black" });
-                            squares[i * nodeOrdering.length+k].attr({ "stroke-width": 1, "stroke": "black" });
-                        }
                         this.setState({ hoveredCell : ['None', 'None']})
                     }
                 );
             }
         }
 
+        console.log(squares)
         // TODO
         // Adding Matrix header
 
@@ -135,9 +147,28 @@ class AdjacencyMatrix extends React.Component {
 
         return (
             <div>
-                <h1>Adjacency Matrix</h1> 
-                <div id="test0"></div>
-                <div>{this.state.hoveredCell[0]} to {this.state.hoveredCell[1]}</div>
+                <div class = "block_container">
+                    <h1>Adjacency Matrix</h1> 
+
+                    <div id="block0"></div>
+
+                    <div id = "block1">
+                        <div id = "b1col0">
+                        <p class = "infobox">  From: {this.state.hoveredCell[0]}  </p>
+                        <p class = "infobox">  To: {this.state.hoveredCell[1]}    </p>
+                        <p class = "infobox">  Amount of emails:                  </p>
+                        <p class = "infobox">  Average sentiment:                 </p>
+                        </div>
+                        <div id = "b1col1">
+                            <div class = "dropdown">
+
+                            </div>
+
+                        </div>
+
+                
+                        </div>
+                </div>
             </div>
         );
     }
