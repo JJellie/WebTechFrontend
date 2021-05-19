@@ -7,6 +7,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -14,26 +15,30 @@ code {
 .page  {
     padding-top: 0px;
     margin-top: 0px;
-    margin-left: 220px;
+    margin-left: 200px;
     overflow: hidden;
 }
 
 .sidebar {
     margin: 0;
-    border-right: 6px solid #999;
+    border-right: 6px solid #20A4F3;
     width: 200px;
     overflow: auto;
     height: 100vh;
     float: left;
-    color: black;
-    background-color: #efefef;
+    color: #F9F5FF;
+    background-color: #6D696A;
+    position: fixed;
 }
 
 .sidebar ul li button {
     width: 200px;
     padding: 16px;
-    display: block;
     border: none;
+    color: #F9F5FF;
+    font-size:large;
+    text-align: left;
+    background-color: #6D696A;
     text-decoration: none;
 }
 .sidebar ul li button:visited {
@@ -41,17 +46,24 @@ code {
     text-decoration: none;
 }
 .sidebar ul li button.active {
-    background-color: aquamarine;
+    background-color: #20A4F3;
+    font-weight: bold;
+    font-size:large;
+    text-align: left;
     text-decoration: none;
-    color: #000
+    color: #000;
 }
+
 .sidebar ul li button:hover:not(.active, .image) {
   background-color: #555;
   text-decoration: none;
-  color: white;
+  text-align: left;
+  padding-left: 20%;
+  font-size:large;
+  color: #F9F5FF;
 }
 .sidebar ul li button:hover.image {
-    background-color: #efefef;
+    background-color: #6D696A;
 }
 .sidebar ul {
     list-style-type: none;

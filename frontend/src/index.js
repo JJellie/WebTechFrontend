@@ -11,6 +11,7 @@ import {
   Link,
 } from "react-router-dom";
 import Contact from './Pages/contact';
+import Logo from './Images/logo 1.png'
 
 class NavBar extends React.Component {
     previousMenu = "";
@@ -45,16 +46,16 @@ class NavBar extends React.Component {
     render() {
         return (    
         <Router>
-            <div class = "sidebar">
+            <div className = "sidebar">
             <ul>
-                <li><button  className="image"><img src="https://static.food4rhino.com/s3fs-public/users-files/dale-fugier/app/colorpicker.png" alt="company logo" width="168" height="168"></img></button></li>
+                <li><button  className="image"><img src={Logo} alt="company logo" width="168" height="168"></img></button></li>
                 <li><Link to="/"><button onClick={() => this.updateState('home')}  className={this.state.home}><span>Home</span></button></Link></li>
                 <li><Link to="/vis"><button onClick={() => this.updateState('vis')}  className={this.state.vis}>Visualisation</button></Link></li>
                 <li><Link to="/about"><button onClick={() => this.updateState('about')}  className={this.state.about}>About</button></Link></li>
                 <li><Link to="/contact"><button onClick={() => this.updateState('contact')}  className={this.state.contact}>Contact</button></Link></li>
             </ul>
             </div>
-            <div class = "page">
+            <div className = "page">
             <Switch>
                 <Route exact path="/">
                     <HomePage />    

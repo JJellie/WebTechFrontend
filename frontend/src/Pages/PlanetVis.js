@@ -1,5 +1,5 @@
 import React from 'react';
-import "../Css/Homepage.css"
+import "../Css/visual.css"
 
 
 class PlanetVis extends React.Component {

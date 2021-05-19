@@ -1,0 +1,12 @@
+
+
+        Black:          #050401
+        Grey:           #6D696A
+        White:          #F9F5FF
+        Salmon/orange:  #FF9770
+        Lilac:          #AB87FF
+        Blue:           #20A4F3
+        Green:          #57A773
+        Yellow:         #FFBA49
+
+        
