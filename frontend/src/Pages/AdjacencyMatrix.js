@@ -4,32 +4,26 @@ import Raphael from 'raphael';
 import "../Css/vis2.css";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-        function componentToHex(c) {
-        var hex = c.toString(16);
-        return hex.length == 1 ? "0" + hex : hex;
-        }
 
-        function rgbToHex(r, g, b) {
-        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-        }
+let colorCoding = {'neutral' : [0,2,63], 'positiveMax' : [202,90,54], 'positiveMin' : [202,20,54], 'negativeMax' : [0,0,0], 'negativeMin' : [0,0,0]};
 
-// to be called from main function: colorCoding based on sentiment/emails amount
-        function colorCoding(i) {
-    /* if button = sentiment (i ranges from -1 to 1)
-     colorCodingSentiment(i)
-     else (i ranges from .. to ..)
-     colorCodingEmails(i)
-     */
-        return colorCodingEmails(i);
-        }
-
-        function colorCodingSentiment(i){ //returns hex code
-
-        }
-
-        function colorCodingEmails(i){ //returns hex code
-        return rgbToHex(255 - Math.floor(i * 223),255-Math.floor(i * 91),255-Math.floor(i * 12))
-        }
+function colorCoding1(i) {
+    if(i > 0) {
+        return Raphael.hsl(
+            ((colorCoding['positiveMax'][0]-colorCoding['positiveMin'][0])*i+colorCoding['positiveMin'][0]),
+            ((colorCoding['positiveMax'][1]-colorCoding['positiveMin'][1])*i+colorCoding['positiveMin'][1]),
+            ((colorCoding['positiveMax'][2]-colorCoding['positiveMin'][2])*i+colorCoding['positiveMin'][2])
+        );
+    } else if(i < 0) {
+        return Raphael.hsl(
+            ((colorCoding['negativeMax'][0]-colorCoding['negativeMin'][0])*-i+colorCoding['negativeMin'][0]),
+            ((colorCoding['negativeMax'][1]-colorCoding['negativeMin'][1])*-i+colorCoding['negativeMin'][1]),
+            ((colorCoding['negativeMax'][2]-colorCoding['negativeMin'][2])*-i+colorCoding['negativeMin'][2])
+        );
+    } else {
+        return Raphael.hsl(colorCoding['neutral'][0],colorCoding['neutral'][1],colorCoding['neutral'][2]);
+    }
+}
 
 
 class AdjacencyMatrix extends React.Component {
@@ -94,7 +88,7 @@ class AdjacencyMatrix extends React.Component {
         for(let j = 0; j < nodeOrdering.length; j++) {
             let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
             squares.push(canvas.rect(MATRIXHEADERWIDTH+(j * cellWidth), MATRIXHEADERWIDTH+(i * cellHeight), cellWidth, cellHeight));
-            squares[i * nodeOrdering.length+j].attr("fill", colorCoding(edgeHash[id]));
+            squares[i * nodeOrdering.length+j].attr({"fill" : colorCoding1(edgeHash[id]), "stroke" : "white"});
         }
     }
 
