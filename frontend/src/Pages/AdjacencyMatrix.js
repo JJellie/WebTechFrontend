@@ -77,20 +77,33 @@ class AdjacencyMatrix extends React.Component {
         ];
 
         let squares = [];
+        let textOrdering = [];
+        let textsV = [];
+        let textsH = [];
 
-        let canvas = Raphael(document.getElementById('block0'), MAXWIDTH+MATRIXHEADERWIDTH, MAXHEIGHT+MATRIXHEADERWIDTH);
+        let canvas = Raphael(document.getElementById('block0'), MAXWIDTH+MATRIXHEADERWIDTH + 400, MAXHEIGHT+MATRIXHEADERWIDTH + 400);
         let cellWidth = MAXWIDTH / (nodeOrdering.length);
         let cellHeight = MAXHEIGHT / (nodeOrdering.length);
 
 
        // 2 for loops looping through all cells in the adjacency matrix
        for(let i = 0; i < nodeOrdering.length; i++) {
-        for(let j = 0; j < nodeOrdering.length; j++) {
-            let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
-            squares.push(canvas.rect(MATRIXHEADERWIDTH+(j * cellWidth), MATRIXHEADERWIDTH+(i * cellHeight), cellWidth, cellHeight));
-            squares[i * nodeOrdering.length+j].attr({"fill" : colorCoding1(edgeHash[id]), "stroke" : "white"});
+            for(let j = 0; j < nodeOrdering.length; j++) {
+                let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
+                squares.push(canvas.rect(MATRIXHEADERWIDTH+(j * cellWidth), MATRIXHEADERWIDTH+(i * cellHeight), cellWidth, cellHeight));
+                squares[i * nodeOrdering.length+j].attr({"fill" : colorCoding1(edgeHash[id]), "stroke" : "white"});
+            }
+
+            textOrdering.push(nodeHash[nodeOrdering[i]]["email"]);
+            textsV.push(canvas.text(MAXWIDTH + MATRIXHEADERWIDTH*4, MATRIXHEADERWIDTH + ((i + .5) * cellHeight), nodeHash[nodeOrdering[i]]["email"]));
+            textsV[textsV.length-1].attr({ "font-size": 18 });
+
+            textsH.push(canvas.text((i + 1.5) * cellWidth, MAXHEIGHT + MATRIXHEADERWIDTH * 4, nodeHash[nodeOrdering[i]]["email"]));
+            textsH[textsH.length-1].attr({
+                "font-size": 18,
+                transform: "r90"
+            });
         }
-    }
 
         let rowHighlight = canvas.rect(0,0, MAXWIDTH, cellHeight);
         let columnHighlight = canvas.rect(0,0, cellWidth, MAXHEIGHT);
