@@ -38,10 +38,25 @@ class AdjacencyMatrix extends React.Component {
     componentDidMount() {
         const MAXWIDTH = 600;
         const MAXHEIGHT = 600;
-        const MATRIXHEADERWIDTH = 50;
+        const MATRIXHEADERWIDTH = 90;
 
         // Test Set
-        let nodeOrdering = [7,2,6,1,0,4,5,8,9,3];
+        let nodeOrdering = [7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3,
+            7,2,6,1,0,4,5,8,9,3
+        ];
         let edges = {
                 "1-0" : 1,
                 "9-0" : 1,
@@ -81,9 +96,31 @@ class AdjacencyMatrix extends React.Component {
         let textsV = [];
         let textsH = [];
 
-        let canvas = Raphael(document.getElementById('block0'), MAXWIDTH+MATRIXHEADERWIDTH + 400, MAXHEIGHT+MATRIXHEADERWIDTH + 400);
+        let canvas = Raphael(document.getElementById('block0'), MAXWIDTH+MATRIXHEADERWIDTH, MAXHEIGHT+MATRIXHEADERWIDTH);
         let cellWidth = MAXWIDTH / (nodeOrdering.length);
         let cellHeight = MAXHEIGHT / (nodeOrdering.length);
+
+        
+
+        // adding the headers:
+
+        for (let i = 0; i < nodeOrdering.length; i++){
+
+            // i picked the value 40 because 0 didn't work, it can be changed
+
+            //horizontally
+            textsH.push(canvas.text((i + .5) * cellWidth + MATRIXHEADERWIDTH, 40, nodeHash[nodeOrdering[i]]["email"]));
+            textsH[textsH.length-1].attr({
+                "font-size": cellWidth/2,
+                transform: "r90"
+            });
+
+            //vertically
+            textOrdering.push(nodeHash[nodeOrdering[i]]["email"]);
+            textsV.push(canvas.text(40, MATRIXHEADERWIDTH + ((i + .5) * cellHeight), nodeHash[nodeOrdering[i]]["email"]));
+            textsV[textsV.length-1].attr({ "font-size": cellHeight/2 });
+
+        }
 
 
        // 2 for loops looping through all cells in the adjacency matrix
@@ -94,15 +131,6 @@ class AdjacencyMatrix extends React.Component {
                 squares[i * nodeOrdering.length+j].attr({"fill" : colorCoding1(edgeHash[id]), "stroke" : "white"});
             }
 
-            textOrdering.push(nodeHash[nodeOrdering[i]]["email"]);
-            textsV.push(canvas.text(MAXWIDTH + MATRIXHEADERWIDTH*4, MATRIXHEADERWIDTH + ((i + .5) * cellHeight), nodeHash[nodeOrdering[i]]["email"]));
-            textsV[textsV.length-1].attr({ "font-size": 18 });
-
-            textsH.push(canvas.text((i + 1.5) * cellWidth, MAXHEIGHT + MATRIXHEADERWIDTH * 4, nodeHash[nodeOrdering[i]]["email"]));
-            textsH[textsH.length-1].attr({
-                "font-size": 18,
-                transform: "r90"
-            });
         }
 
         let rowHighlight = canvas.rect(0,0, MAXWIDTH, cellHeight);
@@ -146,8 +174,7 @@ class AdjacencyMatrix extends React.Component {
         }
 
         console.log(squares)
-        // TODO
-        // Adding Matrix header
+
 
     }
 
