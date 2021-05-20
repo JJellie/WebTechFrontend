@@ -43,6 +43,11 @@ class NavBar extends React.Component {
 
     };
     
+    updateToVis = () => {
+        this.updateState('vis')
+    }
+
+
     render() {
         return (    
         <Router>
@@ -58,7 +63,7 @@ class NavBar extends React.Component {
             <div class = "page">
             <Switch>
                 <Route exact path="/">
-                    <HomePage />    
+                    <HomePage update={this.updateToVis}/>    
                 </Route>
                 <Route exact path="/about">
                     <About />

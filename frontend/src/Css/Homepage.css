@@ -6,26 +6,56 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #efefef;
-  }
+}
 
-  .first h1 {color:#050401;
-    text-align:left;
-    }
+.first h1 {color:#050401;
+    font-size: 100px;
+    margin-bottom: 0px;
+}
 
-    div.first {
-        margin-left:20px;
-    }
-  
-    div.second{
-        position:absolute;
-        bottom:100px;
-    }
+.first h2 {color:#050401;
+    font-size: 40px;
+    margin-top: 0px;
+}
 
-  .second img {
-      float: left;
-      align-self: center;
-      height: 40vh;
-      width: 86vw;
-      margin-left: 0.8%;
-      margin-top: -35%;
-  }
+.first p {color:#050401;
+    width: 30vw;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 20px;
+}
+
+.first button {
+    margin-top: 2vh;
+    font-family: monospace;
+    background: #20A4F3;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 1.5em;
+    padding: 1.5rem;
+    border: 0;
+    transition: 0.5s;
+    border-radius: 10px;
+    width: auto;
+    position: relative;
+}
+
+.first button:hover {
+    background: #20A4F3;
+    transition: 0.5s;
+    border-radius: 10px;
+    padding: 1.5rem 3.5rem 1.5rem 3.5rem;
+}
+.first {
+    height: 40vh;
+    text-align:center;
+}
+
+.second img {
+    height: 35vh;
+    width: 100vw;
+}
+
+
+
+
