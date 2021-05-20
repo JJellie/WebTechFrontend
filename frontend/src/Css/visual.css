@@ -12,4 +12,23 @@ div h1{
   margin-left: 20px;
 }
 .canvas {
+    padding-left: 20px;
 }
+.data {
+    margin-left: 500px;
+}
+.loading{
+    width: 10%;
+    height: 10%;
+    margin: 10%;
+    animation: rotation 2s infinite linear;
+
+}
+@keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
+  }
