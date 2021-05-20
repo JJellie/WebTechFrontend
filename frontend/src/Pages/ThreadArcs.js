@@ -120,7 +120,7 @@ class ThreadArcs extends React.Component {
                     for(let i = 0; i < curves.length; i++) {
                         if (curves[i].data("from") === numbers[j]) {
                         curves[i].animate({'stroke-width': curveWidth}, 100);
-                        curves[i].attr({"stroke": '#259'})
+                        curves[i].attr({"stroke": '#20A4F3'})
                         curves[i].toBack()
                         circles[numbers.indexOf(curves[i].data("to"))].animate({"r":circleRadius}, 100)
                         }
@@ -141,7 +141,7 @@ class ThreadArcs extends React.Component {
                 let circ2 = circles[numbers.indexOf(String(highest))]
                 let distance =  (circ2.attr('cx') - circ1.attr('cx')) 
                 var curve = canvas.path("M "+ circ1.attr('cx') +"," + (circ1.attr('cy')-10) + " A"+ Math.abs(distance/2) +"," + (Math.abs(distance/2) > 290 ? 600*(1-(Math.abs(distance/2) / (circles.length*100) )) : Math.abs(distance/2)) + " 0 0,1 " + circ2.attr('cx') 
-                +"," + (circ2.attr('cy')-10)).attr({"stroke-width": curveWidth, "stroke": "#259",});
+                +"," + (circ2.attr('cy')-10)).attr({"stroke-width": curveWidth, "stroke": "#20A4F3",});
                 curve.data({"from": String(lowest), "to": String(highest)})
                 curve.toBack();
                 curves.push(curve)
@@ -159,7 +159,7 @@ class ThreadArcs extends React.Component {
                     }
                     
                 }, () => {
-                    curves[i].attr({'stroke':"#259", "stroke-width":curveWidth})
+                    curves[i].attr({'stroke':"#20A4F3", "stroke-width":curveWidth})
                     circles[numbers.indexOf(curves[i].data("from"))].attr('fill', "#fff");
                     circles[numbers.indexOf(curves[i].data("from"))].animate({"r": circleRadius}, 100);
                     for(let q = 0; q < curves.length; q++) {
