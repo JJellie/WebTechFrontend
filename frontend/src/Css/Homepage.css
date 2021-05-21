@@ -38,6 +38,7 @@ body {
     border-radius: 10px;
     width: auto;
     position: relative;
+    margin-bottom: 2vh;
 }
 
 .first button:hover {
@@ -50,7 +51,9 @@ body {
     height: 40vh;
     text-align:center;
 }
-
+.second{
+    margin-top: 10%;
+}
 .second img {
     height: 35vh;
     width: 100vw;

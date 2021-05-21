@@ -185,7 +185,6 @@ class AdjacencyMatrix extends React.Component {
         return (
                 <div>
                 <div class = "block_container">
-                    <h1>Adjacency Matrix</h1>
 
                      <TransformWrapper
 

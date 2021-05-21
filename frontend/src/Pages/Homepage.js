@@ -9,14 +9,14 @@ class HomePage extends React.Component {
     render () {
         return (
             <div>
-                <div class="first"> 
+                <div className="first"> 
                     <h1>NAME</h1>
                     <h2>By the Amazing DBL team</h2>
                     <p> Basic visualization tool for visualizing nice Adjacency Matrices and Thread Arcs Start making your visualizations now for free </p>
                     <Link to="/vis"><button onClick={this.props.update}>Start visualizing</button></Link>
                 </div>
 
-                <div class="second">
+                <div className="second">
                     <img src={Banner} alt = "Banner picure" ></img>
                 </div>
             </div>

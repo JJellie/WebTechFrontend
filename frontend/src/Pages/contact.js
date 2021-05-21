@@ -9,7 +9,7 @@ class Contact extends React.Component {
             <div> 
                 
             <div class="text">
-                <h1>Wajo gekke weerwolf</h1>
+                <h1>Work in progress</h1>
             </div>
 
             </div>

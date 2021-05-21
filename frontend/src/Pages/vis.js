@@ -8,8 +8,9 @@ class Vis extends React.Component {
     render() {
         return (
             <div>
-                <h1> Threadarcs </h1>
+                <h1 className='Visheader'> Threadarcs </h1>
                 <ThreadArcs />
+                <h1 className='Visheader'> AdjacencyMatrix </h1>
                 <AdjacencyMatrix />
             </div>
         );
