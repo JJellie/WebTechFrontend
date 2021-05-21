@@ -43,23 +43,44 @@ class ThreadArcs extends React.Component {
         return "Error";
     }
   
-    async getDataset() {
+    async getDataset(filename) {
         async function fetchData() {
-            const response = await fetch('http://localhost:3001/test/download/csv.json', {method: 'GET'});
+            const response = await fetch('http://localhost:3001/test/download/csv.json?file=' + filename, {method: 'GET'});
             const obj = await response.json();
             return obj;
         }
         this.setData(await fetchData());
         return;
     }
-    async componentDidMount() {
+    
+    async getParsedData(filename) {
         document.getElementById('loading').style.display = 'block';
-        try {await this.getDataset();
+
+        try {await this.getDataset(filename);
         this.isDataReady = true;} catch {}
+
         //raphaelRender();
         document.getElementById('loading').style.display = 'none';
         this.raphaelRender();
+        this.setState({rendered: true});
     }
+
+
+    SendFile = async () => {
+        let file = document.getElementById('UploadedFile').files[0];
+        console.log(file)
+        
+        let data = new FormData();
+        data.append("file", file);
+        let filename = file.name;
+        const response = await fetch("http://localhost:3001/upload", { method: "POST", body: data });
+
+        if (response.status === 200) {
+            console.log("filename", filename);
+            this.getParsedData(filename);
+        }
+    }
+
     raphaelRender() {
         let circles = [];
         let numbers = [];
@@ -174,10 +195,8 @@ class ThreadArcs extends React.Component {
         }   
         canvas.canvas.className.baseVal += 'canvas';     
     } 
-    SendFile() {
-        let file = document.getElementById('UploadedFile').files[0];
-        console.log(file)
-    }
+
+    
    
     render () {
         return (
