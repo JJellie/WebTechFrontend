@@ -18,11 +18,25 @@ div h1{
     margin-left: 500px;
 }
 .loading{
+    display: none;
     width: 10%;
     height: 10%;
     margin: 10%;
     animation: rotation 2s infinite linear;
 
+}
+.UploadButton {
+    border-style: solid;
+    display: block;
+    border-width: 3px;
+    margin-left: 5%;
+    margin-bottom: 1%;
+    background-color: #20A4F3;
+    width: 7%;
+    border-color: black;
+}
+input[type='file'] {
+    display: none;
 }
 @keyframes rotation {
     from {
