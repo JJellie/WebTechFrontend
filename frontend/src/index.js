@@ -12,9 +12,11 @@ import {
 } from "react-router-dom";
 import Contact from './Pages/contact';
 import Logo from './Images/logo 1.png'
+import Hamburger from './Images/Hamburger.png'
 
 class NavBar extends React.Component {
     previousMenu = "";
+    showMenu = true;
     constructor(props) {
         super(props);
 
@@ -48,11 +50,26 @@ class NavBar extends React.Component {
     }
 
 
+    menuChange() {
+        this.showMenu = !this.showMenu
+        if (this.showMenu) {
+            document.getElementById('sidebar').style.width = '50px';
+            document.getElementById('sidebar').style.borderStyle = 'none';
+            document.getElementById('sideBarList').style.display = 'none';
+        } else {
+            document.getElementById('sidebar').style.width = '200px';
+            document.getElementById('sidebar').style.borderRightStyle = 'solid';
+            document.getElementById('sideBarList').style.display = 'block';
+        }
+    }
+
     render() {
+   
         return (    
         <Router>
-            <div className = "sidebar">
-            <ul>
+            <div class = "sidebar" id='sidebar'>
+            <button className='Hamburger' onClick={() => this.menuChange()}><img src={Hamburger} alt='Hamburger Icon'width='40px' height="40px"></img></button>
+            <ul class= 'sidebarList' id = 'sideBarList'>
                 <li><button  className="image"><img src={Logo} alt="company logo" width="168" height="168"></img></button></li>
                 <li><Link to="/"><button onClick={() => this.updateState('home')}  className={this.state.home}><span>Home</span></button></Link></li>
                 <li><Link to="/vis"><button onClick={() => this.updateState('vis')}  className={this.state.vis}>Visualisation</button></Link></li>
