@@ -15,22 +15,34 @@ code {
 .page  {
     padding-top: 0px;
     margin-top: 0px;
-    margin-left: 200px;
+    margin-left: 5%;
     overflow: hidden;
 }
-
+.Hamburger {
+    margin-left: -3px;
+    margin-top: 5px;
+    color: transparent;
+    background-color: transparent;
+    border: none;
+}
 .sidebar {
+    z-index: 1;
     margin: 0;
-    border-right: 6px solid #20A4F3;
-    width: 200px;
-    overflow: auto;
+    border-right: 6px none #20A4F3;
+    width: 50px;
+    overflow: hidden;
     height: 100vh;
     float: left;
     color: #F9F5FF;
     background-color: #6D696A;
+    transition: width 0.5s;
+}
+.sidebarList {
+    display: none;
 }
 
-.sidebar ul li button {
+.sidebarList li button {
+    display: block;
     width: 200px;
     padding: 16px;
     border: none;
@@ -40,11 +52,11 @@ code {
     background-color: #6D696A;
     text-decoration: none;
 }
-.sidebar ul li button:visited {
+.sidebarList li button:visited {
     color: black;
     text-decoration: none;
 }
-.sidebar ul li button.active {
+.sidebarList li button.active {
     background-color: #20A4F3;
     font-weight: bold;
     font-size:large;
@@ -53,7 +65,7 @@ code {
     color: #000;
 }
 
-.sidebar ul li button:hover:not(.active, .image) {
+.sidebarList li button:hover:not(.active, .image) {
   background-color: #555;
   text-decoration: none;
   text-align: left;
@@ -61,8 +73,11 @@ code {
   font-size:large;
   color: #F9F5FF;
 }
-.sidebar ul li button:hover.image {
+.sidebarList li button:hover.image {
     background-color: #6D696A;
+}
+.sidebar ul li a {
+    text-decoration: none;
 }
 .sidebar ul {
     list-style-type: none;
