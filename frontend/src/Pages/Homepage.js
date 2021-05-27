@@ -6,6 +6,11 @@ import {
   } from "react-router-dom";
 
 class HomePage extends React.Component {
+    componentDidMount() {
+        this.props.update()
+    }
+
+
     render () {
         return (
             <div>
@@ -13,7 +18,7 @@ class HomePage extends React.Component {
                     <h1>NAME</h1>
                     <h2>By the Amazing DBL team</h2>
                     <p> Basic visualization tool for visualizing nice Adjacency Matrices and Thread Arcs Start making your visualizations now for free </p>
-                    <Link to="/vis"><button onClick={this.props.update}>Start visualizing</button></Link>
+                    <Link to="/vis"><button>Start visualizing</button></Link>
                 </div>
 
                 <div class="second">

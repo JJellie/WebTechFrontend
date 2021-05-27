@@ -4,6 +4,10 @@ import "../Css/contact.css"
 
 
 class Contact extends React.Component {
+    componentDidMount() {
+        this.props.update()
+    }
+    
     render() {    
         return (
             <div> 

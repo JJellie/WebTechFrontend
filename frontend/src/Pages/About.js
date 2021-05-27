@@ -3,6 +3,10 @@ import "../Css/About.css";
 
 
 class About extends React.Component {
+    componentDidMount() {
+        this.props.update()
+    }
+    
     render() {    
         return (
             <div> 

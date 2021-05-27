@@ -14,38 +14,32 @@ import Contact from './Pages/contact';
 import Logo from './Images/logo 1.png'
 
 class NavBar extends React.Component {
-    previousMenu = "";
     constructor(props) {
         super(props);
-
-        if (window.location.pathname === "/") {
-            this.state = { home: "active", vis: "", about: "", contact: ""};
-            this.previousMenu = "home"
-        } else if (window.location.pathname === "/vis") {
-            this.state = { home: "", vis: "active", about: "", contact: ""};
-            this.previousMenu = "vis"
-        } else if (window.location.pathname === "/about") {
-            this.state = { home: "", vis: "", about: "active", contact: ""};
-            this.previousMenu = "about"
-        } else if (window.location.pathname === "/contact") {
-            this.state = { home: "", vis: "", about: "", contact: "active"};
-            this.previousMenu = "contact"
-        }
-
-
-
+        // this.state["activepage"]:
+        // 0 - Home
+        // 1 - Visualisation
+        // 2 - About
+        // 3 - Contact
+        this.state = {
+            "activepage" : 0
+        };
     }
 
-    updateState(newMenu) {
-        this.setState({[this.previousMenu]: ""});
-        this.setState({[newMenu]: "active"});
-        this.previousMenu = newMenu;
-
-    };
+    updateHome = () => {
+        this.setState({"activepage" : 0})
+    }
+    updateVis = () => {
+        this.setState({"activepage" : 1})
+    }
+    updateAbout = () => {
+        this.setState({"activepage" : 2})
+    }
+    updateContact = () => {
+        this.setState({"activepage" : 3})
+    }
     
-    updateToVis = () => {
-        this.updateState('vis')
-    }
+    
 
 
     render() {
@@ -54,25 +48,25 @@ class NavBar extends React.Component {
             <div class = "sidebar">
             <ul>
                 <li><button  className="image"><img src={Logo} alt="company logo" width="168" height="168"></img></button></li>
-                <li><Link to="/"><button onClick={() => this.updateState('home')}  className={this.state.home}><span>Home</span></button></Link></li>
-                <li><Link to="/vis"><button onClick={() => this.updateState('vis')}  className={this.state.vis}>Visualisation</button></Link></li>
-                <li><Link to="/about"><button onClick={() => this.updateState('about')}  className={this.state.about}>About</button></Link></li>
-                <li><Link to="/contact"><button onClick={() => this.updateState('contact')}  className={this.state.contact}>Contact</button></Link></li>
+                <li><Link to="/"><button className={this.state["activepage"] == 0 ? "active" : ""}><span>Home</span></button></Link></li>
+                <li><Link to="/vis"><button className={this.state["activepage"] == 1 ? "active" : ""}>Visualisation</button></Link></li>
+                <li><Link to="/about"><button className={this.state["activepage"] == 2 ? "active" : ""}>About</button></Link></li>
+                <li><Link to="/contact"><button className={this.state["activepage"] == 3 ? "active" : ""}>Contact</button></Link></li>
             </ul>
             </div>
             <div class = "page">
             <Switch>
                 <Route exact path="/">
-                    <HomePage update={this.updateToVis}/>    
+                    <HomePage update={this.updateHome}/>    
                 </Route>
                 <Route exact path="/about">
-                    <About />
+                    <About update={this.updateAbout}/>
                 </Route>
                 <Route exact path="/Vis">
-                    <Vis />
+                    <Vis update={this.updateVis}/>
                 </Route>
                 <Route exact path="/contact">
-                    <Contact />
+                    <Contact update={this.updateContact}/>
                 </Route>
             </Switch>
             </div>
