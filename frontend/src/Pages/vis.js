@@ -5,10 +5,16 @@ import AdjacencyMatrix from './AdjacencyMatrix';
 
 
 class Vis extends React.Component {
+    componentDidMount() {
+        this.props.update()
+    }
+    
     render() {
         return (
             <div>
+                <h1 className='Visheader'> Threadarcs </h1>
                 <ThreadArcs />
+                <h1 className='Visheader'> AdjacencyMatrix </h1>
                 <AdjacencyMatrix />
             </div>
         );
