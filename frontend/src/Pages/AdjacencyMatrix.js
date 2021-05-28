@@ -38,25 +38,11 @@ class AdjacencyMatrix extends React.Component {
     componentDidMount() {
         const MAXWIDTH = 600;
         const MAXHEIGHT = 600;
-        const MATRIXHEADERWIDTH = 90;
+        const MATRIXHEADERWIDTH = 100;
 
         // Test Set
-        let nodeOrdering = [7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3,
-            7,2,6,1,0,4,5,8,9,3
-        ];
+        let nodeOrdering = [7,2,6,1,0,4,5,8,9,3,7,2,6,1,0,4,5,8,9,3,7,2,6,1,0,4,5,8,9,3];
+
         let edges = {
                 "1-0" : 1,
                 "9-0" : 1,
@@ -92,67 +78,49 @@ class AdjacencyMatrix extends React.Component {
         ];
 
         let squares = [];
-        let textOrdering = [];
         let textsV = [];
         let textsH = [];
 
-        let canvas = Raphael(document.getElementById('block0'), MAXWIDTH+MATRIXHEADERWIDTH, MAXHEIGHT+MATRIXHEADERWIDTH);
+        let matrixCanvas = Raphael(document.getElementById('block0'), MAXWIDTH, MAXHEIGHT);
+        let headerTopCanvas = Raphael(document.getElementById('headertop'), MAXWIDTH, MATRIXHEADERWIDTH);
+        let headerLeftCanvas = Raphael(document.getElementById('headerleft'), MATRIXHEADERWIDTH, MAXHEIGHT);
         let cellWidth = MAXWIDTH / (nodeOrdering.length);
         let cellHeight = MAXHEIGHT / (nodeOrdering.length);
 
         
 
         // adding the headers:
-
         for (let i = 0; i < nodeOrdering.length; i++){
 
             // i picked the value 40 because 0 didn't work, it can be changed
 
             //horizontally
-            textsH.push(canvas.text((i + .5) * cellWidth + MATRIXHEADERWIDTH, 40, nodeHash[nodeOrdering[i]]["email"]));
-            textsH[textsH.length-1].attr({
-                "font-size": cellWidth/2,
-                transform: "r90"
+            textsH.push(headerTopCanvas.text(((i + .5) * cellWidth), MATRIXHEADERWIDTH-5, nodeHash[nodeOrdering[i]]["firstname"]+" "+nodeHash[nodeOrdering[i]]["lastname"]));
+            textsH[i].attr({
+                "font-size": (9.0/16.0)*cellWidth,
+                "text-anchor" : "end",
+                "transform" : "r90,"+((i + .5) * cellWidth).toString()+","+(MATRIXHEADERWIDTH-5).toString()
             });
 
             //vertically
-            textOrdering.push(nodeHash[nodeOrdering[i]]["email"]);
-            textsV.push(canvas.text(40, MATRIXHEADERWIDTH + ((i + .5) * cellHeight), nodeHash[nodeOrdering[i]]["email"]));
-            textsV[textsV.length-1].attr({ "font-size": cellHeight/2 });
+            textsV.push(headerLeftCanvas.text(MATRIXHEADERWIDTH-5, ((i + .5) * cellHeight), nodeHash[nodeOrdering[i]]["firstname"]+" "+nodeHash[nodeOrdering[i]]["lastname"]));
+            textsV[i].attr({ 
+                "font-size": (9.0/16.0)*cellHeight,
+                "text-anchor" : "end",
+            });
 
         }
-
+        
 
        // 2 for loops looping through all cells in the adjacency matrix
        for(let i = 0; i < nodeOrdering.length; i++) {
             for(let j = 0; j < nodeOrdering.length; j++) {
                 let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
-                squares.push(canvas.rect(MATRIXHEADERWIDTH+(j * cellWidth), MATRIXHEADERWIDTH+(i * cellHeight), cellWidth, cellHeight));
+                squares.push(matrixCanvas.rect((j * cellWidth), (i * cellHeight), cellWidth, cellHeight));
                 squares[i * nodeOrdering.length+j].attr({"fill" : colorCoding1(edgeHash[id]), "stroke" : "white"});
             }
 
         }
-
-        let rowHighlight = canvas.rect(0,0, MAXWIDTH, cellHeight);
-        let columnHighlight = canvas.rect(0,0, cellWidth, MAXHEIGHT);
-        rowHighlight.attr({"stroke-width" : 3})
-        columnHighlight.attr({"stroke-width" : 3})
-        rowHighlight.hide();
-        columnHighlight.hide();
-        let matrix = canvas.rect(0,0, MAXWIDTH, MAXHEIGHT);
-        matrix.hide();
-        matrix.hover(
-                () => {
-                rowHighlight.show();
-        columnHighlight.show();
-        matrix.hide();
-        matrix.show();
-            },
-        () => {
-            rowHighlight.hide();
-            columnHighlight.hide();
-        }
-        );
 
         // 2 for loops looping through all cells in the adjacency matrix
         for(let i = 0; i < nodeOrdering.length; i++) {
@@ -161,21 +129,15 @@ class AdjacencyMatrix extends React.Component {
 
 
                 squares[i * nodeOrdering.length+j].hover(
-                        () => {
-                        rowHighlight.attr({"x" : 0, "y" : (i * cellHeight)})
-                columnHighlight.attr({"x" : (j * cellWidth), "y" : 0})
-                this.setState({ hoveredCell : [nodeHash[nodeOrdering[i]]['email'], nodeHash[nodeOrdering[j]]['email'], edgeHash[id]]})
+                    () => {
+                        this.setState({ hoveredCell : [nodeHash[nodeOrdering[i]]['email'], nodeHash[nodeOrdering[j]]['email'], edgeHash[id]]})
                     },
-                () => {
-                    this.setState({ hoveredCell : ['', '', '']})
-                }
+                    () => {
+                        this.setState({ hoveredCell : ['', '', '']})
+                    }
                 );
             }
         }
-
-        console.log(squares)
-
-
     }
 
 
@@ -183,68 +145,144 @@ class AdjacencyMatrix extends React.Component {
     render () {
 
         return (
-                <div>
-                <div class = "block_container">
+            <div>
+                <div >
+                    <h1>Adjacency Matrix</h1>
+                    <div class='vis'>
+                    <div className='matrix'>
+                            <TransformWrapper
+                                options = {{
+                                    transformEnabled : true,
+                                    limitToWrapper: true,
+                                    limitToBounds: false
+                                    }}
 
-                     <TransformWrapper
+                                pan = {{
+                                    velocityEqualToMove: true,
+                                    velocity: true,
+                                    paddingSize: 0,
+                                    animationTime: 20
+                                }}
 
-                        options = {{
-                            transformEnabled : true,
-                            limitToWrapper: true,
-                            limitToBounds: false
-                            }}
+                                zoomIn = {{
+                                    animationTime: 20
+                                }}
 
-                        pan = {{
-                            velocityEqualToMove: true,
-                            velocity: true,
-                            paddingSize: 0,
-                            animationTime: 20
-                          }}
+                                zoomOut ={{
+                                    animationTime: 20
+                                }}
+                    
+                                wheel = {{
+                                    wheelEnabled: true,
+                                    touchPadEnabled: true,
+                                    limitsOnWheel: true,
+                                    step: 8
+                                }}
+                            >
+                                {({scale, positionX, positionY}) => (
+                                    <React.Fragment>
+                                        <div className='header_top'>
+                                            <TransformWrapper
+                                                scale = {scale}
+                                                positionX = {positionX}
+                                                positionY = {100-100*scale}
+                                                options = {{
+                                                    transformEnabled : true,
+                                                    limitToWrapper: true,
+                                                    limitToBounds: false
+                                                    }}
 
-                        zoomIn = {{
-                            animationTime: 20
-                          }}
+                                                pan = {{
+                                                    velocityEqualToMove: true,
+                                                    velocity: true,
+                                                    paddingSize: 0,
+                                                    animationTime: 20
+                                                }}
 
-                        zoomOut ={{
-                            animationTime: 20
-                          }}
-             
-                        wheel = {{
-                            wheelEnabled: true,
-                            touchPadEnabled: true,
-                            limitsOnWheel: true,
-                            step: 8
-                          }}
+                                                zoomIn = {{
+                                                    animationTime: 20
+                                                }}
 
-                     >
-                        <TransformComponent>
-                        <div id = "block00">
-                        <div id = "block0"> </div>
+                                                zoomOut ={{
+                                                    animationTime: 20
+                                                }}
+                                    
+                                                wheel = {{
+                                                    wheelEnabled: false,
+                                                    touchPadEnabled: false,
+                                                    limitsOnWheel: false,
+                                                    step: 8
+                                                }}
+                                            >
+                                                <TransformComponent>
+                                                        <div id="headertop"> </div>
+                                                </TransformComponent>
+                                            </TransformWrapper>
+                                        </div>
+                                        <div className='header_left'>
+                                            <TransformWrapper
+                                                scale = {scale}
+                                                positionX = {100-100*scale}
+                                                positionY = {positionY}
+                                                options = {{
+                                                    transformEnabled : true,
+                                                    limitToWrapper: true,
+                                                    limitToBounds: false
+                                                    }}
+
+                                                pan = {{
+                                                    velocityEqualToMove: true,
+                                                    velocity: true,
+                                                    paddingSize: 0,
+                                                    animationTime: 20
+                                                }}
+
+                                                zoomIn = {{
+                                                    animationTime: 20
+                                                }}
+
+                                                zoomOut ={{
+                                                    animationTime: 20
+                                                }}
+                                    
+                                                wheel = {{
+                                                    wheelEnabled: false,
+                                                    touchPadEnabled: false,
+                                                    limitsOnWheel: false,
+                                                    step: 8
+                                                }}
+                                            >
+                                                <TransformComponent>
+                                                        <div id="headerleft"> </div>
+                                                </TransformComponent>
+                                            </TransformWrapper>
+                                        </div> 
+                                        <TransformComponent>
+                                                <div id="block0"> </div>
+                                        </TransformComponent>
+                                    </React.Fragment>
+                                )}
+                            </TransformWrapper>
                         </div>
-                        </TransformComponent>
-
-
-                    </TransformWrapper>
-                      
+                        
+                    </div>
 
                     <div id = "block1">
                         <div id = "b1col0">
-                        <div class = "infobox">  
-                        <p class = "text_infobox">
-                        From: {this.state.hoveredCell[0]} <br />
-                        To: {this.state.hoveredCell[1]}   <br />
-                        Average sentiment: {this.state.hoveredCell[2]} <br /> </p> </div>
+                            <div className = "infobox">  
+                                <p className = "text_infobox">
+                                    From: {this.state.hoveredCell[0]} <br />
+                                    To: {this.state.hoveredCell[1]}   <br />
+                                    Average sentiment: {this.state.hoveredCell[2]} <br /> 
+                                </p> 
+                            </div>
                         </div>
                         <div id = "b1col1">
-                            <div class = "dropdown">
+                            <div className = "dropdown">
 
                             </div>
-
                         </div>
-
-
                     </div>
-
                 </div>
             </div>
         );
