@@ -31,11 +31,18 @@ class AdjacencyMatrix extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-                hoveredCell : ['','', '']
+                hoveredCell : ['','', ''],
+                rendered: false
         };
-
+        
         this.isDataReady = false;
         this.data = [];
+        this.dataName = this.props.file;
+    }
+    componentDidMount() {
+        if(this.props.uploadStatus === true) {
+            this.setState({rendered: true});
+        }
     }
 
     getDataSize() {
@@ -83,13 +90,7 @@ class AdjacencyMatrix extends React.Component {
 
         try {await this.getDataset(filename);
         this.isDataReady = true;} catch {console.log()}
-    }
-
-    componentDidMount() {
-        //raphaelRender();
-        document.getElementById('loading').style.display = 'none';
         this.raphaelRender();
-        this.setState({rendered: true});
     }
 
 
@@ -187,13 +188,19 @@ class AdjacencyMatrix extends React.Component {
 
 
     render () {
-
+        if(this.props.uploadStatus === true) {
+            if(this.state.rendered === false) {
+                if(this.props.file !== "") {
+                    this.getParsedData(this.props.file);
+                    this.setState({rendered: true});
+                }
+            }
+            
+        }
         return (
                 <div>
-                <div class = "block_container">
-                    
-                    <h1>Adjacency Matrix</h1>
-                    <div class='vis'>
+                <div className = "block_container">
+                    <div className='vis'>
                     <div className='matrix'>
                             <TransformWrapper
                                 options = {{

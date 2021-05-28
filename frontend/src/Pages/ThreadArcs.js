@@ -12,7 +12,7 @@ class ThreadArcs extends React.Component {
         super(props);
         this.data = [];
         this.isDataReady = false;
-        this.state = {"data": [], "testdata": '', "loading": ""};
+        this.state = {"data": [], "testdata": '', "loading": "", "rendered": false};
     }
     getDataSize() {
         if(!this.isDataReady) {
@@ -186,6 +186,15 @@ class ThreadArcs extends React.Component {
     
    
     render () {
+        if(this.props.uploadStatus === true) {
+            if(this.state.rendered === false) {
+                if(this.props.file !== "") {
+                    this.getParsedData(this.props.file);
+                    this.setState({rendered: true});
+                }
+            }
+            
+        }
         return (
             <div>
                 

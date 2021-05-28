@@ -60,9 +60,9 @@ class NavBar extends React.Component {
    
         return (    
         <Router>
-            <div class = "sidebar" id='sidebar'>
+            <div className = "sidebar" id='sidebar'>
             <button className='Hamburger' onClick={() => this.menuChange()}><img src={Hamburger} alt='Hamburger Icon'width='40px' height="40px"></img></button>
-            <ul class= 'sidebarList' id = 'sideBarList'>
+            <ul className= 'sidebarList' id = 'sideBarList'>
                 <li><button  className="image"><img src={Logo} alt="company logo" width="168" height="168"></img></button></li>
                 <li><Link to="/"><button className={this.state["activepage"] === 0 ? "active" : ""}><span>Home</span></button></Link></li>
                 <li><Link to="/vis"><button className={this.state["activepage"] === 1 ? "active" : ""}>Visualisation</button></Link></li>

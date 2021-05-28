@@ -5,34 +5,38 @@ import AdjacencyMatrix from './AdjacencyMatrix';
 
 
 class Vis extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {"uploaded":false, "filename":""}
+    }
     componentDidMount() {
         this.props.update()
     }
+
     SendFile = async () => {
         let file = document.getElementById('UploadedFile').files[0];
-        console.log(file)
-        
+
         let data = new FormData();
         data.append("file", file);
         let filename = file.name;
         const response = await fetch("http://localhost:3001/upload", { method: "POST", body: data });
 
         if (response.status === 200) {
-            console.log("filename", filename);
-            this.getParsedData(filename);
-        }
+            this.setState({"uploaded": true})
+            this.setState({'filename': filename})
+        }   
     }
     
     render() {
         return (
             <div>
-                <label for='UploadedFile' className='UploadButton'>Upload file here</label> 
+                <label htmlFor='UploadedFile' className='UploadButton'>Upload file here</label> 
                 <input type = "file" accept = ".csv"  id="UploadedFile"></input>
-                <input type = "submit" onClick={this.SendFile} className="UploadButton"></input>
+                <input type = "submit" onClick={async () => {await this.SendFile()}} className="UploadButton"></input>
                 <h1 className='Visheader'> Threadarcs </h1>
-                <ThreadArcs />
+                <ThreadArcs file={this.state.filename} uploadStatus={this.state.uploaded}/>
                 <h1 className='Visheader'> AdjacencyMatrix </h1>
-                <AdjacencyMatrix />
+                <AdjacencyMatrix file={this.state.filename} uploadStatus={this.state.uploaded} />
             </div>
         );
     }
