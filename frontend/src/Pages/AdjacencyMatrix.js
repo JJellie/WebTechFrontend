@@ -2,6 +2,7 @@ import React from 'react';
 import "../Css/visual.css"
 import Raphael from 'raphael';
 import "../Css/vis2.css";
+import loadImg from '../Images/LoadIcon.png'
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 
@@ -32,8 +33,57 @@ class AdjacencyMatrix extends React.Component {
         this.state = {
                 hoveredCell : ['','', '']
         };
+
+        this.isDataReady = false;
+        this.data = [];
     }
 
+    getDataSize() {
+        if(!this.isDataReady) {
+            console.log("Not ready.");
+        } else {
+            return this.data.length;
+        }
+        return 1;
+    }
+
+    setData(obj) {
+        this.data = obj;
+    }
+
+    getData(ArrayIndex, dictEntry = null) {
+        if(dictEntry !== null) {
+            if(!this.isDataReady) {
+                console.log("Not ready.");
+            } else {
+                return this.data[ArrayIndex][0][dictEntry];
+            }
+        } else {
+            if(!this.isDataReady) {
+                console.log("Not ready.");
+            } else {
+                return this.data[ArrayIndex];
+            }
+        }
+        return "Error";
+    }
+
+    async getDataset(filename) {
+        async function fetchData() {
+            const response = await fetch('http://localhost:3001/test/download/am.json?file=' + filename, {method: 'GET'});
+            const obj = await response.json();
+            return obj;
+        }
+        this.setData(await fetchData());
+        return;
+    }
+
+    async getParsedData(filename) {
+        document.getElementById('loading').style.display = 'block';
+
+        try {await this.getDataset(filename);
+        this.isDataReady = true;} catch {console.log()}
+    }
 
     componentDidMount() {
         //raphaelRender();
@@ -48,19 +98,16 @@ class AdjacencyMatrix extends React.Component {
         const MAXHEIGHT = 600;
         const MATRIXHEADERWIDTH = 100;
 
-        // Test Set
-        let nodeOrdering = [7,2,6,1,0,4,5,8,9,3,7,2,6,1,0,4,5,8,9,3,7,2,6,1,0,4,5,8,9,3];
+        if(!this.data) return console.log("No data to render");
 
-        let edges = {
-                "1-0" : 1,
-                "9-0" : 1,
-                "4-3" : 1
-        };
+        // Test Set
+        let nodeOrdering = this.data.nodeOrdering;
+        let edges = this.data.edges;
 
         let edgeHash = {};
 
-        for(let i = 0; i < 10; i++) {
-            for(let j = 0; j < 10; j++) {
+        for(let i = 0; i < nodeOrdering.length; i++) {
+            for(let j = 0; j < nodeOrdering.length; j++) {
                 let id = i.toString() + '-' + j.toString();
                 if(edges[id]) {
                     edgeHash[id] = edges[id];
@@ -72,18 +119,7 @@ class AdjacencyMatrix extends React.Component {
 
         console.log(edgeHash);
 
-        let nodeHash = [
-        {"email" : "matthew.lenhart@enron.com", "jobtitle" : "Employee",        "firstname" : 'Matthew',    "lastname" : 'Lenhart'},
-        {"email" : "eric.bass@enron.com",       "jobtitle" : 'Trader',          "firstname" : 'Eric',       "lastname" : 'Bass'},
-        {"email" : "danny.mccarty@enron.com",   "jobtitle" : 'Vice President',  "firstname" : 'Danny',      "lastname" : 'Mccarty'},
-        {"email" : "susan.scott@enron.com",     "jobtitle" : 'Unknown',         "firstname" : 'Susan',      "lastname" : 'Scott'},
-        {"email" : "andy.zipper@enron.com",     "jobtitle" : 'Employee',        "firstname" : 'Andy',       "lastname" : 'Zipper'},
-        {"email" : "kimberly.watson@enron.com", "jobtitle" : 'Employee',        "firstname" : 'Kimberly',   "lastname" : 'Watson'},
-        {"email" : "drew.fossum@enron.com",     "jobtitle" : 'Manager',         "firstname" : 'Drew',       "lastname" : 'Fossum'},
-        {"email" : "errol.mclaughlin@enron.com","jobtitle" : 'CEO',             "firstname" : 'Errol',      "lastname" : 'Mclauchlin'},
-        {"email" : "lavorato@enron.com",        "jobtitle" : 'Employee',        "firstname" : 'Lavorato',   "lastname" : ''},
-        {"email" : "jeff.dasovich@enron.com",   "jobtitle" : 'Employee',        "firstname" : 'Jeff',       "lastname" : 'Dasovich'},
-        ];
+        let nodeHash = this.data.nodeHash;
 
         let squares = [];
         let textsV = [];
@@ -103,7 +139,7 @@ class AdjacencyMatrix extends React.Component {
             // i picked the value 40 because 0 didn't work, it can be changed
 
             //horizontally
-            textsH.push(headerTopCanvas.text(((i + .5) * cellWidth), MATRIXHEADERWIDTH-5, nodeHash[nodeOrdering[i]]["firstname"]+" "+nodeHash[nodeOrdering[i]]["lastname"]));
+            textsH.push(headerTopCanvas.text(((i + .5) * cellWidth), MATRIXHEADERWIDTH-5, nodeHash[nodeOrdering[i]]["firstName"]+" "+nodeHash[nodeOrdering[i]]["lastName"]));
             textsH[i].attr({
                 "font-size": (9.0/16.0)*cellWidth,
                 "text-anchor" : "end",
@@ -111,7 +147,7 @@ class AdjacencyMatrix extends React.Component {
             });
 
             //vertically
-            textsV.push(headerLeftCanvas.text(MATRIXHEADERWIDTH-5, ((i + .5) * cellHeight), nodeHash[nodeOrdering[i]]["firstname"]+" "+nodeHash[nodeOrdering[i]]["lastname"]));
+            textsV.push(headerLeftCanvas.text(MATRIXHEADERWIDTH-5, ((i + .5) * cellHeight), nodeHash[nodeOrdering[i]]["firstName"]+" "+nodeHash[nodeOrdering[i]]["lastName"]));
             textsV[i].attr({ 
                 "font-size": (9.0/16.0)*cellHeight,
                 "text-anchor" : "end",
@@ -293,6 +329,7 @@ class AdjacencyMatrix extends React.Component {
                         </div>
                     </div>
                 </div>
+                <img id= "loading" className="loading" src = {loadImg} alt='Loading'></img> 
             </div>
         );
     }
