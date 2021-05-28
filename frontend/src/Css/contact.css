@@ -11,3 +11,71 @@ body {
 div.text{
   margin-left: 20px;
 }
+
+.contactHeader {
+  display: block;
+  stroke: black;
+  stroke-width: 10px;
+  border-style: solid;
+  border-radius: 16px;
+  width: 50%;
+  margin-left: 25%;
+  border-color: #20A4F3;
+  font-family: 'Courier New', Courier, monospace;
+  margin-top: 1%;
+  font-size: larger;
+}
+.contactHeader h1 {
+  padding-left: 37%;
+  color: #2773d9;
+  word-wrap: break-word;
+  white-space: normal;
+}
+.contactInfo{
+  margin-top: 2%;
+  width: 86%;
+  margin-left: 26%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: large;
+  margin-bottom: 50px;
+}
+.ourTeam {
+  float: left;
+  width: 40%;
+  margin-left: 5%;
+  border-style: solid;
+  border-radius: 16px;
+  margin-right: 5%;
+  margin-bottom: 50px;
+}
+.sendMail {
+  width: 40%;
+  overflow: hidden;
+  border-style: solid;
+  border-radius: 16px;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+.sendMail p {
+  padding: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+}
+.ourTeam p {
+  padding: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.ourTeam h1 {
+  margin-left: 34%;
+  font-family: 'Courier New', Courier, monospace;
+  color: #2773d9;
+  word-wrap: break-word;
+  white-space: normal;
+}
+.sendMail h1 {
+  margin-left: 32%;
+  font-family: 'Courier New', Courier, monospace;
+  color: #2773d9;
+  word-wrap: break-word;
+  white-space: normal;
+}

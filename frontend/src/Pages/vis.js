@@ -5,6 +5,10 @@ import AdjacencyMatrix from './AdjacencyMatrix';
 
 
 class Vis extends React.Component {
+    componentDidMount() {
+        this.props.update()
+    }
+    
     render() {
         return (
             <div>
