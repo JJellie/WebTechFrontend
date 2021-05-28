@@ -36,6 +36,14 @@ class AdjacencyMatrix extends React.Component {
 
 
     componentDidMount() {
+        //raphaelRender();
+        document.getElementById('loading').style.display = 'none';
+        this.raphaelRender();
+        this.setState({rendered: true});
+    }
+
+
+    raphaelRender() {
         const MAXWIDTH = 600;
         const MAXHEIGHT = 600;
         const MATRIXHEADERWIDTH = 100;
@@ -145,8 +153,9 @@ class AdjacencyMatrix extends React.Component {
     render () {
 
         return (
-            <div>
-                <div >
+                <div>
+                <div class = "block_container">
+                    
                     <h1>Adjacency Matrix</h1>
                     <div class='vis'>
                     <div className='matrix'>
