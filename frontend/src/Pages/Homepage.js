@@ -17,7 +17,7 @@ class HomePage extends React.Component {
                 <div class="first"> 
                     <h1>NAME</h1>
                     <h2>By the Amazing DBL team</h2>
-                    <p> Basic visualization tool for visualizing nice Adjacency Matrices and Thread Arcs Start making your visualizations now for free </p>
+                    <p> Basic visualization tool for visualizing <br></br> Nice Adjacency Matrices and Thread Arcs <br></br> Start making your visualizations now for free </p>
                     <Link to="/vis"><button>Start visualizing</button></Link>
                 </div>
 
