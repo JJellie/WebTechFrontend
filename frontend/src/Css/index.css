@@ -35,6 +35,7 @@ code {
     float: left;
     color: #F9F5FF;
     background-color: #6D696A;
+    position: fixed;
     transition: width 0.5s;
 }
 .sidebarList {

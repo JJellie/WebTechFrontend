@@ -1,0 +1,61 @@
+#b1col0
+{
+    padding-left: 20px;
+    padding-top: 20px;
+    padding-bottom: 10px;
+}
+
+
+.infobox
+{
+    width: 300px;
+    height: 90px;
+    display: inline-block;
+    border-style: solid;
+    border-color: #20A4F3;
+    background-color: white;
+}
+
+.text_infobox
+{
+    padding-left: 10px;
+}
+
+
+.matrix
+{
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    top:100px;
+    left:100px;
+}
+
+#block0 {
+    width: 600px;
+    height: 600px;
+}
+
+
+.header_top 
+{
+    position: absolute;
+    width:600px;
+    height:100px;
+    top:-100px;
+}
+
+.header_left
+{
+    position: absolute;
+    width:100px;
+    height:600px;
+    left: -100px;
+}
+
+.vis
+{
+    position: relative;
+    height: 700px;
+    width: 700px;
+}

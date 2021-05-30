@@ -8,6 +8,58 @@ body {
     background-color: #ffffff;
   }
 
-div.text{
+div h1{
   margin-left: 20px;
+}
+.canvas {
+    padding-left: 20px;
+}
+.data {
+    margin-left: 500px;
+}
+.loading{
+    display: none;
+    width: 10%;
+    height: 10%;
+    margin: 10%;
+    animation: rotation 2s infinite linear;
+
+}
+.UploadButton {
+    border-style: solid;
+    display: block;
+    border-width: 3px;
+    margin-left: 5%;
+    margin-bottom: 1%;
+    background-color: #20A4F3;
+    width: 7%;
+    border-color: black;
+}
+input[type='file'] {
+    display: none;
+}
+@keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
+  }
+  .Visheader {
+    display: block;
+    stroke: black;
+    stroke-width: 10px;
+    border-style: solid;
+    border-radius: 16px;
+    width: 25%;
+    margin-left: 25%;
+    border-color: #20A4F3;
+    font-family: 'Courier New', Courier, monospace;
+    margin-top: 1%;
+    font-size: larger;
+    padding-left: 10%;
+}
+.Visheader h1 {
+    padding-left: 25%;
 }
