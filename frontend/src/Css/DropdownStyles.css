@@ -1,0 +1,31 @@
+
+.DropdownWrapper{ /* form */
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-start;
+  }
+  
+  .StyledSelect{ /* select */
+    max-width: 50%;
+    height: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .StyledOption{ /* option */
+   /* color: ${(props) => (props.selected ? "lightgrey" : "black")};*/
+  }
+  
+  .StyledLabel{ /* label */
+    margin-bottom: 1rem;
+  } 
+  
+  .StyledButton{ /* input */
+    max-width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    border: solid 2px blue;
+    padding: 0.5rem;
+    border-radius: 1rem;
+  }

@@ -4,6 +4,7 @@ import Raphael from 'raphael';
 import "../Css/vis2.css";
 import loadImg from '../Images/LoadIcon.png'
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import {Dropdown, DropdownOption} from './Dropdown.js';
 
 
 let colorCoding = {'neutral' : [0,2,63], 'positiveMax' : [202,90,54], 'positiveMin' : [202,20,54], 'negativeMax' : [0,0,0], 'negativeMin' : [0,0,0]};
@@ -32,13 +33,32 @@ class AdjacencyMatrix extends React.Component {
         super(props);
         this.state = {
                 hoveredCell : ['','', ''],
-                rendered: false
+                rendered: false,
+                dropdownValue: "", 
+                dropdownButtonClicked: false,
+                matrixCanvas: "",
+                headerTopCanvas: "",
+                headerLeftCanvas: ""
         };
         
         this.isDataReady = false;
         this.data = [];
         this.dataName = this.props.file;
+        this.handleDropdownSelect = this.handleDropdownSelect.bind(this);
+        this.handleButtonClick = this.handleButtonClick.bind(this);
     }
+
+    handleDropdownSelect(e) {
+        this.setState({ dropdownValue: e.target.value });
+      }
+    
+      handleButtonClick(e){
+        console.log("clicked");
+        console.log(this.state.dropdownValue);
+        //this.draw(false);
+      
+      };
+
     componentDidMount() {
         if(this.props.uploadStatus === true) {
             this.setState({rendered: true});
@@ -93,17 +113,36 @@ class AdjacencyMatrix extends React.Component {
         this.raphaelRender();
     }
 
+    raphaelRender(){
+        this.draw(true);
+    }
 
-    raphaelRender() {
+
+    draw(initial){ // still needs the codes to sort random, alphabetically, etc. (will update once headers are correct)
+
+        if (initial === true){
+            this.drawMatrix();
+        }
+        else if (this.state.dropdownValue === "random"){
+            // need to add the code
+        }
+        else if (this.state.dropdownValue === "alphabetically"){
+            // need to add the code
+        }
+    }
+
+
+    drawMatrix() {
         const MAXWIDTH = 600;
         const MAXHEIGHT = 600;
         const MATRIXHEADERWIDTH = 100;
 
         if(!this.data) return console.log("No data to render");
 
-        // Test Set
+        // the dataset:
         let nodeOrdering = this.data.nodeOrdering;
         let edges = this.data.edges;
+        let nodeHash = this.data.nodeHash;
 
         let edgeHash = {};
 
@@ -120,15 +159,14 @@ class AdjacencyMatrix extends React.Component {
 
         console.log(edgeHash);
 
-        let nodeHash = this.data.nodeHash;
 
         let squares = [];
         let textsV = [];
         let textsH = [];
 
-        let matrixCanvas = Raphael(document.getElementById('block0'), MAXWIDTH, MAXHEIGHT);
-        let headerTopCanvas = Raphael(document.getElementById('headertop'), MAXWIDTH, MATRIXHEADERWIDTH);
-        let headerLeftCanvas = Raphael(document.getElementById('headerleft'), MATRIXHEADERWIDTH, MAXHEIGHT);
+        this.matrixCanvas = Raphael(document.getElementById('block0'), MAXWIDTH, MAXHEIGHT);
+        this.headerTopCanvas = Raphael(document.getElementById('headertop'), MAXWIDTH, MATRIXHEADERWIDTH);
+        this.headerLeftCanvas = Raphael(document.getElementById('headerleft'), MATRIXHEADERWIDTH, MAXHEIGHT);
         let cellWidth = MAXWIDTH / (nodeOrdering.length);
         let cellHeight = MAXHEIGHT / (nodeOrdering.length);
 
@@ -137,10 +175,8 @@ class AdjacencyMatrix extends React.Component {
         // adding the headers:
         for (let i = 0; i < nodeOrdering.length; i++){
 
-            // i picked the value 40 because 0 didn't work, it can be changed
-
             //horizontally
-            textsH.push(headerTopCanvas.text(((i + .5) * cellWidth), MATRIXHEADERWIDTH-5, nodeHash[nodeOrdering[i]]["firstName"]+" "+nodeHash[nodeOrdering[i]]["lastName"]));
+            textsH.push(this.headerTopCanvas.text(((i + .5) * cellWidth), MATRIXHEADERWIDTH-5, nodeHash[nodeOrdering[i]]["firstName"]+" "+nodeHash[nodeOrdering[i]]["lastName"]));
             textsH[i].attr({
                 "font-size": (9.0/16.0)*cellWidth,
                 "text-anchor" : "end",
@@ -148,7 +184,7 @@ class AdjacencyMatrix extends React.Component {
             });
 
             //vertically
-            textsV.push(headerLeftCanvas.text(MATRIXHEADERWIDTH-5, ((i + .5) * cellHeight), nodeHash[nodeOrdering[i]]["firstName"]+" "+nodeHash[nodeOrdering[i]]["lastName"]));
+            textsV.push(this.headerLeftCanvas.text(MATRIXHEADERWIDTH-5, ((i + .5) * cellHeight), nodeHash[nodeOrdering[i]]["firstName"]+" "+nodeHash[nodeOrdering[i]]["lastName"]));
             textsV[i].attr({ 
                 "font-size": (9.0/16.0)*cellHeight,
                 "text-anchor" : "end",
@@ -161,7 +197,7 @@ class AdjacencyMatrix extends React.Component {
        for(let i = 0; i < nodeOrdering.length; i++) {
             for(let j = 0; j < nodeOrdering.length; j++) {
                 let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
-                squares.push(matrixCanvas.rect((j * cellWidth), (i * cellHeight), cellWidth, cellHeight));
+                squares.push(this.matrixCanvas.rect((j * cellWidth), (i * cellHeight), cellWidth, cellHeight));
                 squares[i * nodeOrdering.length+j].attr({"fill" : colorCoding1(edgeHash[id]), "stroke" : "white"});
             }
 
@@ -171,8 +207,6 @@ class AdjacencyMatrix extends React.Component {
         for(let i = 0; i < nodeOrdering.length; i++) {
             for(let j = 0; j < nodeOrdering.length; j++) {
                 let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
-
-
                 squares[i * nodeOrdering.length+j].hover(
                     () => {
                         this.setState({ hoveredCell : [nodeHash[nodeOrdering[i]]['email'], nodeHash[nodeOrdering[j]]['email'], edgeHash[id]]})
@@ -330,7 +364,22 @@ class AdjacencyMatrix extends React.Component {
                             </div>
                         </div>
                         <div id = "b1col1">
-                            <div className = "dropdown">
+                            <div class = "dropdown">
+                            <Dropdown
+                            formLabel = "You can reorder the nodes: (doesn't work yet, i'll add the codes to sort soon)"
+                            buttonText = "submit"
+                            onChange = {this.handleDropdownSelect}
+                            action = "/">
+
+                                <DropdownOption selected value = "click to see options" />
+                                <DropdownOption value = "randomly" />
+                                <DropdownOption value = "alphabetically" />
+                                <DropdownOption value = "by clusters (not 100% sure)" />
+
+                            </Dropdown>
+                            <p> You have selected {this.state.dropdownValue}. </p>
+
+                           <button onClick = {this.handleButtonClick} id = "dropdownButton"> Reorder. </button> 
 
                             </div>
                         </div>
