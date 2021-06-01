@@ -27,12 +27,21 @@ function colorCoding1(i) {
     }
 }
 
-function dynamicSort(property) { // for alphabetical sorting array of objects by property
-    var sortOrder = 1;
+function dynamicSort(property) { // for alphabetical sorting of array of objects by property
     return function (a,b) {
          return a[property].localeCompare(b[property]);
         }        
     }
+
+function randomSort(data){
+    for (let i = 0; i < data.length; i++) { // uses Fisher-Yates shuffle algorithm for random sorting of array 
+        let x = data[i];
+        let y = Math.floor(Math.random() * (i + 1));
+        data[i] = data[y];
+        data[y] = x;
+      }
+    return data;
+}
 
 class AdjacencyMatrix extends React.Component {
     constructor(props) {
@@ -139,12 +148,16 @@ class AdjacencyMatrix extends React.Component {
             this.matrixCanvas.clear();
             this.headerTopCanvas.clear();
             this.headerLeftCanvas.clear();
-            if (this.state.dropdownValue === "random"){
-                // need to add the code
+            if (this.state.dropdownValue === "shuffle randomly"){
+                let nodeOrderingRand = this.sortRandomly(nodeOrdering, nodeHash);
+                this.drawMatrix(nodeOrderingRand, edges, nodeHash);
             }
             else if (this.state.dropdownValue === "alphabetically"){ 
                 let nodeOrderingAlph= this.sortAlphabetically(nodeOrdering, nodeHash); //contains the alphabetic order of the nodes
                 this.drawMatrix(nodeOrderingAlph, edges, nodeHash);
+            }
+            else if (this.state.dropdownValue === "the order from the dataset (default)"){
+                this.drawMatrix(nodeOrdering, edges, nodeHash);
             }
         } 
     }
@@ -162,9 +175,21 @@ class AdjacencyMatrix extends React.Component {
         for (let i = 0; i < nodeOrdering.length; i++){
           nodeOrderingAlph.push(nodeHashAlph[i]['id']);
         }
-    
         return nodeOrderingAlph;
-      }
+    }
+
+    sortRandomly(nodeOrdering, nodeHash){
+        let nodeOrderingRand = [];
+        let nodeHashRand = Object.assign([], nodeHash);
+        nodeHashRand = nodeHashRand.slice(1);
+
+        nodeHashRand = randomSort(nodeHashRand);
+    
+        for (let i = 0; i < nodeOrdering.length; i++){
+          nodeOrderingRand.push(nodeHashRand[i]['id']);
+        }
+        return nodeOrderingRand;
+    }
 
 
 
@@ -399,15 +424,15 @@ class AdjacencyMatrix extends React.Component {
                         <div id = "b1col1">
                             <div class = "dropdown">
                             <Dropdown
-                            formLabel = "You can reorder the nodes: (doesn't work yet, i'll add the codes to sort soon)"
+                            formLabel = "You can reorder the nodes:"
                             buttonText = "submit"
                             onChange = {this.handleDropdownSelect}
                             action = "/">
 
-                                <DropdownOption selected value = "click to see options" />
-                                <DropdownOption value = "randomly" />
+                                <DropdownOption selected value = "the order from the dataset (default)" />
+                                <DropdownOption value = "shuffle randomly" />
                                 <DropdownOption value = "alphabetically" />
-                                <DropdownOption value = "by clusters (not 100% sure)" />
+                                <DropdownOption value = "by clusters (not 100% sure, not working yet)" />
 
                             </Dropdown>
                             <p> You have selected {this.state.dropdownValue}. </p>

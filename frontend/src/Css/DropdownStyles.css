@@ -13,19 +13,11 @@
   }
   
   .StyledOption{ /* option */
-   /* color: ${(props) => (props.selected ? "lightgrey" : "black")};*/
+   /* still need to style */
   }
   
   .StyledLabel{ /* label */
     margin-bottom: 1rem;
   } 
   
-  .StyledButton{ /* input */
-    max-width: 50%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    border: solid 2px blue;
-    padding: 0.5rem;
-    border-radius: 1rem;
-  }
+  
