@@ -27,6 +27,12 @@ function colorCoding1(i) {
     }
 }
 
+function dynamicSort(property) { // for alphabetical sorting array of objects by property
+    var sortOrder = 1;
+    return function (a,b) {
+         return a[property].localeCompare(b[property]);
+        }        
+    }
 
 class AdjacencyMatrix extends React.Component {
     constructor(props) {
@@ -55,7 +61,7 @@ class AdjacencyMatrix extends React.Component {
       handleButtonClick(e){
         console.log("clicked");
         console.log(this.state.dropdownValue);
-        //this.draw(false);
+        this.draw(false);
       
       };
 
@@ -120,29 +126,56 @@ class AdjacencyMatrix extends React.Component {
 
     draw(initial){ // still needs the codes to sort random, alphabetically, etc. (will update once headers are correct)
 
+        let nodeOrdering = this.data.nodeOrdering;
+        let edges = this.data.edges;
+        let nodeHash = this.data.nodeHash;
+
+        console.log(nodeHash);
         if (initial === true){
-            this.drawMatrix();
+            this.drawMatrix(nodeOrdering, edges, nodeHash);
         }
-        else if (this.state.dropdownValue === "random"){
-            // need to add the code
-        }
-        else if (this.state.dropdownValue === "alphabetically"){
-            // need to add the code
-        }
+        else{
+            // first we need to clear the canvas (delete the existing drawn matrix)
+            this.matrixCanvas.clear();
+            this.headerTopCanvas.clear();
+            this.headerLeftCanvas.clear();
+            if (this.state.dropdownValue === "random"){
+                // need to add the code
+            }
+            else if (this.state.dropdownValue === "alphabetically"){ 
+                let nodeOrderingAlph= this.sortAlphabetically(nodeOrdering, nodeHash); //contains the alphabetic order of the nodes
+                this.drawMatrix(nodeOrderingAlph, edges, nodeHash);
+            }
+        } 
     }
 
+    sortAlphabetically(nodeOrdering, nodeHash){ // in JS objects are always passed around by reference, assigning new var changes initial
+        let nodeOrderingAlph = [];
+        let nodeHashAlph = Object.assign([], nodeHash);
+    
+        nodeHashAlph = nodeHashAlph.slice(1);
+        console.log(nodeHashAlph);
+       // nodeHashAlph.sort(dynamicSort("lastname"));
+       // nodeHashAlph.sort(dynamicSort("firstname"));
+       nodeHashAlph.sort(dynamicSort("email"));
+    
+        for (let i = 0; i < nodeOrdering.length; i++){
+          nodeOrderingAlph.push(nodeHashAlph[i]['id']);
+        }
+    
+        return nodeOrderingAlph;
+      }
 
-    drawMatrix() {
+
+
+    drawMatrix(nodeOrdering, edges, nodeHash) {
+
         const MAXWIDTH = 600;
         const MAXHEIGHT = 600;
         const MATRIXHEADERWIDTH = 100;
 
         if(!this.data) return console.log("No data to render");
 
-        // the dataset:
-        let nodeOrdering = this.data.nodeOrdering;
-        let edges = this.data.edges;
-        let nodeHash = this.data.nodeHash;
 
         let edgeHash = {};
 
