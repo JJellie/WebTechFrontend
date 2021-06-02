@@ -31,7 +31,6 @@ class AdjacencyMatrix extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-                hoveredCell : ['','', ''],
                 rendered: false
         };
         
@@ -101,9 +100,9 @@ class AdjacencyMatrix extends React.Component {
 
         if(!this.data) return console.log("No data to render");
 
-        // Test Set
         let nodeOrdering = this.data.nodeOrdering;
         let edges = this.data.edges;
+        console.log(nodeOrdering)
 
         let edgeHash = {};
 
@@ -117,8 +116,6 @@ class AdjacencyMatrix extends React.Component {
                 }
             }
         }
-
-        console.log(edgeHash);
 
         let nodeHash = this.data.nodeHash;
 
@@ -175,10 +172,10 @@ class AdjacencyMatrix extends React.Component {
 
                 squares[i * nodeOrdering.length+j].hover(
                     () => {
-                        this.setState({ hoveredCell : [nodeHash[nodeOrdering[i]]['email'], nodeHash[nodeOrdering[j]]['email'], edgeHash[id]]})
+                        this.props.updateVisState({ selectedInfo : [nodeHash[nodeOrdering[i]]['email'], nodeHash[nodeOrdering[j]]['email'], edgeHash[id], i+1, j+1]})
                     },
                     () => {
-                        this.setState({ hoveredCell : ['', '', '']})
+                        //this.props.updateVisState({ selectedInfo : ['', '', '', null, null]})
                     }
                 );
             }
@@ -319,22 +316,7 @@ class AdjacencyMatrix extends React.Component {
                         
                     </div>
 
-                    <div id = "block1">
-                        <div id = "b1col0">
-                            <div className = "infobox">  
-                                <p className = "text_infobox">
-                                    From: {this.state.hoveredCell[0]} <br />
-                                    To: {this.state.hoveredCell[1]}   <br />
-                                    Average sentiment: {this.state.hoveredCell[2]} <br /> 
-                                </p> 
-                            </div>
-                        </div>
-                        <div id = "b1col1">
-                            <div className = "dropdown">
-
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
                 <img id= "loading" className="loading" src = {loadImg} alt='Loading'></img> 
             </div>

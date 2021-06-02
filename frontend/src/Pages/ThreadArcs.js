@@ -12,7 +12,8 @@ class ThreadArcs extends React.Component {
         super(props);
         this.data = [];
         this.isDataReady = false;
-        this.state = {"data": [], "testdata": '', "loading": "", "rendered": false};
+        this.lastHover = ['', '', '', null, null];
+        this.state = {"data": [], "testdata": '', "loading": "", "rendered": false, 'hover': this.props.getVisState};
     }
     getDataSize() {
         if(!this.isDataReady) {
@@ -69,11 +70,11 @@ class ThreadArcs extends React.Component {
     
 
     raphaelRender() {
-        let circles = [];
-        let numbers = [];
+        this.circles = [];
+        this.numbers = [];
         let lookup = [];
-        let curves = [];
-        let circleRadius = 10;
+        this.curves = [];
+        this.circleRadius = 10;
         let datasize = this.getDataSize()    
         let curveWidth = 2;
         //for(let i = 0; i< testSet.length; i++) {
@@ -86,51 +87,51 @@ class ThreadArcs extends React.Component {
         
         //Importing data into the correct arrays for processing.
         for(let i = 0; i < datasize; i++) {
-            if(numbers.includes(this.getData(i, 'toId')) === false) {
-                numbers.push(this.getData(i, 'toId'));
+            if(this.numbers.includes(this.getData(i, 'toId')) === false) {
+                this.numbers.push(this.getData(i, 'toId'));
                 lookup[this.getData(i, 'toId')] = this.getData(i,'toEmail');
             }
-            if(numbers.includes(this.getData(i, 'fromId')) === false){
-                numbers.push(this.getData(i, 'fromId'));
+            if(this.numbers.includes(this.getData(i, 'fromId')) === false){
+                this.numbers.push(this.getData(i, 'fromId'));
                 lookup[this.getData(i, 'fromId')] = this.getData(i,'fromEmail');
             }
         }
 
-
-        let canvas = Raphael(document.getElementById('test'), (numbers.length+1)*100, 1200);
+        let canvas = Raphael(document.getElementById('test'), (this.numbers.length+1)*100, 1200);
         //numbers.sort(function(a, b){return a - b});
-        for(let j = 0; j < numbers.length- 1; j++) {
-            let circle = canvas.circle(j*3*circleRadius+50, 600, circleRadius)
-            circle.data({"id": numbers[j]})
-            circles.push(circle)
-            circles[j].attr("fill", "#fff");
-            circles[j].attr("stroke-width", "3");
-            circles[j].click(() => {
-                alert(lookup[circles[j].data("id")])
+        for(let j = 0; j < this.numbers.length-1; j++) {
+            let circle = canvas.circle(j*3*this.circleRadius+50, 600, this.circleRadius)
+            circle.data({"id": this.numbers[j]})
+            this.circles.push(circle)
+            this.circles[j].attr("fill", "#fff");
+            this.circles[j].attr("stroke-width", "3");
+            this.circles[j].click(() => {
+                alert(lookup[this.circles[j].data("id")])
             })
-            circles[j].hover(() => {
-                circles[j].attr({"fill" :' #f00'});
-                circles[j].animate({"r": 2*circleRadius}, 100);
-                for(let i = 0; i < curves.length; i++) {
-                    if (curves[i].data("from") === numbers[j]) {
-                    curves[i].animate({'stroke-width': curveWidth*2}, 100);
-                    curves[i].attr({"stroke": '#000'})
-                    curves[i].toFront();
-                    circles[numbers.indexOf(curves[i].data("to"))].animate({"r":1.5*circleRadius}, 100)
-                    circles[numbers.indexOf(curves[i].data("to"))].toFront();
+            this.circles[j].hover(() => {
+                this.props.updateVisState({"hoverEmail":lookup[this.circles[j].data("id")]})
+                this.circles[j].attr({"fill" :' #f00'});
+                this.circles[j].animate({"r": 2*this.circleRadius}, 100);
+                for(let i = 0; i < this.curves.length; i++) {
+                    if (this.curves[i].data("from") === this.numbers[j]) {
+                    this.curves[i].animate({'stroke-width': curveWidth*2}, 100);
+                    this.curves[i].attr({"stroke": '#000'})
+                    this.curves[i].toFront();
+                    this.circles[this.numbers.indexOf(this.curves[i].data("to"))].animate({"r":1.5*this.circleRadius}, 100)
+                    this.circles[this.numbers.indexOf(this.curves[i].data("to"))].toFront();
                     }
-                    circles[j].toFront();
+                    this.circles[j].toFront();
                 }
                 
             }, () => {
-                circles[j].attr('fill', "#fff");
-                circles[j].animate({"r": circleRadius}, 100);
-                for(let i = 0; i < curves.length; i++) {
-                    if (curves[i].data("from") === numbers[j]) {
-                    curves[i].animate({'stroke-width': curveWidth}, 100);
-                    curves[i].attr({"stroke": '#20A4F3'})
-                    curves[i].toBack()
-                    circles[numbers.indexOf(curves[i].data("to"))].animate({"r":circleRadius}, 100)
+                this.circles[j].attr('fill', "#fff");
+                this.circles[j].animate({"r": this.circleRadius}, 100);
+                for(let i = 0; i < this.curves.length; i++) {
+                    if (this.curves[i].data("from") === this.numbers[j]) {
+                        this.curves[i].animate({'stroke-width': curveWidth}, 100);
+                        this.curves[i].attr({"stroke": '#20A4F3'})
+                        this.curves[i].toBack()
+                        this.circles[this.numbers.indexOf(this.curves[i].data("to"))].animate({"r":this.circleRadius}, 100)
                     }
                 }
             });
@@ -145,35 +146,35 @@ class ThreadArcs extends React.Component {
             } else {
                 highest = parseInt(this.getData(i, 'toId'));
             }
-            let circ1 = circles[numbers.indexOf(String(lowest))];
-            let circ2 = circles[numbers.indexOf(String(highest))]
+            let circ1 = this.circles[this.numbers.indexOf(String(lowest))];
+            let circ2 = this.circles[this.numbers.indexOf(String(highest))]
             let distance =  (circ2.attr('cx') - circ1.attr('cx')) 
-            var curve = canvas.path("M "+ circ1.attr('cx') +"," + (circ1.attr('cy')-10) + " A"+ Math.abs(distance/2) +"," + (Math.abs(distance/2) > 290 ? 600*(1-(Math.abs(distance/2) / (circles.length*100) )) : Math.abs(distance/2)) + " 0 0,1 " + circ2.attr('cx') 
+            var curve = canvas.path("M "+ circ1.attr('cx') +"," + (circ1.attr('cy')-10) + " A"+ Math.abs(distance/2) +"," + (Math.abs(distance/2) > 290 ? 600*(1-(Math.abs(distance/2) / (this.circles.length*100) )) : Math.abs(distance/2)) + " 0 0,1 " + circ2.attr('cx') 
             +"," + (circ2.attr('cy')-10)).attr({"stroke-width": curveWidth, "stroke": "#20A4F3",});
             curve.data({"from": String(lowest), "to": String(highest)})
             curve.toBack();
-            curves.push(curve)
+            this.curves.push(curve)
 
 
-            curves[i].hover(() => {
-                curves[i].attr({'stroke':"#000", "stroke-width": curveWidth*3})
-                circles[numbers.indexOf(curves[i].data("from"))].attr({"fill" :' #f00'});
-                circles[numbers.indexOf(curves[i].data("from"))].animate({"r": 2*circleRadius}, 100);
-                for(let q = 0; q < curves.length; q++) {
-                    if (curves[q].data("from") === numbers[i]) {
-                    curves[q].animate({'stroke-width': curveWidth*3}, 100);
-                    circles[numbers.indexOf(curves[q].data("to"))].animate({"r":1.5*circleRadius}, 100);
+            this.curves[i].hover(() => {
+                this.curves[i].attr({'stroke':"#000", "stroke-width": curveWidth*3})
+                this.circles[this.numbers.indexOf(this.curves[i].data("from"))].attr({"fill" :' #f00'});
+                this.circles[this.numbers.indexOf(this.curves[i].data("from"))].animate({"r": 2*this.circleRadius}, 100);
+                for(let q = 0; q < this.curves.length; q++) {
+                    if (this.curves[q].data("from") === this.numbers[i]) {
+                    this.curves[q].animate({'stroke-width': curveWidth*3}, 100);
+                    this.circles[this.numbers.indexOf(this.curves[q].data("to"))].animate({"r":1.5*this.circleRadius}, 100);
                     }
                 }
                 
             }, () => {
-                curves[i].attr({'stroke':"#20A4F3", "stroke-width":curveWidth})
-                circles[numbers.indexOf(curves[i].data("from"))].attr('fill', "#fff");
-                circles[numbers.indexOf(curves[i].data("from"))].animate({"r": circleRadius}, 100);
-                for(let q = 0; q < curves.length; q++) {
-                    if (curves[q].data("from") === numbers[i]) {
-                    curves[q].animate({'stroke-width': curveWidth}, 100);
-                    circles[numbers.indexOf(curves[q].data("to"))].animate({"r":circleRadius}, 100);
+                this.curves[i].attr({'stroke':"#20A4F3", "stroke-width":curveWidth})
+                this.circles[this.numbers.indexOf(this.curves[i].data("from"))].attr('fill', "#fff");
+                this.circles[this.numbers.indexOf(this.curves[i].data("from"))].animate({"r": this.circleRadius}, 100);
+                for(let q = 0; q < this.curves.length; q++) {
+                    if (this.curves[q].data("from") === this.numbers[i]) {
+                        this.curves[q].animate({'stroke-width': curveWidth}, 100);
+                        this.circles[this.numbers.indexOf(this.curves[q].data("to"))].animate({"r":this.circleRadius}, 100);
                     }
                 }
             }
@@ -182,15 +183,34 @@ class ThreadArcs extends React.Component {
         }   
         canvas.canvas.className.baseVal += 'canvas';     
     } 
-
-    
+    crossHover() {
+        let lastId1 = this.lastHover[3];
+        let lastId2 = this.lastHover[4];
+        this.lastHover = this.props.getVisState;
+        let id1 = this.props.getVisState[3];
+        let id2 = this.props.getVisState[4];
+        if(!(id1 === null)) {
+            this.circles[this.numbers.indexOf(String(id1))].animate({"r": 2*this.circleRadius}, 100);
+            this.circles[this.numbers.indexOf(String(id2))].animate({"r": 2*this.circleRadius}, 100);
+        }
+        if(!(lastId1 === null) & lastId1 !== id1) {
+            this.circles[this.numbers.indexOf(String(lastId1))].animate({"r": this.circleRadius}, 100);
+            this.circles[this.numbers.indexOf(String(lastId2))].animate({"r": this.circleRadius}, 100);
+        }
+    }
+     
    
     render () {
+        if(this.state.rendered) {
+            this.crossHover();
+        }
+
+
         if(this.props.uploadStatus === true) {
             if(this.state.rendered === false) {
                 if(this.props.file !== "") {
                     this.getParsedData(this.props.file);
-                    this.setState({rendered: true});
+                    
                 }
             }
             
