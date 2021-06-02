@@ -201,8 +201,6 @@ class AdjacencyMatrix extends React.Component {
 
         if(!this.data) return console.log("No data to render");
 
-        let nodeOrdering = this.data.nodeOrdering;
-        let edges = this.data.edges;
         console.log(nodeOrdering)
 
         let edgeHash = {};
@@ -217,8 +215,6 @@ class AdjacencyMatrix extends React.Component {
                 }
             }
         }
-
-        let nodeHash = this.data.nodeHash;
 
         let squares = [];
         let textsV = [];
@@ -414,15 +410,6 @@ class AdjacencyMatrix extends React.Component {
                     </div>
 
                     <div id = "block1">
-                        <div id = "b1col0">
-                            <div className = "infobox">  
-                                <p className = "text_infobox">
-                                    From: {this.state.hoveredCell[0]} <br />
-                                    To: {this.state.hoveredCell[1]}   <br />
-                                    Average sentiment: {this.state.hoveredCell[2]} <br /> 
-                                </p> 
-                            </div>
-                        </div>
                         <div id = "b1col1">
                             <div class = "dropdown">
                             <Dropdown
@@ -431,10 +418,10 @@ class AdjacencyMatrix extends React.Component {
                             onChange = {this.handleDropdownSelect}
                             action = "/">
 
-                                <DropdownOption selected value = "the order from the dataset (default)" />
-                                <DropdownOption value = "shuffle randomly" />
-                                <DropdownOption value = "alphabetically" />
-                                <DropdownOption value = "by clusters (not 100% sure, not working yet)" />
+                                <DropdownOption selected value = "The order from the dataset (default)" />
+                                <DropdownOption value = "Shuffle randomly" />
+                                <DropdownOption value = "Alphabetically" />
+                                <DropdownOption value = "By clusters (not 100% sure, not working yet)" />
 
                             </Dropdown>
                             <p> You have selected {this.state.dropdownValue}. </p>

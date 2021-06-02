@@ -193,7 +193,7 @@ class ThreadArcs extends React.Component {
             this.circles[this.numbers.indexOf(String(id1))].animate({"r": 2*this.circleRadius}, 100);
             this.circles[this.numbers.indexOf(String(id2))].animate({"r": 2*this.circleRadius}, 100);
         }
-        if(!(lastId1 === null) & lastId1 !== id1) {
+        if(!(lastId1 === null)) {
             this.circles[this.numbers.indexOf(String(lastId1))].animate({"r": this.circleRadius}, 100);
             this.circles[this.numbers.indexOf(String(lastId2))].animate({"r": this.circleRadius}, 100);
         }
