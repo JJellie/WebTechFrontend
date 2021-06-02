@@ -70,6 +70,7 @@ code {
   background-color: #555;
   text-decoration: none;
   text-align: left;
+  cursor: pointer;
   padding-left: 20%;
   font-size:large;
   color: #F9F5FF;

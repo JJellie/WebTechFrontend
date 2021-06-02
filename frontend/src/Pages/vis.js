@@ -2,6 +2,8 @@ import ThreadArcs from './ThreadArcs';
 import '../Css/visual.css';
 import React from 'react';
 import AdjacencyMatrix from './AdjacencyMatrix';
+import Banner from "../Images/banner vis.png";
+import Divider from "../Images/divider.png";
 
 
 class Vis extends React.Component {
@@ -30,6 +32,7 @@ class Vis extends React.Component {
     render() {
         return (
             <div>
+            <div className='visualizations'>
                 <label htmlFor='UploadedFile' className='UploadButton'>Upload file here</label> 
                 <input type = "file" accept = ".csv"  id="UploadedFile"></input>
                 <input type = "submit" onClick={async () => {await this.SendFile()}} className="UploadButton"></input>
@@ -52,6 +55,47 @@ class Vis extends React.Component {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div> 
+                <div class="visHeader">
+                    <h1>Visualisation</h1>
+                </div>
+
+                <div class="line">
+                    {/* this will be a line */}
+                </div>
+                <div class="symbol"> <img src={Divider} alt="Divider"></img> </div>
+                <div class="line2">
+                    {/* this will be a line */}
+                </div>
+
+                <div class="visText">
+                    <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis porta lectus. Suspendisse efficitur odio a felis fringilla, at mattis justo porta. Mauris imperdiet sem eu mauris volutpat, sed pulvinar libero convallis. 
+                Fusce ullamcorper, enim eget consequat auctor, arcu turpis molestie nisl, rhoncus fringilla nisl lorem sit amet erat. 
+                Mauris cursus nunc dolor, vel malesuada ipsum ullamcorper non. Cras in nibh nec lectus semper interdum. 
+                Ut non nisi ante. In hac habitasse platea dictumst. Sed at tellus est.</p>
+                </div>
+
+                <div class="line">
+                    {/* this will be a line */}
+                </div>
+                <div class="symbol"><img src={Divider} alt="Divider"></img></div>
+                <div class="line2">
+                    {/* this will be a line */}
+                </div>
+
+                <div class="uploadbutton">
+                    <button>Upload your data here!</button>
+                </div>
+
+                <div class="banner">
+                    <img src={Banner} alt="Banner image"></img>
+                </div>
+
+
+                {/* <ThreadArcs />
+                <PlanetVis /> */}
+            </div>
             </div>
             
         );
