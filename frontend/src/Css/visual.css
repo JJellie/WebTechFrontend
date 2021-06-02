@@ -46,20 +46,117 @@ input[type='file'] {
       transform: rotate(359deg);
     }
   }
-  .Visheader {
-    display: block;
-    stroke: black;
-    stroke-width: 10px;
+
+#b1col0
+{
+    padding-left: 20px;
+    padding-top: 20px;
+    padding-bottom: 10px;
+}
+
+
+.infobox
+{
+    width: 300px;
+    height: 90px;
+    display: inline-block;
     border-style: solid;
-    border-radius: 16px;
-    width: 25%;
-    margin-left: 25%;
     border-color: #20A4F3;
-    font-family: 'Courier New', Courier, monospace;
-    margin-top: 1%;
-    font-size: larger;
-    padding-left: 10%;
+    background-color: white;
 }
-.Visheader h1 {
-    padding-left: 25%;
+
+.text_infobox
+{
+    padding-left: 10px;
 }
+.visHeader{
+  display: block;
+  stroke: black;
+  stroke-width: 10px;
+  border-style: solid;
+  border-radius: 16px;
+  width: 50%;
+  margin-left: 25%;
+  border-color: #20A4F3;
+  font-family: 'Courier New', Courier, monospace;
+  margin-top: 1%;
+  font-size: larger;
+}
+.visHeader h1 {
+  text-align: center;
+  color: #2773d9;
+}
+
+.line{
+  width: 36vw;
+  border-bottom: 4px double #7e7b7c;
+  position: absolute;
+  margin-left:3vw;
+  margin-top: 2%
+  }
+.symbol img{
+  position: absolute;
+  margin-left: 40.5%;
+  width: 5vw;
+  height: 2.8vh;
+  margin-top:1.5%;
+}
+.line2{
+  width: 36vw;
+  border-bottom: 4px double #7e7b7c;
+  position: absolute;
+  margin-left: 47vw;
+  margin-top: 2%
+  }
+  
+.visText{
+  stroke: black;
+  stroke-width: 10px;
+  border-radius: 16px;
+  width: 79vw;
+  margin-left: 4vw;
+  margin-top: 4%;
+  font-family: 'Courier New', Courier, monospace;
+}
+.visText p{
+  padding: 10px;
+  color: black;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.banner img{
+  vertical-align:bottom;
+  height: 35%;
+  width: 100vw;
+  position:fixed;
+  bottom:0px;
+  left:206px;
+}
+
+.uploadbutton{
+  text-align:center;
+}
+
+.uploadbutton button {
+  margin-top: 10vh;
+  
+  font-family: monospace;
+  background: #20A4F3;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 1.5em;
+  padding: 1.5rem;
+  border: 0;
+  transition: 0.5s;
+  border-radius: 10px;
+  width: auto;
+  position: relative;
+}
+
+.uploadbutton button:hover {
+  background: #20A4F3;
+  transition: 0.5s;
+  border-radius: 10px;
+  padding: 1.5rem 2.5rem 1.5rem 2.5rem;
+}
+
