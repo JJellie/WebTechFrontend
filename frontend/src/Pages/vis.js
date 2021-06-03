@@ -4,6 +4,9 @@ import React from 'react';
 import AdjacencyMatrix from './AdjacencyMatrix';
 import Banner from "../Images/banner vis.png";
 import Divider from "../Images/divider.png";
+import {
+    Link,
+  } from "react-router-dom";
 
 
 class Vis extends React.Component {
@@ -90,10 +93,11 @@ class Vis extends React.Component {
                 </div>
 
                 <div className="visText">
-                    <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis porta lectus. Suspendisse efficitur odio a felis fringilla, at mattis justo porta. Mauris imperdiet sem eu mauris volutpat, sed pulvinar libero convallis. 
-                Fusce ullamcorper, enim eget consequat auctor, arcu turpis molestie nisl, rhoncus fringilla nisl lorem sit amet erat. 
-                Mauris cursus nunc dolor, vel malesuada ipsum ullamcorper non. Cras in nibh nec lectus semper interdum. 
-                Ut non nisi ante. In hac habitasse platea dictumst. Sed at tellus est.</p>
+                     Wecome to the visualisation page. You can upload your data using the big blue button below. In the case you do not have a dataset, you can also use the standard dataset.
+                        <br></br>
+                        When your data is uploaded, the visualisations will be loaded in. For some extra tips, refer to our <Link to="../about">About page</Link>. <br></br>
+                        When the visualisations have loaded, you can select our visual-impairment friendly modes. You can choose a colour scheme, or go for the extra experience with audio cues upon hovering.
+                        
                 </div>
 
                 <div className="line">
@@ -119,7 +123,7 @@ class Vis extends React.Component {
             <div className='visualizations' id="visualizations">
                
                 <h1 className='Visheader'> Threadarcs </h1>
-                <div className='ThreadArc'>
+                <div className='ThreadArc' id='ThreadarcContainter'>
                     <ThreadArcs file={this.state.filename} uploadStatus={this.state.uploaded} updateVisState={(p) => {this.setState(p)}} getVisState={this.state.selectedInfo}/>
                 </div>
                

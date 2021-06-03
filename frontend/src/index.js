@@ -22,6 +22,7 @@ class NavBar extends React.Component {
         // 1 - Visualisation
         // 2 - About
         // 3 - Contact
+        this.showMenu = true;
         this.state = {
             "activepage" : 0
         };

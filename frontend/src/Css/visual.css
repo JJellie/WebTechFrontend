@@ -162,7 +162,7 @@ input[type='submit'] {
 }
 .visualizations {
     display: none;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .popup {
@@ -280,7 +280,8 @@ text-align: center;
 }
 .Am_block {
     float: right;
-    margin-top: -4500px;
+    overflow: visible;
+    margin-top: -2300px;
     z-index: 10;
-    margin-left: 50%;
+    margin-left: 20%;
 }

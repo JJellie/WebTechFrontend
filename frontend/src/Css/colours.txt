@@ -3,10 +3,33 @@
         Black:          #050401
         Grey:           #6D696A
         White:          #F9F5FF
-        Salmon/orange:  #FF9770
-        Lilac:          #AB87FF
         Blue:           #20A4F3
         Green:          #57A773
         Yellow:         #FFBA49
 
-        
+        Protanopia scheme:
+        Variable 1:     #3b1f2b                 Dark Purple
+        Variable 2:     #a23b72                 Maximum Red Purple
+        Variable 3:     #c73e1d                 Vermillion
+        Variable 4:     #f18f01                 Carrot Orange
+        Variable 5:     #2e86ab                 Blue NCS
+        Variable 6:     #00ffc5                 Sea Green Crayola
+        Variable 7:     #4acee0                 Celeste
+
+        Deuteranopia scheme:
+        Variable 1:     #813405                 Saddle Brown
+        Variable 2:     #7f0799                 Violet RYB
+        Variable 3:     #ff4365                 Radical Red
+        Variable 4:     #058ed9                 Green Blue Crayola
+        Variable 5:     #00d9c0                 Turquoise
+        Variable 6:     #e4ff1a                 Chartreuse Traditional
+        Variable 7:     #b7ad99                 Khaki Web
+
+        Tritanopia scheme:
+        Variable 1:     #693668                 Palatinate Purple
+        Variable 2:     #a74482                 Maximum Red Purple
+        Variable 3:     #b9415f                 Dark Pink
+        Variable 4:     #ff3562                 Radical Red
+        Variable 5:     #b7986e                 Khaki
+        Variable 6:     #ee8e2c                 Deep Saffron
+        Variable 7:     #ffb86f                 Mellow Apricot
