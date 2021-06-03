@@ -98,15 +98,39 @@ class ThreadArcs extends React.Component {
                 lookup[this.getData(i, 'fromId')] = {'email': this.getData(i,'fromEmail'), 'jobTitle': this.getData(i,'fromJob')};
             }
         }
+        console.log(this.getData(1))
+        console.log(lookup)
+        
 
         for(let key in lookup) {
-            if(lookup[key]['jobTitle'] in jobCount['jobs']) {
+            if(lookup[key]['jobTitle'] in jobCount) {
                 jobCount[lookup[key]['jobTitle']] += 1;
             } else {
                 jobCount['jobs'].push(lookup[key]['jobTitle'])
                 jobCount[lookup[key]['jobTitle']] = 1;
             }
         }
+        console.log(jobCount)
+        console.log("Employee" in jobCount)
+
+        let highest = 0;
+        let title;
+        let jobColour = [[]]       
+        for(let i = 0; i < 7; i++){
+            let highest = 0;
+            let title;
+            for(let key in jobCount){
+                if(key !== "jobs" & jobCount[key] > highest) {
+                    highest = jobCount[key];
+                    title = key;
+                }
+            }
+            
+            jobColour[i] = [title, highest];
+            delete jobCount[title];
+        }
+        console.log(jobColour)
+
         //[["jobtitle", count], [], []] where it is ordered in descending fashion
         
         let colour_x;
@@ -127,11 +151,33 @@ class ThreadArcs extends React.Component {
             let circle = canvas.circle(this.svgWidth/2, j*3*this.circleRadius+50, this.circleRadius)
             circle.data({"id": this.numbers[j]})
             this.circles.push(circle)
-            if(lookup[this.circles[j].data('id')]['jobTitle'] === 'Manager') {
-                this.colorCircle(j,"#f00" )
+
+            //              ~~~~ Below is an experiment for code optimalisation ~~~~
+            // let id;
+            // id = jobColour.find(lookup[this.circles[j].data('id')]['jobTitle']);
+            // this.colorCircle(j, this.colours[colour_x][id]);
+
+            if (lookup[this.circles[j].data('id')]['jobTitle'] === jobColour[0][0]){
+                this.colorCircle(j, this.colours[colour_x][0]);
+            } else if (lookup[this.circles[j].data('id')]['jobTitle'] === jobColour[1][0]){
+                this.colorCircle(j, this.colours[colour_x][1]);
+            } else if (lookup[this.circles[j].data('id')]['jobTitle'] === jobColour[2][0]){
+                this.colorCircle(j, this.colours[colour_x][2]);
+            } else if (lookup[this.circles[j].data('id')]['jobTitle'] === jobColour[3][0]){
+                this.colorCircle(j, this.colours[colour_x][3]);
+            } else if (lookup[this.circles[j].data('id')]['jobTitle'] === jobColour[4][0]){
+                this.colorCircle(j, this.colours[colour_x][4]);
+            } else if (lookup[this.circles[j].data('id')]['jobTitle'] === jobColour[5][0]){
+                this.colorCircle(j, this.colours[colour_x][5]);
             } else {
-                this.colorCircle(j,"#fff")
+                this.colorCircle(j, this.colours[colour_x][6]);
             }
+
+            // if(lookup[this.circles[j].data('id')]['jobTitle'] === 'Manager') {
+            //     this.colorCircle(j,"#f00" )
+            // } else {
+            //     this.colorCircle(j,"#fff")
+            // }
            
             this.circles[j].attr("stroke-width", Math.floor(this.circleRadius/3)+1);
             this.circles[j].click(() => {
