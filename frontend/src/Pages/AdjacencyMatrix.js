@@ -411,7 +411,7 @@ class AdjacencyMatrix extends React.Component {
 
                     <div id = "block1">
                         <div id = "b1col1">
-                            <div class = "dropdown">
+                            <div className = "dropdown">
                             <Dropdown
                             formLabel = "You can reorder the nodes:"
                             buttonText = "submit"

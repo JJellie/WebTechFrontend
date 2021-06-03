@@ -1,5 +1,7 @@
 
-
+.block_container {
+    margin-left: -10px;
+}
 
 .matrix
 {
@@ -14,7 +16,9 @@
     width: 600px;
     height: 600px;
 }
-
+.AM_block {
+    overflow: hidden;
+}
 
 .header_top 
 {
