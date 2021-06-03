@@ -70,6 +70,7 @@ class ThreadArcs extends React.Component {
     
 
     raphaelRender() {
+        this.svgWidth= 1200;
         this.circles = [];
         this.numbers = [];
         let lookup = [];
@@ -97,10 +98,10 @@ class ThreadArcs extends React.Component {
             }
         }
 
-        let canvas = Raphael(document.getElementById('test'), (this.numbers.length+1)*100, 1200);
+        let canvas = Raphael(document.getElementById('test'),  this.svgWidth, (this.numbers.length+1)*(3*this.circleRadius),);
         //numbers.sort(function(a, b){return a - b});
         for(let j = 0; j < this.numbers.length-1; j++) {
-            let circle = canvas.circle(j*3*this.circleRadius+50, 600, this.circleRadius)
+            let circle = canvas.circle(this.svgWidth/2, j*3*this.circleRadius+50, this.circleRadius)
             circle.data({"id": this.numbers[j]})
             this.circles.push(circle)
             this.circles[j].attr("fill", "#fff");
@@ -148,9 +149,9 @@ class ThreadArcs extends React.Component {
             }
             let circ1 = this.circles[this.numbers.indexOf(String(lowest))];
             let circ2 = this.circles[this.numbers.indexOf(String(highest))]
-            let distance =  (circ2.attr('cx') - circ1.attr('cx')) 
-            var curve = canvas.path("M "+ circ1.attr('cx') +"," + (circ1.attr('cy')-10) + " A"+ Math.abs(distance/2) +"," + (Math.abs(distance/2) > 290 ? 600*(1-(Math.abs(distance/2) / (this.circles.length*100) )) : Math.abs(distance/2)) + " 0 0,1 " + circ2.attr('cx') 
-            +"," + (circ2.attr('cy')-10)).attr({"stroke-width": curveWidth, "stroke": "#20A4F3",});
+            let distance =  (circ2.attr('cy') - circ1.attr('cy')) 
+            var curve = canvas.path("M "+ (circ1.attr('cx')+10) +"," + (circ1.attr('cy')) + " A"+  (Math.abs(distance/2) > (this.svgWidth/2 -10) ? (this.svgWidth/2)*(1-(Math.abs(distance/2) / (this.circles.length*100) )) : Math.abs(distance/2)) +"," + Math.abs(distance/2)  + " 0 0,1 " + circ2.attr('cx') 
+            +"," + (circ2.attr('cy'))).attr({"stroke-width": curveWidth, "stroke": "#20A4F3",});
             curve.data({"from": String(lowest), "to": String(highest)})
             curve.toBack();
             this.curves.push(curve)
@@ -219,16 +220,18 @@ class ThreadArcs extends React.Component {
             <div>
                 
                 <TransformWrapper
+                  defaultScale={0.5}
                   wheel = {{
                     wheelEnabled: true,
                     touchPadEnabled: true,
                     limitsOnWheel: true,
-                    step: 200
+                    step: 20
                     
                   }}  
                   options ={{
                       limitToBounds: false,
-                      minScale: -1
+                      limitToWrapper:true,
+                      minScale: -1,
                   }}
                   doubleClick ={{
                       mode: 'reset'
