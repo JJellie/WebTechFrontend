@@ -107,6 +107,7 @@ class ThreadArcs extends React.Component {
                 jobCount[lookup[key]['jobTitle']] = 1;
             }
         }
+        //[["jobtitle", count], [], []] where it is ordered in descending fashion
         
         let colour_x;
         if (this.currentScheme === "default"){
