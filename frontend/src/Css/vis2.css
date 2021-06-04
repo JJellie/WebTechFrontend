@@ -44,12 +44,12 @@
 }
 
 #dropdownButton{
-    max-width: 50%;
+    width: 20%;
     height: 100%;
     display: flex;
     justify-content: center;
+    text-align: center;
     padding: 0.5rem;
-    padding-left: 5rem;
     border-radius: 1rem;
 }
 
@@ -62,4 +62,8 @@
     box-shadow: 0 5px #666;
     transform: translateY(4px);
     
+}
+
+#block1{
+    margin-left: 75px;
 }

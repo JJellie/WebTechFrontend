@@ -5,9 +5,12 @@ import "../Css/vis2.css";
 import loadImg from '../Images/LoadIcon.png'
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {Dropdown, DropdownOption} from './Dropdown.js';
+import positive from "../Audio/positive.mp3"
+import negative from "../Audio/negative.mp3"
+import neutral from "../Audio/neutral.mp3"
 
 
-let colorCoding = {'neutral' : [0,2,63], 'positiveMax' : [202,90,54], 'positiveMin' : [202,20,54], 'negativeMax' : [0,0,0], 'negativeMin' : [0,0,0]};
+let colorCoding = {'neutral' : [250, 248, 247], 'positiveMax' : [202,90,54], 'positiveMin' : [202,20,54], 'negativeMax' : [0,0,0], 'negativeMin' : [0,0,0]};
 
 function colorCoding1(i) {
     if(i > 0) {
@@ -130,6 +133,7 @@ class AdjacencyMatrix extends React.Component {
 
     raphaelRender(){
         this.draw(true);
+        console.log("MATRIISIS");
     }
 
 
@@ -139,25 +143,33 @@ class AdjacencyMatrix extends React.Component {
         let edges = this.data.edges;
         let nodeHash = this.data.nodeHash;
 
+        const MAXWIDTH = 600;
+        const MAXHEIGHT = 600;
+        const MATRIXHEADERWIDTH = 100;
+
         console.log(nodeHash);
         if (initial === true){
-            this.drawMatrix(nodeOrdering, edges, nodeHash);
+            this.matrixCanvas = Raphael(document.getElementById('block0'), MAXWIDTH, MAXHEIGHT);
+            this.headerTopCanvas = Raphael(document.getElementById('headertop'), MAXWIDTH, MATRIXHEADERWIDTH);
+            this.headerLeftCanvas = Raphael(document.getElementById('headerleft'), MATRIXHEADERWIDTH, MAXHEIGHT);
+            this.dropdownValue = "Sorted in ascending order by id (default)";
+            this.drawMatrix(nodeOrdering, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
         }
         else{
             // first we need to clear the canvas (delete the existing drawn matrix)
             this.matrixCanvas.clear();
             this.headerTopCanvas.clear();
             this.headerLeftCanvas.clear();
-            if (this.state.dropdownValue === "shuffle randomly"){
+            if (this.state.dropdownValue === "Shuffle randomly"){
                 let nodeOrderingRand = this.sortRandomly(nodeOrdering, nodeHash);
-                this.drawMatrix(nodeOrderingRand, edges, nodeHash);
+                this.drawMatrix(nodeOrderingRand, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
             }
-            else if (this.state.dropdownValue === "alphabetically"){ 
+            else if (this.state.dropdownValue === "Alphabetically"){ 
                 let nodeOrderingAlph= this.sortAlphabetically(nodeOrdering, nodeHash); //contains the alphabetic order of the nodes
-                this.drawMatrix(nodeOrderingAlph, edges, nodeHash);
+                this.drawMatrix(nodeOrderingAlph, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
             }
-            else if (this.state.dropdownValue === "the order from the dataset (default)"){
-                this.drawMatrix(nodeOrdering, edges, nodeHash);
+            else if (this.state.dropdownValue === "Sorted in ascending order by id (default)"){
+                this.drawMatrix(nodeOrdering, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
             }
         } 
     }
@@ -168,9 +180,8 @@ class AdjacencyMatrix extends React.Component {
     
         nodeHashAlph = nodeHashAlph.slice(1);
         console.log(nodeHashAlph);
-       // nodeHashAlph.sort(dynamicSort("lastname"));
-       // nodeHashAlph.sort(dynamicSort("firstname"));
-       nodeHashAlph.sort(dynamicSort("email"));
+        nodeHashAlph.sort(dynamicSort("lastName"));
+        nodeHashAlph.sort(dynamicSort("firstName"));
     
         for (let i = 0; i < nodeOrdering.length; i++){
           nodeOrderingAlph.push(nodeHashAlph[i]['id']);
@@ -193,11 +204,11 @@ class AdjacencyMatrix extends React.Component {
 
 
 
-    drawMatrix(nodeOrdering, edges, nodeHash) {
+    drawMatrix(nodeOrdering, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH) {
 
-        const MAXWIDTH = 600;
-        const MAXHEIGHT = 600;
-        const MATRIXHEADERWIDTH = 100;
+        let positiveAudio = new Audio(positive);
+        let negativeAudio = new Audio(negative);
+        let neutralAudio = new Audio(neutral);
 
         if(!this.data) return console.log("No data to render");
 
@@ -220,14 +231,10 @@ class AdjacencyMatrix extends React.Component {
         let textsV = [];
         let textsH = [];
 
-        this.matrixCanvas = Raphael(document.getElementById('block0'), MAXWIDTH, MAXHEIGHT);
-        this.headerTopCanvas = Raphael(document.getElementById('headertop'), MAXWIDTH, MATRIXHEADERWIDTH);
-        this.headerLeftCanvas = Raphael(document.getElementById('headerleft'), MATRIXHEADERWIDTH, MAXHEIGHT);
         let cellWidth = MAXWIDTH / (nodeOrdering.length);
         let cellHeight = MAXHEIGHT / (nodeOrdering.length);
 
         
-
         // adding the headers:
         for (let i = 0; i < nodeOrdering.length; i++){
 
@@ -254,7 +261,17 @@ class AdjacencyMatrix extends React.Component {
             for(let j = 0; j < nodeOrdering.length; j++) {
                 let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
                 squares.push(this.matrixCanvas.rect((j * cellWidth), (i * cellHeight), cellWidth, cellHeight));
-                squares[i * nodeOrdering.length+j].attr({"fill" : colorCoding1(edgeHash[id]), "stroke" : "white"});
+              //  squares[i * nodeOrdering.length+j].attr({"fill" : colorCoding1(edgeHash[id]), "stroke" : "white"});
+              // i think there are some issues with the colorCoding function
+              if (edgeHash[id] > 0){
+                  squares[i * nodeOrdering.length+j].attr({"fill" : "#20A4F3", "stroke" : "white"});
+              }
+              else if (edgeHash[id] < 0){
+                squares[i * nodeOrdering.length+j].attr({"fill" : "black", "stroke" : "white"});
+              }
+              else{
+                squares[i * nodeOrdering.length+j].attr({"fill" : "#F2F0F4", "stroke" : "white"});
+              }
             }
 
         }
@@ -265,10 +282,25 @@ class AdjacencyMatrix extends React.Component {
                 let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
                 squares[i * nodeOrdering.length+j].hover(
                     () => {
+                        console.log(nodeHash[nodeOrdering[i]]['email']);
                         this.props.updateVisState({ selectedInfo : [nodeHash[nodeOrdering[i]]['email'], nodeHash[nodeOrdering[j]]['email'], edgeHash[id], i+1, j+1]})
                     },
                     () => {
                         //this.props.updateVisState({ selectedInfo : ['', '', '', null, null]})
+                    }
+                );
+                squares[i * nodeOrdering.length + j].click(
+                    () => {
+                        console.log(edgeHash[id]);
+                        if (edgeHash[id] > 0){
+                            positiveAudio.play();
+                        }
+                        else if (edgeHash[id] === 0){
+                            neutralAudio.play();
+                        }
+                        else if (edgeHash[id] < 0){
+                            negativeAudio.play();
+                        }
                     }
                 );
             }
@@ -335,10 +367,7 @@ class AdjacencyMatrix extends React.Component {
                                                     }}
 
                                                 pan = {{
-                                                    velocityEqualToMove: true,
-                                                    velocity: true,
-                                                    paddingSize: 0,
-                                                    animationTime: 20
+                                                   disabled: true
                                                 }}
 
                                                 zoomIn = {{
@@ -373,10 +402,7 @@ class AdjacencyMatrix extends React.Component {
                                                     }}
 
                                                 pan = {{
-                                                    velocityEqualToMove: true,
-                                                    velocity: true,
-                                                    paddingSize: 0,
-                                                    animationTime: 20
+                                                    disabled: true
                                                 }}
 
                                                 zoomIn = {{
@@ -418,10 +444,9 @@ class AdjacencyMatrix extends React.Component {
                             onChange = {this.handleDropdownSelect}
                             action = "/">
 
-                                <DropdownOption selected value = "The order from the dataset (default)" />
+                                <DropdownOption selected value = "Sorted in ascending order by id (default)" />
                                 <DropdownOption value = "Shuffle randomly" />
                                 <DropdownOption value = "Alphabetically" />
-                                <DropdownOption value = "By clusters (not 100% sure, not working yet)" />
 
                             </Dropdown>
                             <p> You have selected {this.state.dropdownValue}. </p>
