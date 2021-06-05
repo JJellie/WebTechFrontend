@@ -53,7 +53,7 @@ class AdjacencyMatrix extends React.Component {
                 hoveredCell : ['','', ''],
                 rendered: false,
                 dropdownValue: "", 
-                dropdownButtonClicked: false,
+                soundCheckboxChecked : false,
                 matrixCanvas: "",
                 headerTopCanvas: "",
                 headerLeftCanvas: ""
@@ -64,18 +64,21 @@ class AdjacencyMatrix extends React.Component {
         this.dataName = this.props.file;
         this.handleDropdownSelect = this.handleDropdownSelect.bind(this);
         this.handleButtonClick = this.handleButtonClick.bind(this);
+        this.handleSoundCheckbox = this.handleSoundCheckbox.bind(this);
     }
 
     handleDropdownSelect(e) {
         this.setState({ dropdownValue: e.target.value });
       }
     
-      handleButtonClick(e){
-        console.log("clicked");
-        console.log(this.state.dropdownValue);
+    handleButtonClick(e){
         this.draw(false);
       
       };
+
+    handleSoundCheckbox(e) {
+        this.setState({soundCheckboxChecked : !this.state.soundCheckboxChecked});
+    }
 
     componentDidMount() {
         if(this.props.uploadStatus === true) {
@@ -133,7 +136,6 @@ class AdjacencyMatrix extends React.Component {
 
     raphaelRender(){
         this.draw(true);
-        console.log("MATRIISIS");
     }
 
 
@@ -282,7 +284,7 @@ class AdjacencyMatrix extends React.Component {
                 let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
                 squares[i * nodeOrdering.length+j].hover(
                     () => {
-                        console.log(nodeHash[nodeOrdering[i]]['email']);
+                        
                         this.props.updateVisState({ selectedInfo : [nodeHash[nodeOrdering[i]]['email'], nodeHash[nodeOrdering[j]]['email'], edgeHash[id], i+1, j+1]})
                     },
                     () => {
@@ -291,16 +293,17 @@ class AdjacencyMatrix extends React.Component {
                 );
                 squares[i * nodeOrdering.length + j].click(
                     () => {
-                        console.log(edgeHash[id]);
-                        if (edgeHash[id] > 0){
-                            positiveAudio.play();
-                        }
-                        else if (edgeHash[id] === 0){
-                            neutralAudio.play();
-                        }
-                        else if (edgeHash[id] < 0){
-                            negativeAudio.play();
-                        }
+                        if (this.state.soundCheckboxChecked === true){
+                            if (edgeHash[id] > 0){
+                                positiveAudio.play();
+                            }
+                            else if (edgeHash[id] === 0){
+                                neutralAudio.play();
+                            }
+                            else if (edgeHash[id] < 0){
+                                negativeAudio.play();
+                            }
+                    }
                     }
                 );
             }
@@ -454,7 +457,13 @@ class AdjacencyMatrix extends React.Component {
                            <button onClick = {this.handleButtonClick} id = "dropdownButton"> Reorder. </button> 
 
                             </div>
-                        </div>
+                            <div id = "soundCheckbox">
+                                <label> Enable sounds:
+                                <input type = "checkbox"  onClick = {this.handleSoundCheckbox} />
+                                </label>
+                                
+                            </div>                        
+                            </div>
                     </div>
                 </div>
                 <img id= "loading" className="loading" src = {loadImg} alt='Loading'></img> 
