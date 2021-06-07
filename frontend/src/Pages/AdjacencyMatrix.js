@@ -52,11 +52,14 @@ class AdjacencyMatrix extends React.Component {
         this.state = {
                 hoveredCell : ['','', ''],
                 rendered: false,
-                dropdownValue: "", 
+                dropdownValue: "", //selected val
+                graphType: "",                          //selected val
+                currentGraphType: "undirected",
+                currentNodeOrdering: "sorted in ascending order by id",
                 soundCheckboxChecked : false,
                 matrixCanvas: "",
                 headerTopCanvas: "",
-                headerLeftCanvas: ""
+                headerLeftCanvas: "",
         };
         
         this.isDataReady = false;
@@ -65,16 +68,24 @@ class AdjacencyMatrix extends React.Component {
         this.handleDropdownSelect = this.handleDropdownSelect.bind(this);
         this.handleButtonClick = this.handleButtonClick.bind(this);
         this.handleSoundCheckbox = this.handleSoundCheckbox.bind(this);
+        this.handleGraphTypeDropdownSelect = this.handleGraphTypeDropdownSelect.bind(this);
+    }
+
+    handleGraphTypeDropdownSelect(e){
+        this.setState({ graphType : e.target.value});
     }
 
     handleDropdownSelect(e) {
         this.setState({ dropdownValue: e.target.value });
       }
     
-    handleButtonClick(e){
-        this.draw(false);
-      
-      };
+  
+
+    handleButtonClick(e){ // note: setState is asynchronous!! 
+        this.setState({ currentGraphType: ((this.state.graphType !== "") ? this.state.graphType : this.state.currentGraphType),
+                        currentNodeOrdering: ((this.state.dropdownValue !== "") ? this.state.dropdownValue : this.state.currentNodeOrdering)}, () => {this.draw(false);});
+        this.setState({ graphType: "", dropdownValue: ""});
+      }
 
     handleSoundCheckbox(e) {
         this.setState({soundCheckboxChecked : !this.state.soundCheckboxChecked});
@@ -154,24 +165,24 @@ class AdjacencyMatrix extends React.Component {
             this.matrixCanvas = Raphael(document.getElementById('block0'), MAXWIDTH, MAXHEIGHT);
             this.headerTopCanvas = Raphael(document.getElementById('headertop'), MAXWIDTH, MATRIXHEADERWIDTH);
             this.headerLeftCanvas = Raphael(document.getElementById('headerleft'), MATRIXHEADERWIDTH, MAXHEIGHT);
-            this.dropdownValue = "Sorted in ascending order by id (default)";
-            this.drawMatrix(nodeOrdering, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+            this.drawMatrix(nodeOrdering, nodeOrdering, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
         }
         else{
             // first we need to clear the canvas (delete the existing drawn matrix)
             this.matrixCanvas.clear();
             this.headerTopCanvas.clear();
             this.headerLeftCanvas.clear();
-            if (this.state.dropdownValue === "Shuffle randomly"){
+            console.log(this.state.currentNodeOrdering);
+            if (this.state.currentNodeOrdering === "shuffle randomly"){
                 let nodeOrderingRand = this.sortRandomly(nodeOrdering, nodeHash);
-                this.drawMatrix(nodeOrderingRand, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+                this.drawMatrix(nodeOrderingRand, nodeOrderingRand, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
             }
-            else if (this.state.dropdownValue === "Alphabetically"){ 
+            else if (this.state.currentNodeOrdering === "alphabetically"){ 
                 let nodeOrderingAlph= this.sortAlphabetically(nodeOrdering, nodeHash); //contains the alphabetic order of the nodes
-                this.drawMatrix(nodeOrderingAlph, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+                this.drawMatrix(nodeOrderingAlph, nodeOrderingAlph, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
             }
-            else if (this.state.dropdownValue === "Sorted in ascending order by id (default)"){
-                this.drawMatrix(nodeOrdering, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+            else if (this.state.currentNodeOrdering === "sorted in ascending order by id"){
+                this.drawMatrix(nodeOrdering, nodeOrdering, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
             }
         } 
     }
@@ -188,6 +199,7 @@ class AdjacencyMatrix extends React.Component {
         for (let i = 0; i < nodeOrdering.length; i++){
           nodeOrderingAlph.push(nodeHashAlph[i]['id']);
         }
+
         return nodeOrderingAlph;
     }
 
@@ -206,20 +218,20 @@ class AdjacencyMatrix extends React.Component {
 
 
 
-    drawMatrix(nodeOrdering, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH) {
+    drawMatrix(nodeOrderingRow, nodeOrderingCol, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH) {
 
         let positiveAudio = new Audio(positive);
         let negativeAudio = new Audio(negative);
         let neutralAudio = new Audio(neutral);
+        let nodesNumber = nodeOrderingRow.length;
 
         if(!this.data) return console.log("No data to render");
 
-        console.log(nodeOrdering)
 
         let edgeHash = {};
 
-        for(let i = 0; i < nodeOrdering.length; i++) {
-            for(let j = 0; j < nodeOrdering.length; j++) {
+        for(let i = 0; i < nodesNumber; i++) {
+            for(let j = 0; j < nodesNumber; j++) {
                 let id = i.toString() + '-' + j.toString();
                 if(edges[id]) {
                     edgeHash[id] = edges[id];
@@ -233,15 +245,15 @@ class AdjacencyMatrix extends React.Component {
         let textsV = [];
         let textsH = [];
 
-        let cellWidth = MAXWIDTH / (nodeOrdering.length);
-        let cellHeight = MAXHEIGHT / (nodeOrdering.length);
+        let cellWidth = MAXWIDTH / (nodesNumber);
+        let cellHeight = MAXHEIGHT / (nodesNumber);
 
         
         // adding the headers:
-        for (let i = 0; i < nodeOrdering.length; i++){
+        for (let i = 0; i < nodesNumber; i++){
 
             //horizontally
-            textsH.push(this.headerTopCanvas.text(((i + .5) * cellWidth), MATRIXHEADERWIDTH-5, nodeHash[nodeOrdering[i]]["firstName"]+" "+nodeHash[nodeOrdering[i]]["lastName"]));
+            textsH.push(this.headerTopCanvas.text(((i + .5) * cellWidth), MATRIXHEADERWIDTH-5, nodeHash[nodeOrderingCol[i]]["firstName"]+" "+nodeHash[nodeOrderingCol[i]]["lastName"]));
             textsH[i].attr({
                 "font-size": (9.0/16.0)*cellWidth,
                 "text-anchor" : "end",
@@ -249,7 +261,7 @@ class AdjacencyMatrix extends React.Component {
             });
 
             //vertically
-            textsV.push(this.headerLeftCanvas.text(MATRIXHEADERWIDTH-5, ((i + .5) * cellHeight), nodeHash[nodeOrdering[i]]["firstName"]+" "+nodeHash[nodeOrdering[i]]["lastName"]));
+            textsV.push(this.headerLeftCanvas.text(MATRIXHEADERWIDTH-5, ((i + .5) * cellHeight), nodeHash[nodeOrderingRow[i]]["firstName"]+" "+nodeHash[nodeOrderingRow[i]]["lastName"]));
             textsV[i].attr({ 
                 "font-size": (9.0/16.0)*cellHeight,
                 "text-anchor" : "end",
@@ -259,48 +271,71 @@ class AdjacencyMatrix extends React.Component {
         
 
        // 2 for loops looping through all cells in the adjacency matrix
-       for(let i = 0; i < nodeOrdering.length; i++) {
-            for(let j = 0; j < nodeOrdering.length; j++) {
-                let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
+       for(let i = 0; i < nodesNumber; i++) {
+            for(let j = 0; j < nodesNumber; j++) {
+                let id1 = nodeOrderingRow[i].toString() + "-" + nodeOrderingCol[j].toString();
+                let id2 = nodeOrderingCol[j].toString() + "-" + nodeOrderingRow[i].toString();
+                let averageSentiment = 0;
                 squares.push(this.matrixCanvas.rect((j * cellWidth), (i * cellHeight), cellWidth, cellHeight));
               //  squares[i * nodeOrdering.length+j].attr({"fill" : colorCoding1(edgeHash[id]), "stroke" : "white"});
               // i think there are some issues with the colorCoding function
-              if (edgeHash[id] > 0){
-                  squares[i * nodeOrdering.length+j].attr({"fill" : "#20A4F3", "stroke" : "white"});
-              }
-              else if (edgeHash[id] < 0){
-                squares[i * nodeOrdering.length+j].attr({"fill" : "black", "stroke" : "white"});
-              }
-              else{
-                squares[i * nodeOrdering.length+j].attr({"fill" : "#F2F0F4", "stroke" : "white"});
-              }
+                if (this.state.currentGraphType === "directed"){
+                    averageSentiment = edgeHash[id1];
+                }
+                else{
+                    // need to know whether there are emails sent BOTH ways or only ONE WAY between those 2 people
+                    // in case there's only emails from one side, we shouldn't take the other sentiment in consideration!!
+                    averageSentiment = (edgeHash[id1] + edgeHash[id2])/2;
+                    
+                }
+
+                if (averageSentiment > 0){
+                    squares[i * nodesNumber + j].attr({"fill" : "#20A4F3", "stroke" : "white"});
+                }
+                else if (averageSentiment < 0){
+                    squares[i * nodesNumber + j].attr({"fill" : "black", "stroke" : "white"});
+                }
+                else{
+                    squares[i * nodesNumber + j].attr({"fill" : "#F2F0F4", "stroke" : "white"});
+                }
             }
 
         }
 
         // 2 for loops looping through all cells in the adjacency matrix
-        for(let i = 0; i < nodeOrdering.length; i++) {
-            for(let j = 0; j < nodeOrdering.length; j++) {
-                let id = nodeOrdering[i].toString() + "-" + nodeOrdering[j].toString();
-                squares[i * nodeOrdering.length+j].hover(
+        for(let i = 0; i < nodesNumber; i++) {
+            for(let j = 0; j < nodesNumber; j++) {
+                let id1 = nodeOrderingRow[i].toString() + "-" + nodeOrderingCol[j].toString();
+                let id2 = nodeOrderingCol[j].toString() + "-" + nodeOrderingRow[i].toString();
+                let averageSentiment = 0;
+                if (this.state.currentGraphType === "directed"){
+                    averageSentiment = edgeHash[id1];
+                }
+                else{
+                    // need to know whether there are emails sent BOTH ways or only ONE WAY between those 2 people
+                    // in case there's only emails from one side, we shouldn't take the other sentiment in consideration!!
+                    averageSentiment = (edgeHash[id1] + edgeHash[id2])/2;
+                    
+                }
+                squares[i * nodesNumber + j].hover(
                     () => {
                         
-                        this.props.updateVisState({ selectedInfo : [nodeHash[nodeOrdering[i]]['email'], nodeHash[nodeOrdering[j]]['email'], edgeHash[id], i+1, j+1]})
+                        this.props.updateVisState({ selectedInfo : [nodeHash[nodeOrderingRow[i]]['email'], nodeHash[nodeOrderingCol[j]]['email'], averageSentiment, i+1, j+1]})
                     },
                     () => {
                         //this.props.updateVisState({ selectedInfo : ['', '', '', null, null]})
                     }
                 );
-                squares[i * nodeOrdering.length + j].click(
+                squares[i * nodesNumber + j].click(
                     () => {
                         if (this.state.soundCheckboxChecked === true){
-                            if (edgeHash[id] > 0){
+                            if (averageSentiment > 0){
                                 positiveAudio.play();
                             }
-                            else if (edgeHash[id] === 0){
+                            else if (averageSentiment === 0){
                                 neutralAudio.play();
                             }
-                            else if (edgeHash[id] < 0){
+                            else if (averageSentiment < 0){
                                 negativeAudio.play();
                             }
                     }
@@ -308,6 +343,9 @@ class AdjacencyMatrix extends React.Component {
                 );
             }
         }
+
+
+
     }
 
 
@@ -440,6 +478,25 @@ class AdjacencyMatrix extends React.Component {
 
                     <div id = "block1">
                         <div id = "b1col1">
+
+                            <p> The current graph is {this.state.currentGraphType}. <br />
+                                The current node ordering is: {this.state.currentNodeOrdering}. </p>
+
+                            {/* first dropdown: select undirected/directed graph*/}
+                            <div className = "dropdown">
+                            <Dropdown
+                            formLabel = "Select what type of graph you want:"
+                            buttonText = "submit"
+                            onChange = {this.handleGraphTypeDropdownSelect}
+                            action = "/">
+                                <DropdownOption selected value = "undirected" />
+                                <DropdownOption value = "directed" />
+
+                            </Dropdown>
+                            </div>
+                     
+
+                            {/* second dropdown: select node ordering */}
                             <div className = "dropdown">
                             <Dropdown
                             formLabel = "You can reorder the nodes:"
@@ -447,12 +504,14 @@ class AdjacencyMatrix extends React.Component {
                             onChange = {this.handleDropdownSelect}
                             action = "/">
 
-                                <DropdownOption selected value = "Sorted in ascending order by id (default)" />
-                                <DropdownOption value = "Shuffle randomly" />
-                                <DropdownOption value = "Alphabetically" />
+                                <DropdownOption value = "sorted in ascending order by id" />
+                                <DropdownOption value = "shuffle randomly" />
+                                <DropdownOption value = "alphabetically" />
+                                <DropdownOption value = "algorithm" hide = {true} />
 
                             </Dropdown>
-                            <p> You have selected {this.state.dropdownValue}. </p>
+
+                            <p> You have selected {this.state.dropdownValue} ({this.state.graphType} graph) </p>
 
                            <button onClick = {this.handleButtonClick} id = "dropdownButton"> Reorder. </button> 
 

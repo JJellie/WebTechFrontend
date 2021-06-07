@@ -11,14 +11,13 @@ export function Dropdown(props){
                 {props.children}
             </select>
         </form>
-        
 
     );
 }
 
 export function DropdownOption(props){
     return(
-        <option class = "StyledOption" selected = {props.selected}>
+        <option class = "StyledOption" selected = {props.selected} disabled = {props.hide}>
             {props.value}
         </option>
     );
