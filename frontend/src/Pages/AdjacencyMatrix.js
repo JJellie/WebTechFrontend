@@ -45,6 +45,24 @@ function randomSort(data){
     return data;
 }
 
+function addNeighbors(index, adjLists, queue, degrees){
+    let neighbors = [];
+    for (let i = 0; i < adjLists[index]; i++){
+        neighbors.push([adjLists[index][i], degrees[adjLists[index][i]-1][1]]); // degrees index starts at 0
+    }
+
+    let sortedNeighbors = neighbors.sort(function(a, b) {
+        return a[1] - b[1];
+      });
+
+    for (let i of sortedNeighbors){
+        queue.push(sortedNeighbors[i][0]);
+    }
+
+    return queue;
+}
+
+
 class AdjacencyMatrix extends React.Component {
     constructor(props) {
         super(props);
@@ -59,7 +77,7 @@ class AdjacencyMatrix extends React.Component {
                 matrixCanvas: "",
                 headerTopCanvas: "",
                 headerLeftCanvas: "",
-                nodeOrderingOptions: null
+                algorithmOption: null
         };
         
         this.isDataReady = false;
@@ -80,14 +98,10 @@ class AdjacencyMatrix extends React.Component {
       }
 
     secondDropdown(){
-        const undirectedOptions = ["sorted in ascending order by id", "alphabetically", "shuffle randomly", "algorithm"];
-        const directedOptions = ["sorted in ascending order by id", "alphabetically", "shuffle randomly"];
-        let typeToMap = (this.state.graphType === "undirected") ? undirectedOptions : directedOptions;
-        let nodesOrder = typeToMap.map((el) => <option value = {el}> {el} </option>);
-        this.setState({nodeOrderingOptions : nodesOrder});
-        console.log(typeToMap);
+        let algorithmVisible = (this.state.graphType === "undirected") ? false : true;
+        let algOpt = <option value = "algorithm" hidden = {algorithmVisible} disabled = {true}> algorithm (not available yet) </option>
+        this.setState({algorithmOption : algOpt});
 }
-
 
     handleButtonClick(e){ // note: setState is asynchronous!! 
         this.setState({ currentGraphType: ((this.state.graphType !== "") ? this.state.graphType : this.state.currentGraphType),
@@ -163,17 +177,32 @@ class AdjacencyMatrix extends React.Component {
         let nodeOrdering = this.data.nodeOrdering;
         let edges = this.data.edges;
         let nodeHash = this.data.nodeHash;
+        let nodesNumber = nodeOrdering.length;
 
         const MAXWIDTH = 600;
         const MAXHEIGHT = 600;
         const MATRIXHEADERWIDTH = 100;
+
+        let edgeHash = {};
+
+        for(let i = 0; i < nodesNumber; i++) {
+            for(let j = 0; j < nodesNumber; j++) {
+                let id = i.toString() + '-' + j.toString();
+                if(edges[id]) {
+                    edgeHash[id] = edges[id];
+                } else {
+                    edgeHash[id] = 0;
+                }
+            }
+        }
 
         console.log(nodeHash);
         if (initial === true){
             this.matrixCanvas = Raphael(document.getElementById('block0'), MAXWIDTH, MAXHEIGHT);
             this.headerTopCanvas = Raphael(document.getElementById('headertop'), MAXWIDTH, MATRIXHEADERWIDTH);
             this.headerLeftCanvas = Raphael(document.getElementById('headerleft'), MATRIXHEADERWIDTH, MAXHEIGHT);
-            this.drawMatrix(nodeOrdering, nodeOrdering, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+            this.drawMatrix(nodeOrdering, nodeOrdering, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+           // this.reverseCuthillMckee(nodeOrdering, edgeHash);
         }
         else{
             // first we need to clear the canvas (delete the existing drawn matrix)
@@ -183,17 +212,96 @@ class AdjacencyMatrix extends React.Component {
             console.log(this.state.currentNodeOrdering);
             if (this.state.currentNodeOrdering === "shuffle randomly"){
                 let nodeOrderingRand = this.sortRandomly(nodeOrdering, nodeHash);
-                this.drawMatrix(nodeOrderingRand, nodeOrderingRand, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+                this.drawMatrix(nodeOrderingRand, nodeOrderingRand, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
             }
             else if (this.state.currentNodeOrdering === "alphabetically"){ 
                 let nodeOrderingAlph= this.sortAlphabetically(nodeOrdering, nodeHash); //contains the alphabetic order of the nodes
-                this.drawMatrix(nodeOrderingAlph, nodeOrderingAlph, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+                this.drawMatrix(nodeOrderingAlph, nodeOrderingAlph, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
             }
             else if (this.state.currentNodeOrdering === "sorted in ascending order by id"){
-                this.drawMatrix(nodeOrdering, nodeOrdering, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+                this.drawMatrix(nodeOrdering, nodeOrdering, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+            }
+            else if (this.state.currentNodeOrdering === "algorithm"){
+                // do reverse
             }
         } 
     }
+
+
+    reverseCuthillMckee(nodeOrdering, edgeHash){
+        // i need array of degrees + adjacency lists
+
+        let queue = [];
+        let permR = [];
+
+        let missingR = nodeOrdering.length; // the no. of nodes missing from permR
+
+        let adjLists = [["null"]]; // adjacency lists for all nodes
+        let degrees = []; // array of degrees for all nodes
+        let isInR = [0]; // array that records whether an element is in R or not
+
+        // initializing
+        for (let i = 1; i <= nodeOrdering.length; i++){
+            adjLists.push([""]);
+            isInR.push(0);
+        }
+
+
+        // computing the adjacency lists 
+        for (let i = 1; i < nodeOrdering.length; i++){
+            for (let j = i + 1; j <= nodeOrdering.length; j++){
+                let id1 = i.toString() + '-' + j.toString();
+                let id2 = j.toString() + '-' + i.toString();
+                if(edgeHash[id1] || edgeHash[id2]) {
+                    adjLists[i].push(j);
+                    adjLists[j].push(i);
+                }
+            }
+        }
+
+        // computing the degree array
+        for (let i = 1; i <= nodeOrdering.length; i++){
+            degrees.push([i, adjLists[i].length]);
+        }
+
+       // while (missingR){ // while there are nodes that aren't in permR
+
+            // sorting the degree array by no. of degrees
+            let sortedDegrees = degrees.sort(function(a, b) {
+                return a[1] - b[1];
+              });
+    
+           // s1: find obj w min degree that hasn't been added to R, if it's on pth row add p to R (we identify id = row)
+        let elementR = 0;
+        for (let i in sortedDegrees){
+            if (!isInR[sortedDegrees[i][0]]){
+                elementR = sortedDegrees[i][0];
+                permR.push(elementR);
+                missingR--;
+                isInR[elementR] = 1;
+            }
+         break;
+        }
+          // s2: add all neighbours of elementR in increasing order of degree to queue
+          addNeighbors(elementR, adjLists, queue, degrees);
+    
+          // s3: extract first node from queue, say C, if C hasn't been added to permR add it, also all neigbours of C in increasing
+          // order of degree (repeat while queue not empty)
+      
+          while (queue.length){
+            let C = queue.shift(); // returns and removes first element of array
+            if (!isInR[C]){
+                permR.push(C);
+                missingR--;
+            }
+            addNeighbors(C, adjLists, queue, degrees);
+          }
+ //   }
+            
+    
+}
+
+
 
     sortAlphabetically(nodeOrdering, nodeHash){ // in JS objects are always passed around by reference, assigning new var changes initial
         let nodeOrderingAlph = [];
@@ -226,7 +334,7 @@ class AdjacencyMatrix extends React.Component {
 
 
 
-    drawMatrix(nodeOrderingRow, nodeOrderingCol, edges, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH) {
+    drawMatrix(nodeOrderingRow, nodeOrderingCol, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH) {
 
         let positiveAudio = new Audio(positive);
         let negativeAudio = new Audio(negative);
@@ -235,19 +343,6 @@ class AdjacencyMatrix extends React.Component {
 
         if(!this.data) return console.log("No data to render");
 
-
-        let edgeHash = {};
-
-        for(let i = 0; i < nodesNumber; i++) {
-            for(let j = 0; j < nodesNumber; j++) {
-                let id = i.toString() + '-' + j.toString();
-                if(edges[id]) {
-                    edgeHash[id] = edges[id];
-                } else {
-                    edgeHash[id] = 0;
-                }
-            }
-        }
 
         let squares = [];
         let textsV = [];
@@ -517,7 +612,10 @@ class AdjacencyMatrix extends React.Component {
                             class = "styledSelect"
                             >
                             <option value = "" disabled selected> Choose a type of node ordering: </option>
-                            {this.state.nodeOrderingOptions}
+                            <option value = "sorted in ascending order by id" > sorted in ascending order by id </option>
+                            <option value = "alphabetically" > alphabetically </option>
+                            <option value = "shuffle randomly"> shuffle randomly</option>
+                            {this.state.algorithmOption}
 
                             </select>
                             </div>
@@ -527,7 +625,7 @@ class AdjacencyMatrix extends React.Component {
 
                             </div>
 
-                            <div>   You have selected {this.state.dropdownValue} ({this.state.graphType} graph) </div>
+                            <div>   You have selected {this.state.dropdownValue} ({this.state.graphType}) </div>
 
                            
                             
