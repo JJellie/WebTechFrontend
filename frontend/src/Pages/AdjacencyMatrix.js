@@ -4,7 +4,6 @@ import Raphael from 'raphael';
 import "../Css/vis2.css";
 import loadImg from '../Images/LoadIcon.png'
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import {Dropdown, DropdownOption} from './Dropdown.js';
 import positive from "../Audio/positive.mp3"
 import negative from "../Audio/negative.mp3"
 import neutral from "../Audio/neutral.mp3"
@@ -60,6 +59,7 @@ class AdjacencyMatrix extends React.Component {
                 matrixCanvas: "",
                 headerTopCanvas: "",
                 headerLeftCanvas: "",
+                nodeOrderingOptions: null
         };
         
         this.isDataReady = false;
@@ -72,14 +72,22 @@ class AdjacencyMatrix extends React.Component {
     }
 
     handleGraphTypeDropdownSelect(e){
-        this.setState({ graphType : e.target.value});
+        this.setState({ graphType : e.target.value}, () => {this.secondDropdown();});
     }
 
     handleDropdownSelect(e) {
         this.setState({ dropdownValue: e.target.value });
       }
-    
-  
+
+    secondDropdown(){
+        const undirectedOptions = ["sorted in ascending order by id", "alphabetically", "shuffle randomly", "algorithm"];
+        const directedOptions = ["sorted in ascending order by id", "alphabetically", "shuffle randomly"];
+        let typeToMap = (this.state.graphType === "undirected") ? undirectedOptions : directedOptions;
+        let nodesOrder = typeToMap.map((el) => <option value = {el}> {el} </option>);
+        this.setState({nodeOrderingOptions : nodesOrder});
+        console.log(typeToMap);
+}
+
 
     handleButtonClick(e){ // note: setState is asynchronous!! 
         this.setState({ currentGraphType: ((this.state.graphType !== "") ? this.state.graphType : this.state.currentGraphType),
@@ -482,40 +490,47 @@ class AdjacencyMatrix extends React.Component {
                             <p> The current graph is {this.state.currentGraphType}. <br />
                                 The current node ordering is: {this.state.currentNodeOrdering}. </p>
 
+                            <div className = "reorderingMenu">
+
                             {/* first dropdown: select undirected/directed graph*/}
                             <div className = "dropdown">
-                            <Dropdown
+                            <select
                             formLabel = "Select what type of graph you want:"
                             buttonText = "submit"
                             onChange = {this.handleGraphTypeDropdownSelect}
-                            action = "/">
-                                <DropdownOption selected value = "undirected" />
-                                <DropdownOption value = "directed" />
-
-                            </Dropdown>
+                            class = "styledSelect"
+                            >
+                                <option value = "" disabled selected> First choose a type of graph: </option>
+                                <option value = "undirected" > undirected </option>
+                                <option value = "directed" > directed </option>
+                            </select>
+                          
                             </div>
                      
 
                             {/* second dropdown: select node ordering */}
                             <div className = "dropdown">
-                            <Dropdown
+                            <select
                             formLabel = "You can reorder the nodes:"
                             buttonText = "submit"
                             onChange = {this.handleDropdownSelect}
-                            action = "/">
+                            class = "styledSelect"
+                            >
+                            <option value = "" disabled selected> Choose a type of node ordering: </option>
+                            {this.state.nodeOrderingOptions}
 
-                                <DropdownOption value = "sorted in ascending order by id" />
-                                <DropdownOption value = "shuffle randomly" />
-                                <DropdownOption value = "alphabetically" />
-                                <DropdownOption value = "algorithm" hide = {true} />
+                            </select>
+                            </div>
 
-                            </Dropdown>
-
-                            <p> You have selected {this.state.dropdownValue} ({this.state.graphType} graph) </p>
-
-                           <button onClick = {this.handleButtonClick} id = "dropdownButton"> Reorder. </button> 
+                           
+                            <button onClick = {this.handleButtonClick} id = "dropdownButton"> Reorder. </button> 
 
                             </div>
+
+                            <div>   You have selected {this.state.dropdownValue} ({this.state.graphType} graph) </div>
+
+                           
+                            
                             <div id = "soundCheckbox">
                                 <label> Enable sounds:
                                 <input type = "checkbox"  onClick = {this.handleSoundCheckbox} />
