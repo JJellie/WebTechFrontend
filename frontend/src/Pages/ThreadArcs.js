@@ -15,7 +15,8 @@ class ThreadArcs extends React.Component {
         this.lastHover = ['', '', '', null, null];
         this.state = {"data": [], "testdata": '', "loading": "", "rendered": false, 'hover': this.props.getVisState};
 
-        this.colours = [['#3b1f2b', '#a23b72', '#c73e1d', '#f18f01', '#2e86ab', '#00ffc5', '#4acee0'], //prot
+        this.colours = [["#20A4F3", "#FFBA49", "#57A773", "#F06C9B", "#5B2A86", "#FB3640", "#CE98F5"], //default
+                        ['#3b1f2b', '#a23b72', '#c73e1d', '#f18f01', '#2e86ab', '#00ffc5', '#4acee0'], //prot
                         ["#813405", "#7f0799", "#ff4365", "#058ed9", "#00d9c0", "#e4ff1a", "#b7ad99"], //deut
                         ["#693668", "#a74482", "#b9415f", "#ff3562", "#b7986e", "#ee8e2c", "#ffb86f"]] //trit
         this.currentScheme = "default";
@@ -98,10 +99,10 @@ class ThreadArcs extends React.Component {
                 lookup[this.getData(i, 'fromId')] = {'email': this.getData(i,'fromEmail'), 'jobTitle': this.getData(i,'fromJob')};
             }
         }
-        console.log(this.getData(1))
-        console.log(lookup)
+        // console.log(this.getData(1))
+        // console.log(lookup)
         
-
+        // Counting all the jobs per jobTitle
         for(let key in lookup) {
             if(lookup[key]['jobTitle'] in jobCount) {
                 jobCount[lookup[key]['jobTitle']] += 1;
@@ -110,11 +111,10 @@ class ThreadArcs extends React.Component {
                 jobCount[lookup[key]['jobTitle']] = 1;
             }
         }
-        console.log(jobCount)
-        console.log("Employee" in jobCount)
+        // console.log(jobCount)
+        // console.log("Employee" in jobCount)
 
-        let highest = 0;
-        let title;
+        // Assigning colour to each job based on amount of times it occurs
         let jobColour = [[]]       
         for(let i = 0; i < 7; i++){
             let highest = 0;
@@ -129,10 +129,9 @@ class ThreadArcs extends React.Component {
             jobColour[i] = [title, highest];
             delete jobCount[title];
         }
-        console.log(jobColour)
-
-        //[["jobtitle", count], [], []] where it is ordered in descending fashion
+        // console.log(jobColour)
         
+        // Selection of the right first dimension of the colours array
         let colour_x;
         if (this.currentScheme === "default"){
             colour_x = 0;
@@ -157,6 +156,7 @@ class ThreadArcs extends React.Component {
             // id = jobColour.find(lookup[this.circles[j].data('id')]['jobTitle']);
             // this.colorCircle(j, this.colours[colour_x][id]);
 
+            // Buncha if statements to give the nodes the right colour
             if (lookup[this.circles[j].data('id')]['jobTitle'] === jobColour[0][0]){
                 this.colorCircle(j, this.colours[colour_x][0]);
             } else if (lookup[this.circles[j].data('id')]['jobTitle'] === jobColour[1][0]){
@@ -173,11 +173,6 @@ class ThreadArcs extends React.Component {
                 this.colorCircle(j, this.colours[colour_x][6]);
             }
 
-            // if(lookup[this.circles[j].data('id')]['jobTitle'] === 'Manager') {
-            //     this.colorCircle(j,"#f00" )
-            // } else {
-            //     this.colorCircle(j,"#fff")
-            // }
            
             this.circles[j].attr("stroke-width", Math.floor(this.circleRadius/3)+1);
             this.circles[j].click(() => {

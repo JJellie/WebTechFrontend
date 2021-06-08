@@ -96,7 +96,7 @@ class Vis extends React.Component {
 
                 {/* ~~~~  This is the text displayed between dividers  ~~~~  */}
                 <div className="visText">
-                     Wecome to the visualisation page. You can upload your data using the big blue button below. In the case you do not have a dataset, you can also use the standard dataset.
+                     Welcome to the visualisation page. You can upload your data using the big blue button below. In the case you do not have a dataset, you can also use the standard dataset.
                         <br></br>
                         When your data is uploaded, the visualisations will be loaded in. For some extra tips, refer to our <Link to="../about">About page</Link>. <br></br>
                         When the visualisations have loaded, you can select our visual-impairment friendly modes. You can choose a colour scheme, or go for the extra experience with audio cues upon hovering.                        
