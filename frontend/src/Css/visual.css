@@ -66,6 +66,8 @@ input[type='submit'] {
 {
     padding-left: 10px;
 }
+
+/* Properties of the header */
 .visHeader{
   display: block;
   stroke: black;
@@ -84,6 +86,7 @@ input[type='submit'] {
   color: #2773d9;
 }
 
+/*  properties of the divider lines */
 .line{
   width: 36vw;
   border-bottom: 4px double #7e7b7c;
@@ -105,7 +108,8 @@ input[type='submit'] {
   margin-left: 47vw;
   margin-top: 2%
   }
-  
+ 
+/* properties of the text between the lines */
 .visText{
   stroke: black;
   stroke-width: 10px;
@@ -121,6 +125,7 @@ input[type='submit'] {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* properties of the banner on the vispage */
 .banner img{
   vertical-align:bottom;
   height: 35%;
@@ -132,6 +137,7 @@ input[type='submit'] {
   z-index: -1;
 }
 
+/* visual properties of the upload button */
 .uploadbutton{
   margin-left: -10%;
   text-align: center;
