@@ -1,5 +1,5 @@
 body {
-    margin: 0;
+    margin: 0px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
       sans-serif;
@@ -7,26 +7,36 @@ body {
     -moz-osx-font-smoothing: grayscale;
     background-color: #efefef;
 }
-
-.first h1 {color:#050401;
-    font-size: 10vh;
-    margin-bottom: 0px;
+/* Start of Banner code */
+.Banner {
+    background-image: url("https://i.imgur.com/7M752Wn.png");
+    background-size: cover;
+    height:100vh;
+    width:100vw;
+    padding:1px;
 }
-
-.first h2 {color:#050401;
+.Banner .BannerText{
+    margin-top: 25vh;
+    height: 25%;
+    width: 95%;
+    text-align: center;
+}
+.BannerText h1 {color:#050401;
+    font-size: 10vh;
+    margin-top: 0vh;
+    margin-bottom: 0vh;
+    position: center;
+}
+.BannerText h2 {color:#050401;
     font-size: 3.5vh;
     margin-top: 0px;
 }
-
-.first p {color:#050401;
-    width: 30vw;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 2vh;
+.BannerButton{
+    text-align:center;
+    width: 95%;
 }
-
-.first button {
-    margin-top: 2vh;
+.BannerButton button {
+    margin-top: 10vh;
     font-family: monospace;
     background: #20A4F3;
     color: #ffffff;
@@ -40,23 +50,21 @@ body {
     position: relative;
     margin-bottom: 2vh;
 }
-
-.first button:hover {
+.BannerButton button:hover {
     background: #20A4F3;
     transition: 0.5s;
     border-radius: 10px;
     padding: 1.5rem 3.5rem 1.5rem 3.5rem;
 }
-.first {
-    height: 45vh;
-    text-align:center;
-}
-.second{
-    margin-top: 10%;
-}
-.second img {
-    height: 35vh;
-    width: 100vw;
+
+/* Start of the rest of the div code */
+
+.BannerBottomText p {
+    font-family: monospace;
+    text-align: center;
+    color:#050401;
+    font-size: 3vh;
+    margin-top: 10px;
 }
 
 
