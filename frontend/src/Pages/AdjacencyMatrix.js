@@ -593,7 +593,7 @@ class AdjacencyMatrix extends React.Component {
                             formLabel = "Select what type of graph you want:"
                             buttonText = "submit"
                             onChange = {this.handleGraphTypeDropdownSelect}
-                            class = "styledSelect"
+                            className = "styledSelect"
                             >
                                 <option value = "" disabled selected> First choose a type of graph: </option>
                                 <option value = "undirected" > undirected </option>
