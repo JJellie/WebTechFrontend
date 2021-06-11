@@ -19,6 +19,7 @@ padding: 20px;
 border: 1px solid #888;
 width: 50%; /* Could be more or less, depending on screen size */
 height: 30%;
+position: relative;
 }
 
 /* The Close Button */
@@ -110,4 +111,28 @@ position: relative;
   to {
     transform: rotate(1turn);
   }
+}
+
+
+.ColumnSortingMenu button {
+  text-align: center;
+  overflow: hidden;
+  font-family: monospace;
+  background: #20A4F3;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 1.25em;
+  padding: 0.5rem 1.5rem;
+  border: 0;
+  transition: 0.5s;
+  border-radius: 10px;
+  position: absolute;
+  float: right;
+  bottom: 0;
+  margin-left: 1em;
+}
+
+.ColumnSortingMenu button:hover {
+  background: #1a86c5;
+  transition: 0.5s;
 }
