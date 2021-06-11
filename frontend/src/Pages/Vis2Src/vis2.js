@@ -8,13 +8,12 @@ import { Link } from "react-router-dom";
 import { popupShow, DatasetPopup } from "./backend.js";
 
 
-
 function Vis2() {
     const [dataSet, setDataSet] = useState(null);
 
     return(
         <>  
-            <DatasetPopup setDataSet={setDataSet}/>
+            <DatasetPopup setDataSet={setDataSet} colorScheme={["#FFBA49", "#57A773", "#F06C9B", "#5B2A86", "#FB3640", "#CE98F5"]}/>
             <div>
                 {/* ~~~~  This is the main title ~~~~  */} 
                 <div className="visHeader">

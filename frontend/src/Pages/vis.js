@@ -1,19 +1,21 @@
 import ThreadArcs from './ThreadArcs';
 import '../Css/visual.css';
 import React from 'react';
-import AdjacencyMatrix from './AdjacencyMatrix';
+import AdjacencyMatrix from './AdjacencyMatrix/AdjacencyMatrix';
 import Banner from "../Images/banner vis.png";
 import Divider from "../Images/divider.png";
-import {
-    Link,
-  } from "react-router-dom";
-
+import { Link, } from "react-router-dom";
 
 class Vis extends React.Component {
     constructor(props) {
         super(props)
         this.state = {"uploaded":false, "filename":"", "emailHover" : 1,"selectedInfo" : ['','','',null,null], "selectedFile": "none"}
+        this.isDataReady = false;
+        this.data = [];
+        this.dataName = this.props.file;
     }
+    
+    
     componentDidMount() {
         this.props.update()
     }
@@ -41,11 +43,10 @@ class Vis extends React.Component {
                 document.getElementById("visualizations").style.display= "block";
                 document.getElementById('openPopup').textContent = 'Reupload your data'
         }
-        
-
-        
     }
-    popupShow(){
+
+
+    popupShow() {
         let box = document.getElementById('popup')
         box.style.display = "block";
     }
@@ -67,7 +68,6 @@ class Vis extends React.Component {
     render() {
         return (
             <div>
-        
             <div id='popup' className='popup'>
                 <div className='popup-content'>
                     <span onClick={() => this.closePopup()} className="close">&times;</span>
@@ -79,13 +79,11 @@ class Vis extends React.Component {
                     <label className='testSetText' id='testSet' onClick={() => this.loadTestSet()}>Or click here to use a test data set</label>
                 </div>
             </div>
-            <div>
-                {/* ~~~~  This is the main title ~~~~  */} 
+            <div> 
                 <div className="visHeader">
                     <h1>Visualisation</h1>
                 </div>
 
-                {/* ~~~~  This is the top divider  ~~~~  */}
                 <div className="line">
                     {/* this will be a line */}
                 </div>
@@ -94,15 +92,14 @@ class Vis extends React.Component {
                     {/* this will be a line */}
                 </div>
 
-                {/* ~~~~  This is the text displayed between dividers  ~~~~  */}
                 <div className="visText">
-                     Welcome to the visualisation page. You can upload your data using the big blue button below. In the case you do not have a dataset, you can also use the standard dataset.
+                     Wecome to the visualisation page. You can upload your data using the big blue button below. In the case you do not have a dataset, you can also use the standard dataset.
                         <br></br>
                         When your data is uploaded, the visualisations will be loaded in. For some extra tips, refer to our <Link to="../about">About page</Link>. <br></br>
-                        When the visualisations have loaded, you can select our visual-impairment friendly modes. You can choose a colour scheme, or go for the extra experience with audio cues upon hovering.                        
+                        When the visualisations have loaded, you can select our visual-impairment friendly modes. You can choose a colour scheme, or go for the extra experience with audio cues upon hovering.
+                        
                 </div>
 
-                {/* ~~~~  This is the bottom divider  ~~~~  */}
                 <div className="line">
                     {/* this will be a line */}
                 </div>
@@ -111,7 +108,6 @@ class Vis extends React.Component {
                     {/* this will be a line */}
                 </div>
 
-                {/* ~~~~  This is the upload button which opens the popup ~~~~  */}
                 <div className="uploadbutton">
                     <button id='openPopup' onClick={() => this.popupShow()}>Upload your data here!</button>
                 </div>
@@ -134,7 +130,6 @@ class Vis extends React.Component {
                <div className="Am_block">
                <h1 className='Visheader'> AdjacencyMatrix </h1>
                     <AdjacencyMatrix file={this.state.filename} uploadStatus={this.state.uploaded} updateVisState={(p) => {this.setState(p)}} getVisState={this.state.selectedInfo}/>
-               
                <div id = "block1">
                    <div id = "b1col0">
                        <div className = "infobox">  
@@ -153,7 +148,6 @@ class Vis extends React.Component {
                </div>
            </div>
         </div>
-            
         );
     }
 }

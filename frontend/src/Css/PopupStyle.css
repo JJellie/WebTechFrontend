@@ -17,17 +17,20 @@ background-color: #fefefe;
 margin: 15% auto; /* 15% from the top and centered */
 padding: 20px;
 border: 1px solid #888;
-width: 50%; /* Could be more or less, depending on screen size */
+width: 40%; /* Could be more or less, depending on screen size */
 height: 30%;
 position: relative;
+border-radius: 15px;
 }
 
 /* The Close Button */
 .close {
 color: #aaa;
-float: right;
 font-size: 28px;
 font-weight: bold;
+position: absolute;
+top: 2.5%;
+right: 2.5%;
 }
 
 .close:hover,
@@ -37,7 +40,7 @@ text-decoration: none;
 cursor: pointer;
 }
 
-.UploadButton{
+.uploadButton{
 text-align: center;
 display: block;
 overflow: hidden;
@@ -57,12 +60,12 @@ position: relative;
 }
 
 
-.UploadButton:hover {
+.uploadButton:hover {
 background: #1a86c5;
 transition: 0.5s;
 }
 
-.SubmitButton{
+.submitButton{
 text-align: center;
 display: none;
 overflow: hidden;
@@ -81,13 +84,13 @@ width: 40%;
 position: relative;
 }
 
-.SubmitButtonLoading{
+.submitButtonLoading{
   display: block;
   background: #1a86c5;
 }
 
 
-.SubmitButtonLoading span::after{
+.submitButtonLoading span::after{
   content: "";
   position: absolute;
   width: 16px;
@@ -112,27 +115,105 @@ position: relative;
     transform: rotate(1turn);
   }
 }
-
-
-.ColumnSortingMenu button {
-  text-align: center;
-  overflow: hidden;
-  font-family: monospace;
-  background: #20A4F3;
-  color: #ffffff;
-  cursor: pointer;
-  font-size: 1.25em;
-  padding: 0.5rem 1.5rem;
-  border: 0;
-  transition: 0.5s;
-  border-radius: 10px;
-  position: absolute;
-  float: right;
-  bottom: 0;
-  margin-left: 1em;
+.columnSortingMenu {
+    text-align: center;
 }
 
-.ColumnSortingMenu button:hover {
-  background: #1a86c5;
-  transition: 0.5s;
+.buttonContainer {
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+}
+
+.buttonContainer div {
+    position: relative;
+    left: -50%;
+}
+
+
+.columnSortingMenu button {
+    text-align: center;
+    overflow: hidden;
+    font-family: monospace;
+    color: #ffffff;
+    font-size: 1.25em;
+    padding: 0.5rem 1.5rem;
+    border: 0;
+    transition: 0.5s;
+    border-radius: 10px;
+    margin: 0.25em;
+    bottom: 5%;
+}
+
+.columnSortingButtonEnabled {
+    background: #20A4F3;
+    cursor: pointer;
+}
+
+.columnSortingButtonDisabled {
+    background: #1a86c5;
+    cursor: default;
+}
+
+
+.columnSortingMenu button:hover {
+    background: #1a86c5;
+    transition: 0.5s;
+}
+
+.columnSortingMenu h1 {
+    margin-bottom: 10px;
+}
+
+.columnSortingMenu p {
+    width: 80%;
+    margin: auto;
+    margin-top: 10px;
+}
+
+.columnSelection {
+    margin-top: 3%;
+}
+
+.columnSelectionRow {
+    margin-bottom: 3%;
+}
+
+
+
+.columnSelectionRow span {
+    font-family: monospace;
+    font-size: 1.25em;
+    border-style: solid;
+    border-color: #20A4F3;
+    border-width: 2px;
+    border-radius: 12.5px;
+    user-select: none;
+}
+
+.columnSelectionUnselected:hover {
+    padding: 0.4rem 0.9rem;
+    margin: 0.25rem;
+}
+
+.columnSelectionUnselected {
+    padding: 0.3rem 0.75rem;
+    margin: 0.4rem;
+}
+
+.columnSelectionSelected {
+    padding: 0.4rem 0.9rem;
+    margin: 0.25rem;
+}
+
+.errorMessage {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+}
+
+.errorMessage b {
+    position: relative;
+    left: -50%;
+    color: red;
 }
