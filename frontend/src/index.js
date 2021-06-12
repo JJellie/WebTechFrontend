@@ -62,13 +62,13 @@ class NavBar extends React.Component {
         return (    
         <Router>
             <div className = "sidebar" id='sidebar'>
-            <button className='Hamburger' onClick={() => this.menuChange()}><img src={Hamburger} alt='Hamburger Icon'width='40px' height="40px"></img></button>
+            {/* <button className='Hamburger' onClick={() => this.menuChange()}><img src={Hamburger} alt='Hamburger Icon'width='40px' height="40px"></img></button> */}
             <ul className= 'sidebarList' id = 'sideBarList'>
-                <li><button  className="image"><img src={Logo} alt="company logo" width="168" height="168"></img></button></li>
-                <li><Link to="/"><button className={this.state["activepage"] === 0 ? "active" : ""}><span>Home</span></button></Link></li>
-                <li><Link to="/vis"><button className={this.state["activepage"] === 1 ? "active" : ""}>Visualisation</button></Link></li>
-                <li><Link to="/about"><button className={this.state["activepage"] === 2 ? "active" : ""}>About</button></Link></li>
-                <li><Link to="/contact"><button className={this.state["activepage"] === 3 ? "active" : ""}>Contact</button></Link></li>
+                <a><button  className="image"><img src={Logo} alt="company logo" width="46px" height="46px"></img></button></a>
+                <a><Link to="/"><button className={this.state["activepage"] === 0 ? "active" : ""}><span>Home</span></button></Link></a>
+                <a><Link to="/vis"><button className={this.state["activepage"] === 1 ? "active" : ""}>Visualisation</button></Link></a>
+                <a><Link to="/about"><button className={this.state["activepage"] === 2 ? "active" : ""}>About</button></Link></a>
+                <a><Link to="/contact"><button className={this.state["activepage"] === 3 ? "active" : ""}>Contact</button></Link></a>
             </ul>
             </div>
             <div className = "page">

@@ -75,7 +75,7 @@ input[type='submit'] {
   border-style: solid;
   border-radius: 16px;
   width: 50%;
-  margin-left: 25%;
+  margin-left:25%;
   border-color: #20A4F3;
   font-family: 'Courier New', Courier, monospace;
   margin-top: 1%;
@@ -88,25 +88,25 @@ input[type='submit'] {
 
 /*  properties of the divider lines */
 .line{
-  width: 36vw;
+  width: 42vw;
   border-bottom: 4px double #7e7b7c;
   position: absolute;
   margin-left:3vw;
-  margin-top: 2%
+  margin-top: 2.1%
   }
 .symbol img{
   position: absolute;
-  margin-left: 40.5%;
-  width: 5vw;
-  height: 2.8vh;
+  margin-left: 47vw;
+  width: 6vw;
+  height: 3vh;
   margin-top:1.5%;
 }
 .line2{
-  width: 36vw;
+  width: 42vw;
   border-bottom: 4px double #7e7b7c;
   position: absolute;
-  margin-left: 47vw;
-  margin-top: 2%
+  margin-left: 55vw;
+  margin-top: 2.1%
   }
  
 /* properties of the text between the lines */
@@ -114,8 +114,8 @@ input[type='submit'] {
   stroke: black;
   stroke-width: 10px;
   border-radius: 16px;
-  width: 79vw;
-  margin-left: 4vw;
+  width: 90vw;
+  margin-left: 5vw;
   margin-top: 4%;
   font-family: 'Courier New', Courier, monospace;
 }
@@ -132,14 +132,14 @@ input[type='submit'] {
   width: 100vw;
   position:fixed;
   bottom:0px;
-  left:26px;
+  left:0px;
   overflow: visible;
   z-index: -1;
 }
 
 /* visual properties of the upload button */
 .uploadbutton{
-  margin-left: -10%;
+  margin-left: 0;
   text-align: center;
   overflow: hidden;
 }
