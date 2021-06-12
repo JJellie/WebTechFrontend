@@ -5,7 +5,7 @@ body {
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #efefef;
+    background-color: #e6e6e6;
 }
 /* Start of Banner code */
 .Banner {
@@ -56,17 +56,169 @@ body {
     border-radius: 10px;
     padding: 1.5rem 3.5rem 1.5rem 3.5rem;
 }
+.BannerButton p{
+    margin-top:2vh;
+    font-style: italic;
+    font-size:1.3em;
+    color: #6D696A;
+    font-family: monospace;
+}
 
 /* Start of the rest of the div code */
 
-.BannerBottomText p {
-    font-family: monospace;
-    text-align: center;
-    color:#050401;
-    font-size: 3vh;
-    margin-top: 10px;
+.marquee {
+    height: 1.6vw;
+    width: 100vw;
+  
+    overflow: hidden;
+    position: relative;
+    background-color:#E6E6E6;
+}
+  
+  .marquee div {
+    display: block;
+    width: 210%;
+    height: 30px;
+  
+    position: absolute;
+    overflow: hidden;
+  
+    animation: marquee 20s linear infinite;
+  }
+  
+  .marquee span {
+    float: left;
+    width: 50%;
+    font-family:monospace;
+    font-size:1.4vw;
+  }
+  
+  @keyframes marquee {
+    0% { left: 0; }
+    100% { left: -100%; }
+  }
+
+.GeneralAd {
+    display: block;
+    stroke: black;
+    stroke-width: 10px;
+    border-style: dotted;
+    border-radius: 16px;
+    width: 80vw;
+    height:10/1vw;
+    margin-left: 5vw;
+    margin-top: 5vh;
+    margin-bottom: 1vh;
+    border-color: #20A4F3;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: larger;
+  }
+/* INVERSE SCALING STILL NEEDED....SOMEHOW*/
+.GeneralAd img{
+    display:block;
+    float:left;
+    Height: 20%;
+    Max-height: 15vw;
+    Width:20%;
+    Max-width: 15vw;
+  }
+.imageHolder{
+    background-image: url(http://localhost:3000/static/media/logo%201.64080741.png);
+    background-size: cover;
+    float:left;
+    width:12vw;
+    height:12vw;
 }
 
+.GeneralAd p{
+    padding:10px;
+    margin-left:12vw;
+    vertical-align: middle;
+  }
 
+.ThreadArcsAd {
+    display: block;
+    stroke: black;
+    stroke-width: 10px;
+    border-style: dotted;
+    border-radius: 16px;
+    width: 80vw;
+    height:10vw;
+    margin-left: 15vw;
+    margin-top: 5vh;
+    margin-bottom: 1vh;
+    border-color: #20A4F3;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: larger;
+}
+/* INVERSE SCALING STILL NEEDED....SOMEHOW*/
+.ThreadArcsAd img{
+    display:block;
+    float:left;
+    max-height:10vw;
+    max-width:10vw;
+  }
 
+.ThreadArcsAd p{
+    padding:10px;
+    margin-left:12vw;
+    vertical-align: middle;
+  }
 
+.AdjacencyAd {
+    display: block;
+    stroke: black;
+    stroke-width: 10px;
+    border-style: dotted;
+    border-radius: 16px;
+    width: 80vw;
+    height:10/1vw;
+    margin-left: 5vw;
+    margin-top: 5vh;
+    margin-bottom: 1vh;
+    border-color: #20A4F3;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: larger;
+  }
+/* INVERSE SCALING STILL NEEDED....SOMEHOW*/
+.AdjacencyAd img{
+    display:block;
+    float:left;
+    max-height:10vw;
+    max-width:10vw;
+  }
+
+.AdjacencyAd p{
+    padding:10px;
+    margin-left:12vw;
+    vertical-align: middle;
+  }
+
+.PageAd {
+    display: block;
+    stroke: black;
+    stroke-width: 10px;
+    border-style: dotted;
+    border-radius: 16px;
+    width: 80vw;
+    height:18vw;
+    margin-left: 15vw;
+    margin-top: 5vh;
+    margin-bottom: 1vh;
+    border-color: #20A4F3;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: larger;
+}
+/* INVERSE SCALING STILL NEEDED....SOMEHOW*/
+.PageAd img{
+    display:block;
+    float:left;
+    max-height:18vw;
+    max-width:18vw;
+  }
+
+.PageAd p{
+    padding:10px;
+    margin-left:20vw;
+    vertical-align: middle;
+  }
