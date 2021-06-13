@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, forceUpdate} from 'react'
 import '../../Css/PopupStyle.css'
 import loadImg from '../../Images/LoadIcon.png'
 
@@ -49,10 +49,23 @@ async function sendOrderedColumns(colArray, filename) {
     await fetch('htt[://localhost:3001/upload/columns?file=' +filename, {method: "POST", body:data});
 }
 
-const errorMessage = ["Select a column", "Don't click next without selecting anything you idiot"];
+function nodeAttrNamePopupShow() {
+    nodeAttrNameActice = true;
+    document.getElementById('nodeAttrNamePopup').style.display = "block";
+}
+
+
+
+let nodeAttrNameActice = false;
+let errorMessage;
 let errorCount = 0;
-let columnData = {date: null, edgeAttr: null, fromId: null, toId: null, nodeAttr: null};
-let columns;
+let columnData = {date: null, edgeAttr: [], fromId: null, toId: null, nodeAttr: {}};
+let nodeAttrSelectionData = {colors: {}, columnInfo : {}};
+let edgeAttrSelectionData = {colors: {}, columnInfo : {}};
+let nodeAttrSelectionColor = 0;
+let edgeAttrSelectionColor = 0;
+let columns = [];
+let rowExample = null;
 
 
 // Popup thing where the dataset will be uploaded and where the user specify the columns
@@ -61,12 +74,15 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
     const initialMenuCount = 0;
     const initialColumnSelected = null;
     const initialError = 0;
+    const initialNodeAttrSelection = false;
+    const initialNodeAttrName = "";
     const [filename, setFilename] = useState(null);
     const [popupState, setPopupState] = useState(initialPopupState);
-    const [columnNames, setColumns] = useState([]);
     const [menuCount, setMenuCount] = useState(initialMenuCount);
     const [columnSelected, setColumnSelected] = useState(initialColumnSelected);
     const [error, setError] = useState(initialError);
+    const [nodeAttrSelection, setNodeAttrSelection] = useState(initialNodeAttrSelection);
+    const [nodeAttrName, setNodeAttrName] = useState(initialNodeAttrName)
 
     function dataPassing(filename) {
         setDataSet(getDataset(filename))
@@ -80,6 +96,11 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
             //TODO
         }
     }
+    function nodeAttrNamePopupClose() {
+        nodeAttrNameActice = false;
+        document.getElementById("nodeAttrNamePopup").style.display = "none";
+        setNodeAttrName(initialNodeAttrName);
+    }
 
     function closePopup() {
         document.getElementById("popup").style.display = "none";
@@ -87,11 +108,27 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
         setMenuCount(initialMenuCount);
         setError(initialError);
         setColumnSelected(initialColumnSelected);
+        setNodeAttrSelection(initialNodeAttrSelection);
+        setNodeAttrName(initialNodeAttrName);
+        nodeAttrSelectionData = {colors: {}, columnInfo : null};
+        columnData = {date: null, edgeAttr: [], fromId: null, toId: null, nodeAttr: {}};
+        errorCount = 0;
+        columns = [];
+        rowExample = null;
+        nodeAttrNameActice = false;
     }
     
     window.onclick = function(event) {
-        if (event.target == document.getElementById("popup")) {
-            closePopup();
+        if (event.target === document.getElementById("popup")) {
+            if(nodeAttrNameActice) {
+                setColumnSelected([columnSelected[0], null]);
+                nodeAttrNamePopupClose();
+            } else {
+                closePopup();
+            }
+        } else if (event.target === document.getElementById("nodeAttrNamePopup")) {
+            setColumnSelected([columnSelected[0], null]);
+            nodeAttrNamePopupClose();
         }
     }
 
@@ -115,9 +152,9 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                                     id='Submit' 
                                     onClick={async () => {
                                         setPopupState("loading"); 
-                                        setColumns(await postDataSet(document.getElementById('UploadedFile').files[0])); 
-                                        setPopupState("columnSorting")
-                                        columns=[columnNames.keys()]; console.log(columnNames)}} 
+                                        rowExample = await postDataSet(document.getElementById('UploadedFile').files[0]);
+                                        columns=[Object.keys(rowExample)];
+                                        setPopupState("columnSorting")}} 
                                     className="uploadButton"></input>
                             </>
                             :
@@ -137,27 +174,28 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                                 <p>To fully be able to use your uploaded dataset, we need you to identify which columns correspond to which attributes of the dataset. In the next few pages you can fill in what column of your dataset corresponds to the prompted attribute. <br></br>Press next to proceed.</p>
                                 <div className="buttonContainer">
                                     <div>
-                                        <button onClick={() => {setPopupState("fileSubmit")}}>Back</button>
-                                        <button onClick={() => {setMenuCount(menuCount + 1)}}>Next</button>
+                                        <button className="columnSortingButtonEnabled" onClick={() => {setPopupState("fileSubmit")}}>Back</button>
+                                        <button className="columnSortingButtonEnabled" onClick={() => {setMenuCount(menuCount + 1)}}>Next</button>
                                     </div>
                                 </div>
                             </div>
                         )
                     // Selecting the date column popup screen
                     case 1:
+                        errorMessage = ["Select a column", "Don't click next without selecting anything you idiot"];
                         return (
                             <div className="columnSortingMenu">
                                 <h1>Date</h1>
-                                <p>Select the column which represents the date.</p>
+                                <p>Select the column which represents the date</p>
                                 <div className="columnSelection">
                                     {[...Array(Math.ceil(columns[0].length/elementsInLine)).keys()].map((i) =>{
                                         return (
                                             <div key={i} className="columnSelectionRow">
-                                                {columns[0][0].slice(i*5,i*5+5).map((column) =>
+                                                {columns[0].slice(i*5,i*5+5).map((column) =>
                                                     (columnSelected === column ?
                                                         <span 
                                                             key={column} 
-                                                            className="columnSelectionSelected" 
+                                                            className={"columnSelectionSelected"}
                                                             style={{color: textColor(colorScheme[0]), backgroundColor : colorScheme[0], borderColor : colorScheme[0]}}
                                                             onClick={() => {setColumnSelected(null)}}
                                                         >
@@ -165,7 +203,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                                                         </span> :
                                                         <span 
                                                             key={column} 
-                                                            className="columnSelectionUnselected" 
+                                                            className={"columnSelectionUnselected"}
                                                             onClick={() => {setColumnSelected(column); if(error === 2){setError(1)}}}
                                                         >
                                                             {column}
@@ -180,7 +218,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                                 {error > 0 ? <div className="errorMessage"><b>{errorCount <= 2 ? errorMessage[0] : errorMessage[1]}</b></div> : ""}
                                 <div className="buttonContainer">
                                     <div>
-                                        <button onClick={() => {
+                                        <button className="columnSortingButtonEnabled" onClick={() => {
                                             setError(0);
                                             setMenuCount(menuCount - 1)
                                             }}>Back</button>
@@ -188,14 +226,35 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                                             <button className="columnSortingButtonDisabled">Next</button>:
                                             <button className="columnSortingButtonEnabled" onClick={() => {
                                                 if(columnSelected) {
-                                                    columnData["date"] = columnSelected;
+                                                    columns[1] = columns[0].filter(e => e !== columnSelected);
                                                     setError(0);
-                                                    setColumnSelected(null);
+                                                    if(columnData.fromId === columnSelected || columnData.toId === columnSelected) {
+                                                        setColumnSelected([null,null]);
+                                                        columnData.fromId = null;
+                                                        columnData.toId = null;
+                                                    }
+                                                    if(columnData.edgeAttr.includes(columnSelected)) {
+                                                        columnData.edgeAttr = columnData.edgeAttr.filter(e => e !== columnSelected);
+                                                        if(columns[2].columnInfo[columnSelected] < edgeAttrSelectionColor) {
+                                                            edgeAttrSelectionColor = columns[2].columnInfo[columnSelected];
+                                                        }
+                                                        delete edgeAttrSelectionData.colors[columns[2].columnInfo[columnSelected]];
+                                                        delete edgeAttrSelectionData.columnInfo[columnSelected];
+                                                    }
+                                                    for(const [key, value] of Object.entries(columnData.nodeAttr)) {
+                                                        if(value.includes(columnSelected)) {
+                                                            delete columnData.nodeAttr[key];
+                                                            delete nodeAttrSelectionData.colors[nodeAttrSelectionData.columnInfo[value[0]][1]];
+                                                            delete nodeAttrSelectionData.columnInfo[value[0]];
+                                                            delete nodeAttrSelectionData.columnInfo[value[1]];
+                                                        } 
+                                                    }
+                                                    columnData["date"] = columnSelected;
+                                                    setColumnSelected([columnData.fromId , columnData.toId]);
                                                     setMenuCount(menuCount + 1);
                                                 } else {
                                                     setError(2);
                                                     errorCount++;
-                                                    console.log(errorCount)
                                                 }
                                             }}>Next</button>
                                         }
@@ -204,17 +263,464 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                                 </div>
                             </div>
                         )
+                    // Selecting node id popup screen.
                     case 2:
+                        errorMessage = ["The selection was unfinished click next again to proceed but your selection will be lost"];
                         return (
                             <div className="columnSortingMenu">
+                                <h1>Node ID</h1>
+                                {columnSelected[0] === null && columnSelected[1] === null ?
+                                    <p>Select the column which represents the ID of the sending node <br></br> or click next if there is no node ID</p> :
+                                    columnSelected[1] === null ?
+                                    <p>Select the column which represents the ID of the receiving node</p> :
+                                    <p>Click next to proceed or click on the selected column to reset</p>
+                                }
+                                <div className="columnSelection">
+                                    {[...Array(Math.ceil(columns[1].length/elementsInLine)).keys()].map((i) =>{
+                                        return (
+                                            <div key={i} className="columnSelectionRow">
+                                                {columns[1].slice(i*5,i*5+5).map((column) =>
+                                                    (columnSelected.includes(column) ?
+                                                        <span 
+                                                            key={column} 
+                                                            className="columnSelectionSelected" 
+                                                            style={{color: textColor(colorScheme[0]), backgroundColor : colorScheme[0], borderColor : colorScheme[0]}}
+                                                            onClick={() => {
+                                                                if(columnSelected[0] === column) {
+                                                                    setColumnSelected([null, null]);
+                                                                } else {
+                                                                    setColumnSelected([columnSelected[0], null]);
+                                                                } 
+                                                                if(error === 1) {setError(0);}}}
+                                                        >
+                                                            {column}
+                                                        </span> :
+                                                        (columnSelected.includes(null)) ?
+                                                            <span 
+                                                            key={column} 
+                                                            className="columnSelectionUnselected" 
+                                                            onClick={() => {
+                                                                if(columnSelected[0] === null) {
+                                                                    setColumnSelected([column, null]);
+                                                                } else {
+                                                                    setColumnSelected([columnSelected[0], column]); 
+                                                                }
+                                                                if(error === 1) {setError(0);}
+                                                                }}
+                                                            >
+                                                                {column}
+                                                            </span> :
+                                                            <span 
+                                                            key={column} 
+                                                            className="columnSelectionUnselectedDisabled" 
+                                                            >
+                                                                {column}
+                                                            </span>
+                                                    )
+                                                )}
+                                            </div>
+                                        )
+                                    }
+                                    )}
+                                </div>
+                                {error === 1 ? <div className="errorMessage"><b>{errorMessage[0]}</b></div> : ""}
                                 <div className="buttonContainer">
                                     <div>
-                                        <button onClick={() => {setMenuCount(menuCount - 1)}}>Back</button>
-                                        <button onClick={() => {setMenuCount(menuCount + 1)}}>Next</button>
+                                        <button className="columnSortingButtonEnabled" onClick={() => {
+                                            columnData.fromId = columnSelected[0];
+                                            columnData.toId = columnSelected[1];
+                                            setError(0);
+                                            setMenuCount(menuCount - 1)
+                                            setColumnSelected(columnData["date"]);
+                                        }}>Back</button>
+                                        <button className="columnSortingButtonEnabled" onClick={() => {
+                                            if ( columnSelected[1] === null && columnSelected[0] !== null && error !== 1) {
+                                                setError(1);
+                                            } else if (error === 1) {
+                                                columnData.fromId = null;
+                                                columnData.toId = null;
+                                                columns[2] = columns[1];
+                                                setError(0);
+                                                setColumnSelected(columnData.edgeAttr);
+                                                setMenuCount(menuCount + 1);
+                                            } else {
+                                                columns[2] = {};
+                                                setError(0);
+                                                if(columnData.edgeAttr.includes(columnSelected[0])) {
+                                                    columnData.edgeAttr = columnData.edgeAttr.filter(e => e !== columnSelected[0]);
+                                                }
+                                                if(columnData.edgeAttr.includes(columnSelected[1])) {
+                                                    columnData.edgeAttr = columnData.edgeAttr.filter(e => e !== columnSelected[1]);
+                                                }
+                                                for(const column of columnSelected) {
+                                                    for(const [key, value] of Object.entries(columnData.nodeAttr)) {
+                                                        if(value.includes(column)) {
+                                                            delete columnData.nodeAttr[key];
+                                                            delete nodeAttrSelectionData.colors[nodeAttrSelectionData.columnInfo[value[0]][1]];
+                                                            delete nodeAttrSelectionData.columnInfo[value[0]];
+                                                            delete nodeAttrSelectionData.columnInfo[value[1]];
+                                                        } 
+                                                    }
+                                                }
+                                                if(!(columnData.fromId === columnSelected[0]) && nodeAttrSelectionData.columnInfo !== null) {
+                                                    nodeAttrSelectionData.columnInfo[columnData.fromId] = null;                                                    
+                                                }
+                                                if(!(columnData.toId === columnSelected[1]) && nodeAttrSelectionData.columnInfo !== null) {
+                                                    nodeAttrSelectionData.columnInfo[columnData.toId] = null;                                                    
+                                                }
+                                                columnData.fromId = columnSelected[0];
+                                                columnData.toId = columnSelected[1];
+                                                columns[2].columnInfo = Object.assign({}, ...columns[1].filter(e => 
+                                                    (e !== columnSelected[0] && e !== columnSelected[1])).map(e => (
+                                                        {[e] : e in edgeAttrSelectionData.columnInfo ? edgeAttrSelectionData.columnInfo[e] : null}
+                                                    )));
+                                                columns[2].colors = edgeAttrSelectionData.colors;
+                                                setColumnSelected(columnData.edgeAttr);
+                                                setMenuCount(menuCount + 1);
+                                            }
+                                        }}>Next</button>
                                     </div>
                                 </div>
                             </div>
                         )
+                    // Selecting the edge attributes columns popup screen
+                    case 3:
+                        errorMessage = [];
+                        return (
+                            <div className="columnSortingMenu">
+                                <h1>Edge Attributes</h1>
+                                <p>Select the columns which represents the edge attributes or click next if there aren't any</p>
+                                <div className="columnSelection">
+                                    {[...Array(Math.ceil((Object.keys(columns[2].columnInfo)).length/elementsInLine)).keys()].map((i) =>{
+                                        return (
+                                            <div key={i} className="columnSelectionRow">
+                                                {(Object.keys(columns[2].columnInfo)).slice(i*5,i*5+5).map((column) => 
+                                                    (columns[2].columnInfo[column] !== null?
+                                                        <span 
+                                                            key={column} 
+                                                            className="columnSelectionSelected" 
+                                                            style={{color: textColor(colorScheme[columns[2].columnInfo[column]]), backgroundColor : colorScheme[columns[2].columnInfo[column]], borderColor : colorScheme[columns[2].columnInfo[column]]}}
+                                                            onClick={() => {
+                                                                if(columns[2].columnInfo[column] < edgeAttrSelectionColor) {
+                                                                    edgeAttrSelectionColor = columns[2].columnInfo[column];
+                                                                }
+                                                                delete columns[2].colors[columns[2].columnInfo[column]];
+                                                                columns[2].columnInfo[column] = null;
+                                                                setColumnSelected(columnSelected.filter(e => e !== column));
+                                                            }}
+                                                        >
+                                                            {column}
+                                                        </span> :
+                                                        <span 
+                                                            key={column} 
+                                                            className="columnSelectionUnselected" 
+                                                            onClick={() => {
+                                                                columns[2].columnInfo[column] = edgeAttrSelectionColor;
+                                                                columns[2].colors[edgeAttrSelectionColor] = column;
+                                                                for(let i = edgeAttrSelectionColor+1; i<colorScheme.length ; i++) {
+                                                                    if(!columns[2].colors[i]) {
+                                                                        edgeAttrSelectionColor = i;
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                setColumnSelected([...columnSelected, column])
+                                                            }}
+                                                        >
+                                                            {column}
+                                                        </span>
+                                                    )
+                                                )}
+                                            </div>
+                                        )
+                                    }
+                                    )}
+                                </div>
+                                <div className="buttonContainer">
+                                    <div>
+                                        <button className="columnSortingButtonEnabled" onClick={() => {
+                                            edgeAttrSelectionData.colors = columns[2].colors;
+                                            edgeAttrSelectionData.columnInfo = columns[2].columnInfo;
+                                            columnData["edgeAttr"] = columnSelected;
+                                            setMenuCount(menuCount - 1)
+                                            setColumnSelected([columnData.fromId, columnData.toId]);
+                                            }}>Back</button>
+                                        <button className="columnSortingButtonEnabled" onClick={() => {
+                                            columns[3] = {};
+                                            for(const column of columnSelected) {
+                                                for(const [key, value] of Object.entries(columnData.nodeAttr)) {
+                                                    if(value.includes(column)) {
+                                                        delete columnData.nodeAttr[key];
+                                                        delete nodeAttrSelectionData.colors[nodeAttrSelectionData.columnInfo[value[0]][1]];
+                                                        delete nodeAttrSelectionData.columnInfo[value[0]];
+                                                        delete nodeAttrSelectionData.columnInfo[value[1]];
+                                                    }
+                                                }
+                                            }
+                                            if(nodeAttrSelectionData.columnInfo !== null) {                
+                                                for(const column of columnData["edgeAttr"]) {
+                                                    if(!(columnSelected.includes(column))) {
+                                                        nodeAttrSelectionData.columnInfo[column] = null;
+                                                    }
+                                                }
+                                            }
+                                            columnData["edgeAttr"] = columnSelected;
+
+                                            columns[3].columnInfo = Object.assign({}, ...(Object.keys(columns[2].columnInfo)).filter(e => 
+                                                (!columnSelected.includes(e))).map(e => 
+                                                    ({[e] : e in nodeAttrSelectionData.columnInfo ? nodeAttrSelectionData.columnInfo[e] : null})
+                                                ));
+                                            columns[3].colors = nodeAttrSelectionData.colors
+                                            columns[3].nodeAttr = columnData.nodeAttr;
+                                            setColumnSelected([null, null]);
+                                            setMenuCount(menuCount + 1);
+                                        }}>Next</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    // Selecting the node attributes columns popup screen
+                    case 4:
+                        errorMessage = ["You have unselected columns left, click next again to proceed but you won't see those columns in the visualisation"];
+                        return (
+                            <div className="columnSortingMenu">
+                                <h1>Node Attributes</h1>
+                                {
+                                    !nodeAttrSelection ? 
+                                        <p>Click create node attribute to create a node attribute or click next if there aren't any</p> :
+                                    columnSelected[0] === null && columnSelected[1] === null ?
+                                        <p>Select a column which represents a node attribute of a sending node</p> :
+                                    columnSelected[1] === null ?
+                                        <p>Select the corresponding column which represents the node attribute of a to node</p> :
+                                        <p></p>
+                                }
+                                <div className="createAttrButtonContainer">
+                                    {nodeAttrSelection ?
+                                        <button 
+                                            className="createAttrButtonEnabled"
+                                            onClick={() => {
+                                                setError(0);
+                                                setNodeAttrSelection(false);
+                                                setColumnSelected([null, null]);
+                                            }}
+                                        >
+                                            Exit Node Attribute Creation
+                                        </button> :
+                                        <button 
+                                            className="createAttrButtonEnabled"
+                                            onClick={() => {
+                                                setError(0);
+                                                setNodeAttrSelection(true);
+                                            }}
+                                        >
+                                            Create Node Attribute
+                                        </button>
+                                    }
+                                </div>
+                                <div className="columnSelection">
+                                    {
+                                        ( [...Array(Math.ceil((Object.keys(columns[3].columnInfo)).length/elementsInLine)).keys()].map((i) => {
+                                            return (
+                                                <div key={i} className="columnSelectionRow">
+                                                    {(Object.keys(columns[3].columnInfo)).slice(i*5,i*5+5).map((column) =>
+                                                        { 
+                                                        return (nodeAttrSelection ?
+                                                            (columns[3].columnInfo[column] ? 
+                                                                        <span 
+                                                                            key={column} 
+                                                                            className="columnSelectionSelected"
+                                                                            style={{color: textColor(colorScheme[columns[3].columnInfo[column][1]]), backgroundColor : colorScheme[columns[3].columnInfo[column][1]], borderColor : colorScheme[columns[3].columnInfo[column][1]]}}
+                                                                        >
+                                                                            {column}
+                                                                        </span> 
+                                                                :
+                                                                (columnSelected.includes(column) ?
+                                                                    <span 
+                                                                        key={column} 
+                                                                        className="columnSelectionSelected"
+                                                                        style={{color: textColor(colorScheme[nodeAttrSelectionColor]), backgroundColor : colorScheme[nodeAttrSelectionColor], borderColor : colorScheme[nodeAttrSelectionColor]}}
+                                                                        onClick={() => {
+                                                                            setError(0);
+                                                                            if(columnSelected[0] === column) {
+                                                                                setColumnSelected([null,null]);  
+                                                                            } 
+                                                                        }}
+                                                                    >
+                                                                        {column}
+                                                                    </span> 
+                                                                    :
+                                                                    <span 
+                                                                        key={column} 
+                                                                        className="columnSelectionUnselected"
+                                                                        onClick={() =>{
+                                                                            setError(0);
+                                                                            if(columnSelected[0] === null) {
+                                                                                setColumnSelected([column, null]);
+                                                                            } else {
+                                                                                setColumnSelected([columnSelected[0], column]);
+                                                                                nodeAttrNamePopupShow();
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {column}
+                                                                    </span> 
+                                                                )
+                                                            )
+                                                            :
+                                                            (columns[3].columnInfo[column] ? 
+                                                                <span 
+                                                                    key={column} 
+                                                                    className="columnSelectionSelected"
+                                                                    style={{color: textColor(colorScheme[columns[3].columnInfo[column][1]]), backgroundColor : colorScheme[columns[3].columnInfo[column][1]], borderColor : colorScheme[columns[3].columnInfo[column][1]]}}
+                                                                    onClick={() => {
+                                                                        let nodeInfo = columns[3].columnInfo[column];
+                                                                        if(nodeInfo[1] < nodeAttrSelectionColor) {
+                                                                            nodeAttrSelectionColor = nodeInfo[1];
+                                                                        }
+                                                                        columns[3].columnInfo[columns[3].nodeAttr[nodeInfo[0]][0]] = null;
+                                                                        columns[3].columnInfo[columns[3].nodeAttr[nodeInfo[0]][1]] = null;
+                                                                        delete columns[3].nodeAttr[nodeInfo[0]];
+                                                                        delete columns[3].colors[nodeInfo[1]];
+                                                                        setError(0);
+                                                                        setColumnSelected([null,null]);
+                                                                    }}
+                                                                >
+                                                                    {column}
+                                                                </span>       
+                                                                :
+                                                                <span key={column} className="columnSelectionUnselectedDisabled">
+                                                                    {column}
+                                                                </span> 
+                                                            )   
+                                                        )}
+                                                    )}
+                                                </div>
+                                            )
+                                        }))
+                                    }
+                                </div>
+                                {error === 1 ? <div className="errorMessage"><b>{errorMessage[0]}</b></div> : ""}
+                                <div className="buttonContainer">
+                                    <div>
+                                        
+                                        {nodeAttrSelection ?
+                                            <>
+                                                <button className="columnSortingButtonDisabled">Back</button>
+                                                <button className="columnSortingButtonDisabled">Next</button>
+                                            </>
+                                            :
+                                            <>
+                                                <button className="columnSortingButtonEnabled" onClick={() => {
+                                                    nodeAttrSelectionData.colors = columns[3].colors;
+                                                    nodeAttrSelectionData.columnInfo = columns[3].columnInfo;
+                                                    columnData.nodeAttr = columns[3].nodeAttr;
+                                                    setColumnSelected(columnData.edgeAttr);
+                                                    setError(0);
+                                                    setMenuCount(menuCount - 1);
+                                                }}>Back</button>
+                                                <button className="columnSortingButtonEnabled" onClick={() => {
+                                                    if(error === 1) {
+                                                        columnData.nodeAttr = columns[3].nodeAttr;
+                                                        setError(0);
+                                                        setMenuCount(menuCount + 1);
+                                                    } else if(Object.values(columns[3].columnInfo).includes(null)){
+                                                        setError(1);
+                                                    } else {
+                                                        columnData.nodeAttr = columns[3].nodeAttr;
+                                                        setError(0);
+                                                        setMenuCount(menuCount + 1);
+                                                    }
+                                                    
+                                                }}>Next</button> 
+                                            </>
+                                        }
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                        // Column selection confirmation popup screen
+                        case 5:
+                            return (
+                                <div className="columnSortingMenu">
+                                    <h1>Well Done :D</h1>
+                                    <p>You're done specifying the columns, here you can see a overview of your choices and after clicking confirm you can start analyzing data</p>
+                                    <div className="columnOverview">
+                                        <div className="columnOverviewColumn">
+                                            <h2>Date</h2>
+                                            <div className="columnOverviewRow">
+                                                <span                                                 
+                                                    style={{color: textColor(colorScheme[0]), backgroundColor : colorScheme[0], borderColor : colorScheme[0]}}
+                                                >
+                                                    {columnData.date}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {columnData.fromId !== null ?
+                                        <div className="columnOverviewColumn">
+                                            <h2>Node ID</h2>
+                                            <div className="columnOverviewRow">
+                                                <span                                                  
+                                                    style={{color: textColor(colorScheme[0]), backgroundColor : colorScheme[0], borderColor : colorScheme[0]}}
+                                                >
+                                                    {columnData.fromId}
+                                                </span>
+                                                <span                                               
+                                                    style={{color: textColor(colorScheme[0]), backgroundColor : colorScheme[0], borderColor : colorScheme[0]}}
+                                                >
+                                                    {columnData.toId}
+                                                </span>
+                                            </div>
+                                        </div> : ""
+                                        }
+                                        {columnData.edgeAttr !== [] ?
+                                        <div className="columnOverviewColumn">
+                                            <h2>Edge Attr</h2>
+                                            {columnData.edgeAttr.map((column) => {
+                                            let color = columns[2].columnInfo[column];
+                                            return(<div className="columnOverviewRow">
+                                                <span                                                    
+                                                    style={{color: textColor(colorScheme[color]), backgroundColor : colorScheme[color], borderColor : colorScheme[color]}}
+                                                >
+                                                    {column}
+                                                </span>
+                                            </div>)
+                                            })}
+                                        </div> : ""
+                                        }
+                                        {columnData.nodeAttr !== {} ?
+                                        <div className="columnOverviewColumn">
+                                            <h2>Node Attr</h2>
+                                            {Object.keys(columnData.nodeAttr).map((nodeAttr) => {
+                                            let color = columns[3].columnInfo[columns[3].nodeAttr[nodeAttr][0]][1];
+                                            return(<div className="columnOverviewRow">
+                                                <span              
+                                                    style={{color: textColor(colorScheme[color]), backgroundColor : colorScheme[color], borderColor : colorScheme[color]}}
+                                                >
+                                                    {columnData.nodeAttr[nodeAttr][0]}
+                                                </span>
+                                                <span                                    
+                                                    style={{color: textColor(colorScheme[color]), backgroundColor : colorScheme[color], borderColor : colorScheme[color]}}
+                                                >
+                                                    {columnData.nodeAttr[nodeAttr][1]}
+                                                </span>
+                                            </div>)
+                                            })}
+                                        </div> : ""
+                                        }
+                                    </div>
+                                    
+                                    <div className="buttonContainer">
+                                        <div>                                                                                        
+                                            <button className="columnSortingButtonEnabled" onClick={() => {
+                                                setMenuCount(menuCount - 1);
+                                            }}>Back</button>
+                                            <button className="columnSortingButtonEnabled" onClick={() => {
+                                                //TODO: SEND DATA TO BACKEND + LOADING THING
+                                            }}>Confirm</button>                                                                             
+                                        </div>
+                                    </div>
+                                </div>
+                            )    
                 }
         }
     }
@@ -223,6 +729,38 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
     return (
         <div id='popup' className='popup'>
             <div className='popup-content'>
+                <div id="nodeAttrNamePopup" className="nodeAttrNamePopup">
+                    <div className="nodeAttrNamePopup-Content">
+                        <h2>Attribute Name</h2>
+                        <p id="NameTakenMessage">This name already exists</p>
+                        <input type="text" name="nodeAttrName" value={nodeAttrName} onChange={(e) => {setNodeAttrName(e.target.value)}} />
+                        <div className="comfirmButton">
+                            <button 
+                                onClick={() => {
+                                    if(Object.keys(columns[3].nodeAttr).includes(nodeAttrName)) {
+                                        document.getElementById('NameTakenMessage').style.visibility = 'visible';
+                                        setNodeAttrName(initialNodeAttrName);
+                                    } else {
+                                        columns[3].nodeAttr[nodeAttrName] = columnSelected;
+                                        columns[3].columnInfo[columnSelected[0]] = [nodeAttrName, nodeAttrSelectionColor];
+                                        columns[3].columnInfo[columnSelected[1]] = [nodeAttrName, nodeAttrSelectionColor];
+                                        columns[3].colors[nodeAttrSelectionColor] = nodeAttrName;
+                                        for(let i = nodeAttrSelectionColor+1; i<colorScheme.length ; i++) {
+                                            if(!columns[3].colors[i]) {
+                                                nodeAttrSelectionColor = i;
+                                                break;
+                                            }
+                                        }
+                                        setColumnSelected([null,null]);
+                                        setNodeAttrName(initialNodeAttrName);
+                                        setNodeAttrSelection(false);
+                                        nodeAttrNamePopupClose();
+                                    }
+                                }}
+                            >Comfirm</button>
+                        </div>
+                    </div>
+                </div>
                 <span onClick={() => {closePopup()}} className="close">&times;</span> 
                 {popupPage(popupState, menuCount)} 
             </div>
@@ -231,7 +769,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
 }
 
 export function popupShow(){
-    let box = document.getElementById('popup')
+    let box = document.getElementById('popup');
     box.style.display = "block";
 }
 
