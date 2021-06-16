@@ -19,7 +19,7 @@ class HomePage extends React.Component {
                 <div className = "Banner">
                     {/* <img src= {BannerNew} alt = "Oops! This image was loaded incorrectly" ></img> */}
                     <div className = "BannerText">
-                        <h1> Graphify™ </h1>
+                        <h1> Graphify </h1>
                         <h2>for Everyone to see</h2>
                     </div>
                     <div className = "BannerButton">
@@ -30,8 +30,8 @@ class HomePage extends React.Component {
 
                 <div class="marquee">
                     <div>
-                        <span> ◈    basic visualization tool for visualizing    ◈   nice Adjacency Matrices and Thread Arcs ◈   Start making your visualizations now for free! </span> 
-                        <span> ◈    basic visualization tool for visualizing    ◈   nice Adjacency Matrices and Thread Arcs ◈   Start making your visualizations now for free! </span>
+                        <span> ◈    Basic visualization tool for visualizing    ◈   Nice Adjacency Matrices and Thread Arcs ◈   Start making your visualizations now for free! </span> 
+                        <span> ◈    Basic visualization tool for visualizing    ◈   Nice Adjacency Matrices and Thread Arcs ◈   Start making your visualizations now for free! </span>
                     </div>
                 </div>
 
