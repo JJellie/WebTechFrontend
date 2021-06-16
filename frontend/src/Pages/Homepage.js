@@ -20,7 +20,7 @@ class HomePage extends React.Component {
                     {/* <img src= {BannerNew} alt = "Oops! This image was loaded incorrectly" ></img> */}
                     <div className = "BannerText">
                         <h1> Graphify™ </h1>
-                        <h2>By the Amazing DBL team</h2>
+                        <h2>for Everyone to see</h2>
                     </div>
                     <div className = "BannerButton">
                         <Link to="/vis"><button>Start visualizing</button></Link>
