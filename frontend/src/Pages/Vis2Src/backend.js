@@ -97,6 +97,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
         }
     }
     function nodeAttrNamePopupClose() {
+        document.getElementById('NameTakenMessage').style.visibility = 'hidden';
         nodeAttrNameActice = false;
         document.getElementById("nodeAttrNamePopup").style.display = "none";
         setNodeAttrName(initialNodeAttrName);
@@ -339,12 +340,17 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                                             } else if (error === 1) {
                                                 columnData.fromId = null;
                                                 columnData.toId = null;
-                                                columns[2] = columns[1];
+                                                columns[2] = {};
+                                                columns[2].columnInfo = Object.assign({}, ...columns[1].map(e => (
+                                                        {[e] : e in edgeAttrSelectionData.columnInfo ? edgeAttrSelectionData.columnInfo[e] : null}
+                                                    )));
+                                                columns[2].colors = edgeAttrSelectionData.colors;
+                                                setColumnSelected(columnData.edgeAttr);
                                                 setError(0);
                                                 setColumnSelected(columnData.edgeAttr);
                                                 setMenuCount(menuCount + 1);
                                             } else {
-                                                columns[2] = {};
+                                                
                                                 setError(0);
                                                 if(columnData.edgeAttr.includes(columnSelected[0])) {
                                                     columnData.edgeAttr = columnData.edgeAttr.filter(e => e !== columnSelected[0]);
@@ -742,6 +748,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                                         document.getElementById('NameTakenMessage').style.visibility = 'visible';
                                         setNodeAttrName(initialNodeAttrName);
                                     } else {
+                                        document.getElementById('NameTakenMessage').style.visibility = 'hidden';
                                         columns[3].nodeAttr[nodeAttrName] = columnSelected;
                                         columns[3].columnInfo[columnSelected[0]] = [nodeAttrName, nodeAttrSelectionColor];
                                         columns[3].columnInfo[columnSelected[1]] = [nodeAttrName, nodeAttrSelectionColor];
