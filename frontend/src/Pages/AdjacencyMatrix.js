@@ -7,9 +7,30 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import positive from "../Audio/positive.mp3"
 import negative from "../Audio/negative.mp3"
 import neutral from "../Audio/neutral.mp3"
+import Select from 'react-select';
 
+const firstDropdown = [
+    {value: "undirected", label: "undirected"},
+    {value: "directed", label: "directed"}
+];
+
+const secondDropdownUndirected = [
+    {value: "sorted in ascending order by id", label: "sorted in ascending order by id"},
+    {value: "alphabetically", label: "alphabetically"},
+    {value: "shuffle randomly", label: "shuffle randomly"},
+    {value: "spectral", label: "spectral"},
+    {value: "barycenter", label: "barycenter"}
+];
+
+const secondDropdownDirected = [
+    {value: "sorted in ascending order by id", label: "sorted in ascending order by id"},
+    {value: "alphabetically", label: "alphabetically"},
+    {value: "shuffle randomly", label: "shuffle randomly"},
+    {value: "barycenter", label: "barycenter"}
+];
 
 let colorCoding = {'neutral' : [250, 248, 247], 'positiveMax' : [202,90,54], 'positiveMin' : [202,20,54], 'negativeMax' : [0,0,0], 'negativeMin' : [0,0,0]};
+let reorder = require("reorder.js");
 
 function colorCoding1(i) {
     if(i > 0) {
@@ -45,23 +66,6 @@ function randomSort(data){
     return data;
 }
 
-function addNeighbors(index, adjLists, queue, degrees){
-    let neighbors = [];
-    for (let i = 0; i < adjLists[index]; i++){
-        neighbors.push([adjLists[index][i], degrees[adjLists[index][i]-1][1]]); // degrees index starts at 0
-    }
-
-    let sortedNeighbors = neighbors.sort(function(a, b) {
-        return a[1] - b[1];
-      });
-
-    for (let i of sortedNeighbors){
-        queue.push(sortedNeighbors[i][0]);
-    }
-
-    return queue;
-}
-
 
 class AdjacencyMatrix extends React.Component {
     constructor(props) {
@@ -73,6 +77,7 @@ class AdjacencyMatrix extends React.Component {
                 graphType: "",                          //selected val
                 currentGraphType: "undirected",
                 currentNodeOrdering: "sorted in ascending order by id",
+                graphIsUndirected: true,
                 soundCheckboxChecked : false,
                 matrixCanvas: "",
                 headerTopCanvas: "",
@@ -90,7 +95,7 @@ class AdjacencyMatrix extends React.Component {
     }
 
     handleGraphTypeDropdownSelect(e){
-        this.setState({ graphType : e.target.value}, () => {this.secondDropdown();});
+        this.setState({ graphType : e}, () => {this.secondDropdown();});
     }
 
     handleDropdownSelect(e) {
@@ -169,10 +174,21 @@ class AdjacencyMatrix extends React.Component {
 
     raphaelRender(){
         this.draw(true);
+        let mat = [
+            [0, 1, 0, 1, 0],
+            [1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 1],
+            [1, 1, 1, 0, 0]
+            ];
+        var graph = reorder.mat2graph(mat, true);
+        var perms = reorder.barycenter_order(graph);
+        
+
+
     }
 
 
-    draw(initial){ // still needs the codes to sort random, alphabetically, etc. (will update once headers are correct)
+    draw(initial){ 
 
         let nodeOrdering = this.data.nodeOrdering;
         let edges = this.data.edges;
@@ -185,16 +201,40 @@ class AdjacencyMatrix extends React.Component {
 
         let edgeHash = {};
 
-        for(let i = 0; i < nodesNumber; i++) {
-            for(let j = 0; j < nodesNumber; j++) {
+        let matrixUndirected = new Array(nodesNumber);
+        let matrixDirected = new Array(nodesNumber);
+
+        for (let i = 0; i < nodesNumber; i++) {
+            matrixUndirected[i] = new Array(nodesNumber);
+            matrixDirected[i] = new Array(nodesNumber);
+        }
+
+
+        for(let i = 1; i <= nodesNumber; i++) {
+            for(let j = 1; j <= nodesNumber; j++) {
                 let id = i.toString() + '-' + j.toString();
+                let id2 = i.toString() + '-' + j.toString();
                 if(edges[id]) {
                     edgeHash[id] = edges[id];
                 } else {
                     edgeHash[id] = 0;
                 }
+
             }
         }
+
+        for(let i = 1; i <= nodesNumber; i++) {
+            for(let j = 1; j <= nodesNumber; j++) {
+                let id = i.toString() + '-' + j.toString();
+                let id2 = i.toString() + '-' + j.toString();
+                matrixDirected[i-1][j-1] = edgeHash[id];
+                matrixUndirected[i-1][j-1] = (edgeHash[id] + edgeHash[id2])/2;
+                }
+            }
+
+     
+
+
 
         console.log(nodeHash);
         if (initial === true){
@@ -202,7 +242,6 @@ class AdjacencyMatrix extends React.Component {
             this.headerTopCanvas = Raphael(document.getElementById('headertop'), MAXWIDTH, MATRIXHEADERWIDTH);
             this.headerLeftCanvas = Raphael(document.getElementById('headerleft'), MATRIXHEADERWIDTH, MAXHEIGHT);
             this.drawMatrix(nodeOrdering, nodeOrdering, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
-           // this.reverseCuthillMckee(nodeOrdering, edgeHash);
         }
         else{
             // first we need to clear the canvas (delete the existing drawn matrix)
@@ -221,86 +260,44 @@ class AdjacencyMatrix extends React.Component {
             else if (this.state.currentNodeOrdering === "sorted in ascending order by id"){
                 this.drawMatrix(nodeOrdering, nodeOrdering, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
             }
-            else if (this.state.currentNodeOrdering === "algorithm"){
-                // do reverse
+            else if (this.state.currentNodeOrdering === "spectral"){
+                let  spectralOrdering = this.computeSpectral(matrixUndirected);
+                this.drawMatrix(spectralOrdering, spectralOrdering, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+            }
+            else if (this.state.currentNodeOrdering === "barycenter"){
+                let  barycenterOrdering = (this.state.currentGraphType === "undirected") ? this.computeBarycenter(matrixUndirected) : this.computeBarycenter(matrixDirected);
+                this.drawMatrix(barycenterOrdering, barycenterOrdering, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+               console.log(barycenterOrdering);
             }
         } 
     }
 
-
-    reverseCuthillMckee(nodeOrdering, edgeHash){
-        // i need array of degrees + adjacency lists
-
-        let queue = [];
-        let permR = [];
-
-        let missingR = nodeOrdering.length; // the no. of nodes missing from permR
-
-        let adjLists = [["null"]]; // adjacency lists for all nodes
-        let degrees = []; // array of degrees for all nodes
-        let isInR = [0]; // array that records whether an element is in R or not
-
-        // initializing
-        for (let i = 1; i <= nodeOrdering.length; i++){
-            adjLists.push([""]);
-            isInR.push(0);
+    computeSpectral(matrix){
+        let graph = reorder.mat2graph(matrix, false);
+        let spectral = reorder.spectral_order(graph);
+        console.log(spectral);
+        let spectralOrdering = [];
+        for (let i = 0; i < spectral.length; i++){
+            spectralOrdering.push(spectral[i]+1);
         }
-
-
-        // computing the adjacency lists 
-        for (let i = 1; i < nodeOrdering.length; i++){
-            for (let j = i + 1; j <= nodeOrdering.length; j++){
-                let id1 = i.toString() + '-' + j.toString();
-                let id2 = j.toString() + '-' + i.toString();
-                if(edgeHash[id1] || edgeHash[id2]) {
-                    adjLists[i].push(j);
-                    adjLists[j].push(i);
-                }
-            }
-        }
-
-        // computing the degree array
-        for (let i = 1; i <= nodeOrdering.length; i++){
-            degrees.push([i, adjLists[i].length]);
-        }
-
-       // while (missingR){ // while there are nodes that aren't in permR
-
-            // sorting the degree array by no. of degrees
-            let sortedDegrees = degrees.sort(function(a, b) {
-                return a[1] - b[1];
-              });
+        return spectralOrdering;
     
-           // s1: find obj w min degree that hasn't been added to R, if it's on pth row add p to R (we identify id = row)
-        let elementR = 0;
-        for (let i in sortedDegrees){
-            if (!isInR[sortedDegrees[i][0]]){
-                elementR = sortedDegrees[i][0];
-                permR.push(elementR);
-                missingR--;
-                isInR[elementR] = 1;
-            }
-         break;
-        }
-          // s2: add all neighbours of elementR in increasing order of degree to queue
-          addNeighbors(elementR, adjLists, queue, degrees);
-    
-          // s3: extract first node from queue, say C, if C hasn't been added to permR add it, also all neigbours of C in increasing
-          // order of degree (repeat while queue not empty)
-      
-          while (queue.length){
-            let C = queue.shift(); // returns and removes first element of array
-            if (!isInR[C]){
-                permR.push(C);
-                missingR--;
-            }
-            addNeighbors(C, adjLists, queue, degrees);
-          }
- //   }
-            
-    
-}
+    }
 
+    computeBarycenter(matrix){
+        let val = (this.state.currentGraphType === "undirected") ? false : true;
+        let graph = reorder.mat2graph(matrix, false);
+        let barycenter = reorder.barycenter_order(graph);
+        let improved = reorder.adjacent_exchange(graph, barycenter[0],  barycenter[1]);
+        console.log(improved);
+        let barycenterOrdering = [];
+        for (let i = 0; i < improved[0].length; i++){
+            barycenterOrdering.push(improved[0][i]+1);
+        }
+        return barycenterOrdering;
+
+    }
+    
 
 
     sortAlphabetically(nodeOrdering, nodeHash){ // in JS objects are always passed around by reference, assigning new var changes initial
@@ -589,35 +586,36 @@ class AdjacencyMatrix extends React.Component {
 
                             {/* first dropdown: select undirected/directed graph*/}
                             <div className = "dropdown">
-                            <select
+                            <Select
                             formLabel = "Select what type of graph you want:"
                             buttonText = "submit"
-                            onChange = {this.handleGraphTypeDropdownSelect}
-                            class = "styledSelect"
+                            onChange = {e => this.setState({
+                                graphType: e.value,
+                                graphIsUndirected: (e.value === "undirected") ? true: false
+                                })}
+                            options = {firstDropdown}
+                            defaultValue = {{value: "undirected", label: "undirected"}}
+                           // {/*class = "styledSelect"*/}
                             >
-                                <option value = "" disabled selected> First choose a type of graph: </option>
-                                <option value = "undirected" > undirected </option>
-                                <option value = "directed" > directed </option>
-                            </select>
+                            </Select>
                           
                             </div>
                      
 
                             {/* second dropdown: select node ordering */}
                             <div className = "dropdown">
-                            <select
+                            <Select
                             formLabel = "You can reorder the nodes:"
                             buttonText = "submit"
-                            onChange = {this.handleDropdownSelect}
-                            class = "styledSelect"
+                            onChange = {e => this.setState({
+                                dropdownValue: e.value
+                            })}
+                            //class = "styledSelect"
+                            options = { (this.state.graphIsUndirected)? secondDropdownUndirected: secondDropdownDirected}
+                            defaultValue = {{value: "sorted in ascending order by id", label: "sorted in ascending order by id"}}
                             >
-                            <option value = "" disabled selected> Choose a type of node ordering: </option>
-                            <option value = "sorted in ascending order by id" > sorted in ascending order by id </option>
-                            <option value = "alphabetically" > alphabetically </option>
-                            <option value = "shuffle randomly"> shuffle randomly</option>
-                            {this.state.algorithmOption}
 
-                            </select>
+                            </Select>
                             </div>
 
                            
