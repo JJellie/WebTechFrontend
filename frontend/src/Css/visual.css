@@ -202,10 +202,25 @@ text-align: center;
     float: left;
     z-index: -10;
 }
-.Am_block {
-    float: right;
-    overflow: visible;
-    margin-top: -2300px;
-    z-index: 10;
-    margin-left: 20%;
+
+.UIContainer {
+    border: 2px solid red;
+}
+.TAContainer {
+    grid-area: TA;
+    border: 2px solid red;
+}
+
+.AMContainer {
+    grid-area: AM;
+    border: 2px solid red;
+}
+
+.visContainer {
+    display: grid;
+    grid-template-columns: 40vw 35vw 25vw;
+    grid-template-rows: 70vh 30vh;
+    grid-template-areas:
+      "AM TA UI"
+      "TG TG TG"; 
 }

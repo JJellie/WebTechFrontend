@@ -6,10 +6,6 @@
 .matrix
 {
     position: absolute;
-    width: 600px;
-    height: 600px;
-    top:100px;
-    left:100px;
 }
 
 #block0 {
@@ -20,27 +16,19 @@
     overflow: hidden;
 }
 
-.header_top 
+.headerTop 
 {
     position: absolute;
-    width:600px;
-    height:100px;
-    top:-100px;
 }
 
-.header_left
+.headerLeft
 {
     position: absolute;
-    width:100px;
-    height:600px;
-    left: -100px;
 }
 
-.vis
+.visualization
 {
     position: relative;
-    height: 700px;
-    width: 700px;
 }
 
 #dropdownButton{

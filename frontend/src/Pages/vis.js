@@ -1,7 +1,7 @@
 import ThreadArcs from './ThreadArcs';
 import '../Css/visual.css';
 import React from 'react';
-import AdjacencyMatrix from './AdjacencyMatrix/AdjacencyMatrix';
+import AdjacencyMatrix from './AdjacencyMatrix';
 import Banner from "../Images/banner vis.png";
 import Divider from "../Images/divider.png";
 import { Link, } from "react-router-dom";

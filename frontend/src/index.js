@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './Css/index.css';
 import About from './Pages/About';
 import HomePage from './Pages/Homepage';
-import Vis from './Pages/Vis2Src/vis2.js';
+import Vis from './Pages/vis2.js';
 import {
   BrowserRouter as Router,
   Switch,
@@ -61,16 +61,6 @@ class NavBar extends React.Component {
    
         return (    
         <Router>
-            <div className = "sidebar" id='sidebar'>
-            <button className='Hamburger' onClick={() => this.menuChange()}><img src={Hamburger} alt='Hamburger Icon'width='40px' height="40px"></img></button>
-            <ul className= 'sidebarList' id = 'sideBarList'>
-                <li><button  className="image"><img src={Logo} alt="company logo" width="168" height="168"></img></button></li>
-                <li><Link to="/"><button className={this.state["activepage"] === 0 ? "active" : ""}><span>Home</span></button></Link></li>
-                <li><Link to="/vis"><button className={this.state["activepage"] === 1 ? "active" : ""}>Visualisation</button></Link></li>
-                <li><Link to="/about"><button className={this.state["activepage"] === 2 ? "active" : ""}>About</button></Link></li>
-                <li><Link to="/contact"><button className={this.state["activepage"] === 3 ? "active" : ""}>Contact</button></Link></li>
-            </ul>
-            </div>
             <div className = "page">
             <Switch>
                 <Route exact path="/">
