@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './Css/index.css';
 import About from './Pages/About';
 import HomePage from './Pages/Homepage';
-import Vis from './Pages/vis2.js';
+import VisPage from './Pages/vispage.js';
 import {
   BrowserRouter as Router,
   Switch,
@@ -70,7 +70,7 @@ class NavBar extends React.Component {
                     <About update={this.updateAbout}/>
                 </Route>
                 <Route exact path="/Vis">
-                    <Vis update={this.updateVis}/>
+                    <VisPage update={this.updateVis} />
                 </Route>
                 <Route exact path="/contact">
                     <Contact update={this.updateContact}/>

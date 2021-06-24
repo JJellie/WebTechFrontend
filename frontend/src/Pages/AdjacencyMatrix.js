@@ -18,45 +18,93 @@ const borderSize = 0;
 const headerNodeAttrColorWidth = 3;
 const noEdgeCellColor = "#c9c9c9";
 
-function createEdgeInfo(ordering, edges, cellWidth, cellHeight){
-  let noEdge = [];
-  let location = {};
-  for( var x of d3.range(ordering.length) ) {
-    for( var y of d3.range(ordering.length) ) {
-      let edgeId = ordering[y].toString() + '-' +  ordering[x].toString();
-      // check whether edge exists
-      if(!(edgeId in edges)) {
-        noEdge.push(edgeId);
-      }
-      // calculate x, y coordinates of cell and add to locationCells
-      location[edgeId] = {x: x*cellWidth ,y: y*cellHeight};
-    }
-  }
-  return [noEdge, location];
+function valueToColor(value, colorPositiveScale, colorNegativeScale, colorNeutral)  {
+  if( value > 0 ) return colorPositiveScale(value);
+  else if( value < 0 ) return colorNegativeScale(value);
+  else return colorNeutral;
 }
 
-function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setHoveredEdge, setSelectedEdge, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorScheme}) {
+function createLocationMapping(ordering) {
+  let locationMapping = {};
+  for(let i in ordering) {
+    locationMapping[ordering[i]] = i;
+  }
+  return locationMapping;
+}
+
+// canvas
+let canvas; 
+let headertop;
+let headerleft;
+
+// arrays containing svg elements
+let cells = {};
+let headertopNames = {};
+let headerleftNames = {};
+
+let locationMapping;
+
+function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, setSelectedEdge, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorScheme}) {
   const matrixWidth = width-headerWidth;
   const matrixHeight = height-headerWidth;
   const cellWidth = (matrixHeight)/ordering.length;
   const cellHeight = (matrixHeight)/ordering.length;
-  const [noEdgeCells, locationCells] = useMemo(() => createEdgeInfo(ordering, edges, cellWidth, cellHeight), []);
 
-  const valueToColor = (value) => {
-    if( value > 0 ) return colorPositiveScale(value);
-    else if( value < 0 ) return colorNegativeScale(value);
-    else return colorNeutral;
-  }
+  console.log(edges);
+
+  locationMapping = useMemo(() => createLocationMapping(ordering), [ordering]);
+ 
+
+  useEffect(() => {
+    try {
+      canvas.clear();
+      headertop.clear();
+      headerleft.clear();
+    } catch {
+
+    }
+    
+    console.log("initialize AM");
+    // create canvas
+    canvas = Raphael(document.getElementById("matrix") ,width, height);
+    headertop = Raphael(document.getElementById("headerTop") ,width, headerWidth);
+    headerleft = Raphael(document.getElementById("headerLeft") ,headerWidth, height);
+
+    // background of matrix
+    canvas.rect(0,0,matrixWidth,matrixHeight).attr({"fill" : noEdgeCellColor, "stroke-width" : 0});
+
+    let fontsizeTop = (9.0/16.0)*cellWidth;
+    let fontsizeLeft = (9.0/16.0)*cellHeight;
+
+
+    // matrix headers
+    for( let nodeId of ordering) {
+      let location = locationMapping[nodeId];
+      headertopNames[nodeId] = headertop.text((location * cellWidth) + .5*cellWidth, headerWidth-headerNodeAttrColorWidth, nodes[nodeId][nodeAttrDisplay]);
+      headertopNames[nodeId].attr({
+        "font-size": fontsizeTop,
+        "text-anchor" : "start",
+        "transform" : "r-90",
+        "transform-origin" : `${(location * cellWidth)}px ${headerWidth-headerNodeAttrColorWidth}px`  
+      })
+    }
+    // loop through all edges
+    for( let edgeId of Object.keys(edges) ) {
+      const [fromNode, toNode] = edgeId.split("-");
+      cells[edgeId] = canvas.rect(locationMapping[toNode]*cellWidth, locationMapping[fromNode]*cellHeight, cellWidth, cellHeight);
+      cells[edgeId].attr({"fill" : valueToColor(edges[edgeId][edgeAttrDisplay], colorPositiveScale, colorNegativeScale, colorNeutral), "stroke-width" : 0});
+      console.log(edges[edgeId][edgeAttrDisplay]);
+    }
+  }, [])
+
+
+
   return (
     <>
     <div className="visualization" width={width} height={height}>
-      
-      
       <div className="matrix" width={matrixWidth} height={matrixHeight} style={{ top:headerWidth, left:headerWidth }}>
       <TransformWrapper
         pan = {{
-          disabled: false,
-          activationKeys: "alt"
         }}
         limitToBounds={true}
       >
@@ -67,7 +115,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
           <TransformWrapper
             scale = {scale}
             positionX = {positionX}
-            positionY = {matrixWidth/6-matrixWidth/6*scale}
+            positionY = {(headerWidth/matrixWidth)*matrixWidth-(headerWidth/matrixWidth)*matrixWidth*scale}
             wheel = {{
               wheelEnabled: false,
               touchPadEnabled: false,
@@ -81,28 +129,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
             }}
           >
           <TransformComponent>
-          <svg width={matrixWidth} height={headerWidth}>
-            {ordering.map((nodeId) => {
-              let edgeId= nodeId + "-" + nodeId;
-              let fontsize = Math.min(cellWidth/2, 12.5);
-              return(
-                <>
-                  <text x={locationCells[edgeId].x+2*headerNodeAttrColorWidth} y={headerWidth+cellWidth/2+1/2*fontsize} style={
-                    {transform: "rotate(-90deg)", 
-                    transformOrigin:`${locationCells[edgeId].x}px ${headerWidth}px`,
-                    fontSize: fontsize}}
-                  >{nodes[nodeId][nodeNameDisplay]}</text>
-                  <rect 
-                    x={locationCells[edgeId].x} 
-                    y={headerWidth-headerNodeAttrColorWidth} 
-                    width={cellWidth} 
-                    height={headerNodeAttrColorWidth} 
-                    fill={colorScheme[nodeAttrColorCoding[nodes[nodeId][nodeColorAttr]]]}
-                  ></rect>
-                </>
-              )
-            })}
-          </svg>
+            <div id="headerTop"></div>
           </TransformComponent>
           </TransformWrapper>
           </div>
@@ -110,7 +137,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
           <div className="headerLeft" width={headerWidth} height={matrixHeight} style={{top:0, left:-headerWidth }} >
           <TransformWrapper
             scale = {scale}
-            positionX = {matrixHeight/6-matrixHeight/6*scale}
+            positionX = {(headerWidth/matrixHeight)*matrixHeight-(headerWidth/matrixHeight)*matrixHeight*scale}
             positionY = {positionY}
             wheel = {{
               wheelEnabled: false,
@@ -125,61 +152,13 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
             }}
           >
           <TransformComponent>
-            <svg width={headerWidth} height={matrixHeight} >
-              {ordering.map((nodeId) => {
-                let edgeId= nodeId + "-" + nodeId;
-                let fontsize = Math.min(cellWidth/2, 12.5);
-                return(
-                  <>
-                    <text x={headerWidth-2*headerNodeAttrColorWidth} y={locationCells[edgeId].y+cellWidth/2+1/2*fontsize} style={
-                      {transform: "1deg", 
-                      transformOrigin:`${headerWidth}px ${locationCells[edgeId].y}px`,
-                      fontSize: fontsize,
-                      textAnchor: "end" }}
-                    >{nodes[nodeId][nodeNameDisplay]}</text>
-                    <rect 
-                      x={headerWidth-headerNodeAttrColorWidth} 
-                      y={locationCells[edgeId].y} 
-                      width={headerNodeAttrColorWidth} 
-                      height={cellHeight} 
-                      fill={colorScheme[nodeAttrColorCoding[nodes[nodeId][nodeColorAttr]]]}
-                    ></rect>
-                  </>
-                )
-              })}
-            </svg>
+            <div id="headerLeft"></div>
           </TransformComponent>
           </TransformWrapper>
           </div>
           {/* Matrix */}
           <TransformComponent>
-          <svg width={matrixWidth} height={matrixHeight} >
-            {noEdgeCells.map((edgeId) => 
-              <rect 
-                key={edgeId}
-                x={locationCells[edgeId].x} 
-                y={locationCells[edgeId].y} 
-                width={cellWidth-borderSize}
-                height={cellHeight-borderSize}
-                fill={noEdgeCellColor}
-                onMouseEnter={() => {setHoveredEdge([edgeId.split("-")])}}
-                onMouseOut={() => {setHoveredEdge([null,null])}}
-              >
-              </rect>)}
-            {Object.keys(edges).map((edgeId) => 
-              <rect 
-                key={edgeId}
-                x={locationCells[edgeId].x} 
-                y={locationCells[edgeId].y} 
-                width={cellWidth-borderSize}
-                height={cellHeight-borderSize}
-                fill={valueToColor(edges[edgeId][edgeAttr])}
-                onMouseEnter={() => {setHoveredEdge([edgeId.split("-")])}}
-                onMouseOut={() => {setHoveredEdge([null,null])}}
-                onClick={() => {setSelectedEdge([edgeId.split("-")])}}
-              > 
-              </rect>)}
-          </svg>
+            <div id="matrix"></div>
           </TransformComponent>
         </>)}
       </TransformWrapper>
