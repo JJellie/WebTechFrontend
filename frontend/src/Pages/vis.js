@@ -66,7 +66,7 @@ function Vis({ dataSet }) {
             <h1 className='Visheader'> Thread Arcs </h1>
             <ThreadArcs 
               width={450}
-              height={600}
+              height={1000}
               ordering={dataSet.orderings.incremental}
               edges={dataSet.edgeInfo}
               nodes={dataSet.nodes}

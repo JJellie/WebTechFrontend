@@ -204,16 +204,16 @@ text-align: center;
 }
 
 .UIContainer {
-    border: 2px solid red;
+   
 }
 .TAContainer {
     grid-area: TA;
-    border: 2px solid red;
+   
 }
 
 .AMContainer {
     grid-area: AM;
-    border: 2px solid red;
+  
 }
 
 .visContainer {

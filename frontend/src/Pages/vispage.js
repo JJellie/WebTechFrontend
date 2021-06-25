@@ -9,9 +9,9 @@ import { Link } from "react-router-dom";
 import { popupShow, DatasetPopup } from "./backend.js";
 import Vis from "./vis.js";
 
-function VisPage() {
+function VisPage({update}) {
   const [dataSet, setDataSet] = useState(null);
-
+    useEffect(update, []);
   return (
     <>
       <DatasetPopup setDataSet={setDataSet} colorScheme={["#FFBA49", "#57A773", "#F06C9B", "#5B2A86", "#FB3640", "#CE98F5"]} />
