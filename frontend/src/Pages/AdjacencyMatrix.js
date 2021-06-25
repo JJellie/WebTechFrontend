@@ -1,8 +1,7 @@
-import React from 'react';
-import "../Css/visual.css"
+import React, {useState, useEffect, useMemo} from 'react';
 import Raphael from 'raphael';
-import "../Css/vis2.css";
-import loadImg from '../Images/LoadIcon.png'
+import * as d3 from "d3";
+import "../Css/AdjacencyMatrix.css";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import positive from "../Audio/positive.mp3"
 import negative from "../Audio/negative.mp3"
@@ -31,37 +30,25 @@ const secondDropdownDirected = [
 
 let colorCoding = {'neutral' : [250, 248, 247], 'positiveMax' : [202,90,54], 'positiveMin' : [202,20,54], 'negativeMax' : [0,0,0], 'negativeMin' : [0,0,0]};
 let reorder = require("reorder.js");
+// array containing cells which don't have edges
+let noEdgeCells = [];
+// dictionary containing cells as keys and location in x and y as value
+let locationCells = {};
 
-function colorCoding1(i) {
-    if(i > 0) {
-        return Raphael.hsl(
-            ((colorCoding['positiveMax'][0]-colorCoding['positiveMin'][0])*i+colorCoding['positiveMin'][0]),
-            ((colorCoding['positiveMax'][1]-colorCoding['positiveMin'][1])*i+colorCoding['positiveMin'][1]),
-            ((colorCoding['positiveMax'][2]-colorCoding['positiveMin'][2])*i+colorCoding['positiveMin'][2])
-        );
-    } else if(i < 0) {
-        return Raphael.hsl(
-            ((colorCoding['negativeMax'][0]-colorCoding['negativeMin'][0])*-i+colorCoding['negativeMin'][0]),
-            ((colorCoding['negativeMax'][1]-colorCoding['negativeMin'][1])*-i+colorCoding['negativeMin'][1]),
-            ((colorCoding['negativeMax'][2]-colorCoding['negativeMin'][2])*-i+colorCoding['negativeMin'][2])
-        );
-    } else {
-        return Raphael.hsl(colorCoding['neutral'][0],colorCoding['neutral'][1],colorCoding['neutral'][2]);
-    }
-}
 
-function dynamicSort(property) { // for alphabetical sorting of array of objects by property
-    return function (a,b) {
-         return a[property].localeCompare(b[property]);
-        }        
-    }
+const borderSize = 0;
+const headerNodeAttrColorWidth = 3;
+const noEdgeCellColor = "#c9c9c9";
 
-function randomSort(data){
-    for (let i = 0; i < data.length; i++) { // uses Fisher-Yates shuffle algorithm for random sorting of array 
-        let x = data[i];
-        let y = Math.floor(Math.random() * (i + 1));
-        data[i] = data[y];
-        data[y] = x;
+function createEdgeInfo(ordering, edges, cellWidth, cellHeight){
+  let noEdge = [];
+  let location = {};
+  for( var x of d3.range(ordering.length) ) {
+    for( var y of d3.range(ordering.length) ) {
+      let edgeId = ordering[y].toString() + '-' +  ordering[x].toString();
+      // check whether edge exists
+      if(!(edgeId in edges)) {
+        noEdge.push(edgeId);
       }
     return data;
 }
@@ -96,16 +83,11 @@ class AdjacencyMatrix extends React.Component {
 
     handleGraphTypeDropdownSelect(e){
         this.setState({ graphType : e}, () => {this.secondDropdown();});
+      // calculate x, y coordinates of cell and add to locationCells
+      location[edgeId] = {x: x*cellWidth ,y: y*cellHeight};
     }
-
-    handleDropdownSelect(e) {
-        this.setState({ dropdownValue: e.target.value });
-      }
-
-    secondDropdown(){
-        let algorithmVisible = (this.state.graphType === "undirected") ? false : true;
-        let algOpt = <option value = "algorithm" hidden = {algorithmVisible} disabled = {true}> algorithm (not available yet) </option>
-        this.setState({algorithmOption : algOpt});
+  }
+  return [noEdge, location];
 }
 
     handleButtonClick(e){ // note: setState is asynchronous!! 
@@ -640,8 +622,158 @@ class AdjacencyMatrix extends React.Component {
             </div>
         );
     }
+function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setHoveredEdge, setSelectedEdge, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorScheme}) {
+  const matrixWidth = width-headerWidth;
+  const matrixHeight = height-headerWidth;
+  const cellWidth = (matrixHeight)/ordering.length;
+  const cellHeight = (matrixHeight)/ordering.length;
+  const [noEdgeCells, locationCells] = useMemo(() => createEdgeInfo(ordering, edges, cellWidth, cellHeight), []);
+
+  const valueToColor = (value) => {
+    if( value > 0 ) return colorPositiveScale(value);
+    else if( value < 0 ) return colorNegativeScale(value);
+    else return colorNeutral;
+  }
+  return (
+    <>
+    <div className="visualization" width={width} height={height}>
+      
+      
+      <div className="matrix" width={matrixWidth} height={matrixHeight} style={{ top:headerWidth, left:headerWidth }}>
+      <TransformWrapper
+        pan = {{
+          disabled: false,
+          activationKeys: "alt"
+        }}
+        limitToBounds={true}
+      >
+        {({scale, positionX, positionY}) => (   
+        <>
+          {/* header top */}
+          <div className="headerTop" width={matrixWidth} height={headerWidth} style={{left:0, top:-headerWidth}} > 
+          <TransformWrapper
+            scale = {scale}
+            positionX = {positionX}
+            positionY = {matrixWidth/6-matrixWidth/6*scale}
+            wheel = {{
+              wheelEnabled: false,
+              touchPadEnabled: false,
+              limitsOnWheel: false,
+            }}
+            pan = {{
+              disabled: true
+            }}
+            pinch = {{
+              disabled: true
+            }}
+          >
+          <TransformComponent>
+          <svg width={matrixWidth} height={headerWidth}>
+            {ordering.map((nodeId) => {
+              let edgeId= nodeId + "-" + nodeId;
+              let fontsize = Math.min(cellWidth/2, 12.5);
+              return(
+                <>
+                  <text x={locationCells[edgeId].x+2*headerNodeAttrColorWidth} y={headerWidth+cellWidth/2+1/2*fontsize} style={
+                    {transform: "rotate(-90deg)", 
+                    transformOrigin:`${locationCells[edgeId].x}px ${headerWidth}px`,
+                    fontSize: fontsize}}
+                  >{nodes[nodeId][nodeNameDisplay]}</text>
+                  <rect 
+                    x={locationCells[edgeId].x} 
+                    y={headerWidth-headerNodeAttrColorWidth} 
+                    width={cellWidth} 
+                    height={headerNodeAttrColorWidth} 
+                    fill={colorScheme[nodeAttrColorCoding[nodes[nodeId][nodeColorAttr]]]}
+                  ></rect>
+                </>
+              )
+            })}
+          </svg>
+          </TransformComponent>
+          </TransformWrapper>
+          </div>
+          {/* header left */}
+          <div className="headerLeft" width={headerWidth} height={matrixHeight} style={{top:0, left:-headerWidth }} >
+          <TransformWrapper
+            scale = {scale}
+            positionX = {matrixHeight/6-matrixHeight/6*scale}
+            positionY = {positionY}
+            wheel = {{
+              wheelEnabled: false,
+              touchPadEnabled: false,
+              limitsOnWheel: false,
+            }}
+            pan = {{
+              disabled: true
+            }}
+            pinch = {{
+              disabled: true
+            }}
+          >
+          <TransformComponent>
+            <svg width={headerWidth} height={matrixHeight} >
+              {ordering.map((nodeId) => {
+                let edgeId= nodeId + "-" + nodeId;
+                let fontsize = Math.min(cellWidth/2, 12.5);
+                return(
+                  <>
+                    <text x={headerWidth-2*headerNodeAttrColorWidth} y={locationCells[edgeId].y+cellWidth/2+1/2*fontsize} style={
+                      {transform: "1deg", 
+                      transformOrigin:`${headerWidth}px ${locationCells[edgeId].y}px`,
+                      fontSize: fontsize,
+                      textAnchor: "end" }}
+                    >{nodes[nodeId][nodeNameDisplay]}</text>
+                    <rect 
+                      x={headerWidth-headerNodeAttrColorWidth} 
+                      y={locationCells[edgeId].y} 
+                      width={headerNodeAttrColorWidth} 
+                      height={cellHeight} 
+                      fill={colorScheme[nodeAttrColorCoding[nodes[nodeId][nodeColorAttr]]]}
+                    ></rect>
+                  </>
+                )
+              })}
+            </svg>
+          </TransformComponent>
+          </TransformWrapper>
+          </div>
+          {/* Matrix */}
+          <TransformComponent>
+          <svg width={matrixWidth} height={matrixHeight} >
+            {noEdgeCells.map((edgeId) => 
+              <rect 
+                key={edgeId}
+                x={locationCells[edgeId].x} 
+                y={locationCells[edgeId].y} 
+                width={cellWidth-borderSize}
+                height={cellHeight-borderSize}
+                fill={noEdgeCellColor}
+                onMouseEnter={() => {setHoveredEdge([edgeId.split("-")])}}
+                onMouseOut={() => {setHoveredEdge([null,null])}}
+              >
+              </rect>)}
+            {Object.keys(edges).map((edgeId) => 
+              <rect 
+                key={edgeId}
+                x={locationCells[edgeId].x} 
+                y={locationCells[edgeId].y} 
+                width={cellWidth-borderSize}
+                height={cellHeight-borderSize}
+                fill={valueToColor(edges[edgeId][edgeAttr])}
+                onMouseEnter={() => {setHoveredEdge([edgeId.split("-")])}}
+                onMouseOut={() => {setHoveredEdge([null,null])}}
+                onClick={() => {setSelectedEdge([edgeId.split("-")])}}
+              > 
+              </rect>)}
+          </svg>
+          </TransformComponent>
+        </>)}
+      </TransformWrapper>
+      </div>
+    </div>
+    </>
+  )  
 }
-
-
 export default AdjacencyMatrix;
 

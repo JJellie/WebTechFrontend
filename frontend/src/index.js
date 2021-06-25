@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './Css/index.css';
 import About from './Pages/About';
 import HomePage from './Pages/Homepage';
-import Vis from './Pages/vis';
+import Vis from './Pages/vis2.js';
 import {
   BrowserRouter as Router,
   Switch,
