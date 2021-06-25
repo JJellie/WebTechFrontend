@@ -19,7 +19,9 @@ const secondDropdownUndirected = [
     {value: "alphabetically", label: "alphabetically"},
     {value: "shuffle randomly", label: "shuffle randomly"},
     {value: "spectral", label: "spectral"},
-    {value: "barycenter", label: "barycenter"}
+    {value: "barycenter", label: "barycenter"},
+    {value: "rcm", label: "bandwidth reduction"},
+    //{value: "by frequency", label: "by frequency"}
 ];
 
 const secondDropdownDirected = [
@@ -174,17 +176,6 @@ class AdjacencyMatrix extends React.Component {
 
     raphaelRender(){
         this.draw(true);
-        let mat = [
-            [0, 1, 0, 1, 0],
-            [1, 0, 1, 0, 1],
-            [0, 1, 0, 1, 1],
-            [1, 1, 1, 0, 0]
-            ];
-        var graph = reorder.mat2graph(mat, true);
-        var perms = reorder.barycenter_order(graph);
-        
-
-
     }
 
 
@@ -203,11 +194,14 @@ class AdjacencyMatrix extends React.Component {
 
         let matrixUndirected = new Array(nodesNumber);
         let matrixDirected = new Array(nodesNumber);
+   
 
         for (let i = 0; i < nodesNumber; i++) {
             matrixUndirected[i] = new Array(nodesNumber);
             matrixDirected[i] = new Array(nodesNumber);
+           
         }
+
 
 
         for(let i = 1; i <= nodesNumber; i++) {
@@ -231,9 +225,6 @@ class AdjacencyMatrix extends React.Component {
                 matrixUndirected[i-1][j-1] = (edgeHash[id] + edgeHash[id2])/2;
                 }
             }
-
-     
-
 
 
         console.log(nodeHash);
@@ -269,6 +260,10 @@ class AdjacencyMatrix extends React.Component {
                 this.drawMatrix(barycenterOrdering, barycenterOrdering, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
                console.log(barycenterOrdering);
             }
+            else if (this.state.currentNodeOrdering === "rcm"){
+                let rcmOrdering = this.computeRCM(matrixUndirected);
+                this.drawMatrix(rcmOrdering, rcmOrdering, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH);
+            }
         } 
     }
 
@@ -286,18 +281,27 @@ class AdjacencyMatrix extends React.Component {
 
     computeBarycenter(matrix){
         let val = (this.state.currentGraphType === "undirected") ? false : true;
-        let graph = reorder.mat2graph(matrix, false);
+        let graph = reorder.mat2graph(matrix, val);
         let barycenter = reorder.barycenter_order(graph);
         let improved = reorder.adjacent_exchange(graph, barycenter[0],  barycenter[1]);
-        console.log(improved);
         let barycenterOrdering = [];
         for (let i = 0; i < improved[0].length; i++){
             barycenterOrdering.push(improved[0][i]+1);
         }
         return barycenterOrdering;
-
     }
-    
+
+    computeRCM(matrix){ // bandwith reduction: reverse cuthill-mckee
+        let graph = reorder.mat2graph(matrix, false);
+        let rcm = reorder.reverse_cuthill_mckee_order(graph);
+        let rcmOrder = [];
+        for (let i = 0; i < rcm.length; i++){
+            rcmOrder.push(rcm[i]+1);
+        }
+        return rcmOrder;
+    }
+
+   
 
 
     sortAlphabetically(nodeOrdering, nodeHash){ // in JS objects are always passed around by reference, assigning new var changes initial
