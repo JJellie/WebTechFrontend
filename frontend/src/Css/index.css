@@ -1,88 +1,87 @@
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-.page  {
-    padding-top: 0px;
-    margin-top: 0px;
-    margin-left: 5%;
-    overflow: hidden;
-}
-.Hamburger {
-    margin-left: -3px;
-    margin-top: 5px;
-    color: transparent;
-    background-color: transparent;
-    border: none;
-}
-.sidebar {
-    z-index: 1;
     margin: 0;
-    border-right: 6px none #20A4F3;
-    width: 50px;
-    overflow: hidden;
-    height: 100vh;
-    float: left;
-    color: #F9F5FF;
-    background-color: #6D696A;
-    position: fixed;
-    transition: width 0.5s;
-}
-.sidebarList {
-    display: none;
-}
-
-.sidebarList li button {
-    display: block;
-    width: 200px;
-    padding: 16px;
-    border: none;
-    color: #F9F5FF;
-    font-size:large;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+      monospace;
+  }
+  .page  {
+      padding-top: 60px;
+      margin-top: 0px;
+      margin-left: 0;
+      overflow: hidden;
+  }
+  
+  .sidebar {
+      background-color: #6D696A;
+      border-bottom: 6px solid #20A4F3;
+      width:100vw;
+      height:62px;
+      position:fixed;
+      z-index: 1000;
+  }
+  .sidebarList {
+      margin: 0;
+      padding: 0;
+      width:100vw;
+      height:62px;
+  }
+  .sidebarList a button {
+      display: block;
+      width: 12vw;
+      padding: 19px;
+      border: none;
+      color: #F9F5FF;
+      font-size:20px;
+      text-align: left;
+      background-color: #6D696A;
+      text-decoration: none;
+  }
+  .sidebarList a button:visited {
+      color: black;
+      text-decoration: none;
+  }
+  .sidebarList a button.active {
+      background-color: #20A4F3;
+      font-weight: bold;
+      font-size:20px;
+      padding-top:19px;
+      padding-bottom:20px;
+      text-decoration: none;
+      color: #000;
+  }
+  
+  .sidebarList a button.image{
+      padding-top: 6px;
+      padding-bottom: 5px;
+      width: 84px;
+  }
+  
+  .sidebarList a button:hover:not(.active, .image) {
+    background-color: #555;
+    text-decoration: none;
     text-align: left;
-    background-color: #6D696A;
-    text-decoration: none;
-}
-.sidebarList li button:visited {
-    color: black;
-    text-decoration: none;
-}
-.sidebarList li button.active {
-    background-color: #20A4F3;
-    font-weight: bold;
-    font-size:large;
-    text-align: left;
-    text-decoration: none;
-    color: #000;
-}
-
-.sidebarList li button:hover:not(.active, .image) {
-  background-color: #555;
-  text-decoration: none;
-  text-align: left;
-  cursor: pointer;
-  padding-left: 20%;
-  font-size:large;
-  color: #F9F5FF;
-}
-.sidebarList li button:hover.image {
-    background-color: #6D696A;
-}
-.sidebar ul li a {
-    text-decoration: none;
-}
-.sidebar ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
+    cursor: pointer;
+    padding:16px;
+    font-size:25px;
+    color: #F9F5FF;
+  }
+  .sidebarList a button:hover.image {
+      background-color: #6D696A;
+  }
+  .sidebarList a {
+      float: left;
+      text-decoration: none;
+  }
+  .sidebar ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+  }

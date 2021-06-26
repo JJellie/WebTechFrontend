@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './Css/index.css';
 import About from './Pages/About';
 import HomePage from './Pages/Homepage';
-import VisPage from './Pages/vispage.js';
+import VisPage from './Pages/vispage';
 import {
   BrowserRouter as Router,
   Switch,
@@ -61,6 +61,16 @@ class NavBar extends React.Component {
    
         return (    
         <Router>
+            <div className = "sidebar" id='sidebar'>
+            {/* <button className='Hamburger' onClick={() => this.menuChange()}><img src={Hamburger} alt='Hamburger Icon'width='40px' height="40px"></img></button> */}
+            <ul className= 'sidebarList' id = 'sideBarList'>
+                <a><button  className="image"><img src={Logo} alt="company logo" width="46px" height="46px"></img></button></a>
+                <a><Link to="/"><button className={this.state["activepage"] === 0 ? "active" : ""}><span>Home</span></button></Link></a>
+                <a><Link to="/vis"><button className={this.state["activepage"] === 1 ? "active" : ""}>Visualisation</button></Link></a>
+                <a><Link to="/about"><button className={this.state["activepage"] === 2 ? "active" : ""}>About</button></Link></a>
+                <a><Link to="/contact"><button className={this.state["activepage"] === 3 ? "active" : ""}>Contact</button></Link></a>
+            </ul>
+            </div>
             <div className = "page">
             <Switch>
                 <Route exact path="/">
@@ -70,7 +80,7 @@ class NavBar extends React.Component {
                     <About update={this.updateAbout}/>
                 </Route>
                 <Route exact path="/Vis">
-                    <VisPage update={this.updateVis} />
+                  <VisPage update={this.updateVis} />
                 </Route>
                 <Route exact path="/contact">
                     <Contact update={this.updateContact}/>

@@ -19,29 +19,28 @@ const colorSchemes =
 
 
 function Vis({ dataSet }) {
-  console.log(dataSet);
-
-
   //State
   
   const [hoveredEdge, setHoveredEdge] = useState([null,null]);
   const [selectedEdge, setSelectedEdge] = useState(null);
   const [edgeAttrDisplayed, setEdgeAttrDisplayed] = useState(dataSet.attrInfo.edgeAttrOrdinal);
   const [colorScheme, setColorScheme] = useState(colorSchemes[0]);
-
+  const [selectedNodes, setSelectedNodes] = useState([]);
+  const [selectedEdges, setSelectedEdges] = useState([]);
+  console.log(selectedNodes);
   // coloring 
   let colorSchemeScale = d3.scaleOrdinal().domain(Object.keys(dataSet.attrInfo.nodeColorAttrMapping)).range(Object.values(dataSet.attrInfo.nodeColorAttrMapping).map((colorIndex) => colorScheme[colorIndex]));  
   let colorScalePositive = d3.scaleLinear().domain([0,dataSet.attrInfo.max[edgeAttrDisplayed]]).range(["#7cc6f2","#20A4F3"]);
   let colorScaleNegative = d3.scaleLinear().domain([dataSet.attrInfo.min[edgeAttrDisplayed],0]).range(["#ff1900","#ff6554"]);
   let colorNeutral = "#f6ff00"
-  
+
   return (
     <>
       {/* Visualization */}
         <div className="visContainer">
           {/* AdjacencyMatrix */}
           <div className="AMContainer">
-            <h1 className='Visheader'> AdjacencyMatrix </h1>
+            <h1 className='Visheader'> Adjacency Matrix </h1>
             <AdjacencyMatrix 
               width={500}
               height={500}
@@ -58,7 +57,7 @@ function Vis({ dataSet }) {
               colorNeutral={colorNeutral}
               nodeAttrColorCoding={dataSet.attrInfo.nodeColorAttrMapping}
               nodeColorAttr={dataSet.attrInfo.nodeColorAttr}
-              colorScheme={colorScheme}
+              colorSchemeScale={colorSchemeScale}
             />
           </div>
 
@@ -76,6 +75,8 @@ function Vis({ dataSet }) {
               setSelectedEdge={setSelectedEdge}
               colorSchemeScale={colorSchemeScale}
               nodeColorAttr={dataSet.attrInfo.nodeColorAttr}
+              setSelectedNodes={setSelectedNodes}
+              selectedNodes={selectedNodes}
             />
           </div>
 

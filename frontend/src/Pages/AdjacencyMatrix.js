@@ -15,8 +15,7 @@ let locationCells = {};
 
 
 const borderSize = 0;
-const headerNodeAttrColorWidth = 3;
-const noEdgeCellColor = "#c9c9c9";
+const noEdgeCellColor = "#e8e8e8";
 
 function valueToColor(value, colorPositiveScale, colorNegativeScale, colorNeutral)  {
   if( value > 0 ) return colorPositiveScale(value);
@@ -41,17 +40,17 @@ let headerleft;
 let cells = {};
 let headertopNames = {};
 let headerleftNames = {};
+ 
 
 let locationMapping;
 
-function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, setSelectedEdge, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorScheme}) {
+function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, setSelectedEdge, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorSchemeScale}) {
   const matrixWidth = width-headerWidth;
   const matrixHeight = height-headerWidth;
   const cellWidth = (matrixHeight)/ordering.length;
   const cellHeight = (matrixHeight)/ordering.length;
-
-  console.log(edges);
-
+  const headerNodeColorTop = cellHeight/5;
+  const headerNodeColorLeft = cellWidth/5;
   locationMapping = useMemo(() => createLocationMapping(ordering), [ordering]);
  
 
@@ -64,7 +63,6 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
 
     }
     
-    console.log("initialize AM");
     // create canvas
     canvas = Raphael(document.getElementById("matrix") ,width, height);
     headertop = Raphael(document.getElementById("headerTop") ,width, headerWidth);
@@ -80,12 +78,34 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
     // matrix headers
     for( let nodeId of ordering) {
       let location = locationMapping[nodeId];
-      headertopNames[nodeId] = headertop.text((location * cellWidth) + .5*cellWidth, headerWidth-headerNodeAttrColorWidth, nodes[nodeId][nodeAttrDisplay]);
-      headertopNames[nodeId].attr({
+      let tx = (location * cellWidth) + .5*cellWidth;
+      let ty = headerWidth - headerNodeColorTop;
+      let lx = headerWidth - headerNodeColorTop;
+      let ly = (location * cellHeight) + .5*cellHeight;
+      // top
+      headertopNames[nodeId] = {};
+      headertopNames[nodeId]["color"] = headertop.rect(tx - .5*cellWidth, ty, cellWidth, headerNodeColorTop);
+      headertopNames[nodeId]["color"].attr({
+        "stroke-width" : 0,
+        "fill" : colorSchemeScale(nodes[nodeId][nodeColorAttr])
+      })
+      headertopNames[nodeId]["name"] = headertop.text(tx, ty-1, nodes[nodeId][nodeAttrDisplay]);
+      headertopNames[nodeId]["name"].attr({
         "font-size": fontsizeTop,
         "text-anchor" : "start",
-        "transform" : "r-90",
-        "transform-origin" : `${(location * cellWidth)}px ${headerWidth-headerNodeAttrColorWidth}px`  
+        "transform" : `r-90,${tx},${ty-1}` 
+      })
+      // left
+      headertopNames[nodeId] = {};
+      headertopNames[nodeId]["color"] = headerleft.rect(lx, ly - .5*cellHeight, headerNodeColorLeft, cellHeight);
+      headertopNames[nodeId]["color"].attr({
+        "stroke-width" : 0,
+        "fill" : colorSchemeScale(nodes[nodeId][nodeColorAttr])
+      })
+      headertopNames[nodeId]["name"] = headerleft.text(lx-1, ly, nodes[nodeId][nodeAttrDisplay]);
+      headertopNames[nodeId]["name"].attr({
+        "font-size": fontsizeTop,
+        "text-anchor" : "end",
       })
     }
     // loop through all edges
@@ -93,7 +113,6 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
       const [fromNode, toNode] = edgeId.split("-");
       cells[edgeId] = canvas.rect(locationMapping[toNode]*cellWidth, locationMapping[fromNode]*cellHeight, cellWidth, cellHeight);
       cells[edgeId].attr({"fill" : valueToColor(edges[edgeId][edgeAttrDisplay], colorPositiveScale, colorNegativeScale, colorNeutral), "stroke-width" : 0});
-      console.log(edges[edgeId][edgeAttrDisplay]);
     }
   }, [])
 

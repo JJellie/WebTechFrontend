@@ -107,10 +107,13 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
     setColumnSelected(initialColumnSelected);
     setNodeAttrSelection(initialNodeAttrSelection);
     setNodeAttrName(initialNodeAttrName);
-    nodeAttrSelectionData = { colors: {}, columnInfo: null };
+    nodeAttrSelectionData = { colors: {}, columnInfo: {} };
+    edgeAttrSelectionData = { colors: {}, columnInfo: {} };
+    nodeAttrSelectionColor = 0;
+    edgeAttrSelectionColor = 0;
     columnData = { date: null, edgeAttr: [], fromId: null, toId: null, nodeAttr: {} };
     errorCount = 0;
-    columns = [];
+    columns = [[], [], {}, {}];
     rowExample = null;
     nodeAttrNameActice = false;
   }
@@ -513,7 +516,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                       }}
                     >
                       Exit Node Attribute Creation
-                                        </button> :
+                    </button> :
                     <button
                       className="createAttrButtonEnabled"
                       onClick={() => {
@@ -522,7 +525,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                       }}
                     >
                       Create Node Attribute
-                                        </button>
+                    </button>
                   }
                 </div>
                 <div className="columnSelection">

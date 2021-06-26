@@ -18,23 +18,120 @@ function createNodeInfo(ordering, distanceBetweenNodes) {
   return nodePositionTemp;
 }
 
+let canvas;
+let clickInfo = {};
+let circles = {};
+let curves = {};
+let nodeInfo = {};
+let edgeConnection = {}
+let selectedNodesCopy = [];
+
+//Pinning nodes
+const clickEvent = (clickInfo, curveWidth, nodeRadius, strokeColor, nodeStrokeWidth) => {
+  let circId = clickInfo["nodeId"];
+  let mode = clickInfo["mode"];
+  let circ = circles[circId];
+  if(mode) {
+    // appearance edges
+    if(edgeConnection[circId]){
+      for(let edgeId of edgeConnection[circId]) {
+        curves[edgeId].animate({'stroke-width':1.5*curveWidth},100);
+        curves[edgeId].attr({'stroke': '#000'});
+        curves[edgeId].toFront();
+        // put end nodes to front
+        circles[edgeId.split("-")[1]].toFront();
+      }
+    }
+    // appearance node
+    circ.attr({'r': 1.5*nodeRadius, 'stroke-width': 1.5*nodeStrokeWidth});
+    circ.toFront();
+    // hover
+    circ.unhover();
+    circles[clickInfo["nodeId"]].hover(
+      () => {
+        if(edgeConnection[circId]){
+          for(let edgeId of edgeConnection[circId]) {
+            let circ2Id = edgeId.split("-")[1];
+            if(circ2Id !== circId) {
+              if(!selectedNodesCopy.includes(edgeId.split("-")[1])) {
+                circles[circ2Id].animate({'r': 1.25*nodeRadius}, 100)
+              }
+            }
+            circles[circ2Id].toFront()
+          }
+        }
+      },
+      () => {
+        if(edgeConnection[circId]){
+          for(let edgeId of edgeConnection[circId]) {
+            if(!selectedNodesCopy.includes(edgeId.split("-")[1])) {
+              circles[edgeId.split("-")[1]].animate({'r': nodeRadius},100)
+            }
+          }
+        }
+      }
+    )
+  } else {
+    // node appearance
+    circ.attr({'stroke-width': nodeStrokeWidth});
+
+    // hover
+    circ.unhover();
+    circ.hover(
+      //On mouse hovering over
+      () => {
+        circ.animate({'r':1.5*nodeRadius}, 100)
+        if(edgeConnection[circId]){
+          for(let edgeId of edgeConnection[circId]) {
+            curves[edgeId].animate({'stroke-width':1.5*curveWidth},100);
+            curves[edgeId].attr({'stroke': '#000'});
+            curves[edgeId].toFront();
+            let circ2Id = edgeId.split("-")[1];
+            if(circ2Id !== circId) {
+              if(!selectedNodesCopy.includes(edgeId.split("-")[1])) {
+                circles[circ2Id].animate({'r': 1.25*nodeRadius}, 100)
+              }
+            }
+            circles[circ2Id].toFront()
+          }
+        }
+        circ.toFront()
+      },
+      //On mouse leaving hover
+      () => {
+        circ.animate({'r':nodeRadius}, 100)
+        if(edgeConnection[circId]){
+          for(let edgeId of edgeConnection[circId]) {
+            curves[edgeId].animate({'stroke-width':curveWidth},100);
+            curves[edgeId].attr({'stroke': strokeColor});
+            curves[edgeId].toBack();
+            if(!selectedNodesCopy.includes(edgeId.split("-")[1])) {
+              circles[edgeId.split("-")[1]].animate({'r': nodeRadius},100)
+            }
+          }
+        }
+      }
+    )
+}}
 
 
-function ThreadArcs({ width, height, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setHoveredEdge, setSelectedEdge, setHoveredNode, setSelectedNode, colorSchemeScale, nodeColorAttr}) {
+function ThreadArcs({ width, height, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setHoveredEdge, setSelectedEdges, setHoveredNode, setSelectedNodes, selectedNodes, colorSchemeScale, nodeColorAttr}) {
   const distanceBetweenNodes = height/ordering.length
-  let canvas; 
-  let circles = {};
-  let curves = {};
-  let nodeInfo = {};
-  const nodeStrokeWidth = 1
-  const nodeRadius = (distanceBetweenNodes/2)-(nodeStrokeWidth/2); 
-  const curveWidth = 0.5
-  let edgeConnection = {}
+  const nodeStrokeWidth = distanceBetweenNodes/12;
+  const nodeRadius = Math.min((distanceBetweenNodes/2)-(nodeStrokeWidth/2), 20); 
+  const curveWidth = nodeRadius/5;
+  const strokeColor = "#20A4F3";
 
+  
   nodePosition = useMemo(() => createNodeInfo(ordering, distanceBetweenNodes), []);
+
   // initialize vis
   useEffect(() => {
-    console.log("initialize TA");
+    try {
+      canvas.clear()
+    } catch {
+    }
+
     canvas = Raphael(document.getElementById("TA") ,width, height);
     //Draw nodes
     for(let nodeIdIndex in ordering) {
@@ -42,65 +139,72 @@ function ThreadArcs({ width, height, ordering, edges, nodes, nodeNameDisplay, ed
       let nodeId = ordering[nodeIdIndex]
       circles[nodeId] = canvas.circle(x, nodeIdIndex * distanceBetweenNodes + ((1/2) * distanceBetweenNodes), nodeRadius, )
       circles[nodeId].attr({"fill": colorSchemeScale(nodes[nodeId][nodeColorAttr])})
-      circles[nodeId].attr({"stroke-width": nodeStrokeWidth})
-      
+      circles[nodeId].attr({"stroke-width": nodeStrokeWidth})      
     }
     //Draw arcs
     for(let edgeId of Object.keys(edges)) {
       const [fromNode, toNode] = edgeId.split("-");
       let distance = circles[toNode].attr('cy') - circles[fromNode].attr('cy')
-      curves[edgeId] = canvas.path("M "+ (circles[fromNode].attr('cx')) +"," + (circles[fromNode].attr('cy')) + " A"+  (Math.abs(distance/2) > (width/3 -20) ? (width/3)*(1-(Math.abs(distance/2) / (circles.length*50) ))-10 : Math.abs(distance/2)) +"," + Math.abs(distance/2)  + " 0 0,1 " + circles[toNode].attr('cx') 
-      +"," + (circles[toNode].attr('cy'))).attr({"stroke-width": curveWidth, "stroke": "#20A4F3",});
+      curves[edgeId] = canvas.path("M "+ (circles[fromNode].attr('cx')) +"," + (circles[fromNode].attr('cy')) + " A"+  (Math.abs(distance/2) > (width/3 -20) ? Math.abs(distance/3) : Math.abs(distance/2)) +"," + Math.abs(distance/2)  + " 0 0,1 " + circles[toNode].attr('cx') 
+      +"," + (circles[toNode].attr('cy'))).attr({"stroke-width": curveWidth, "stroke": strokeColor,});
       curves[edgeId].toBack();
       //curves[edgeId].data({"fromId":fromNode, "toId":toNode})
       if(!edgeConnection[fromNode]) {edgeConnection[fromNode] = []};
       edgeConnection[fromNode].push(edgeId);
     }
-    //Set animations
+    //Set interactions
     for(let circId of Object.keys(circles)) {
       let circ = circles[circId]
+      //On click interaction
+      circ.click(() => {
+        if(selectedNodesCopy.includes(circId)){
+          selectedNodesCopy.splice(selectedNodesCopy.indexOf(circId), 1);
+          setSelectedNodes(selectedNodesCopy);
+          clickEvent({'nodeId': circId, 'mode' : false}, curveWidth, nodeRadius, strokeColor,nodeStrokeWidth);
+        } else {
+          selectedNodesCopy.push(circId);
+          setSelectedNodes(selectedNodesCopy);          
+          clickEvent({'nodeId': circId, 'mode' : true}, curveWidth, nodeRadius, strokeColor,nodeStrokeWidth);
+        }
+      })
+      //Hover
       circ.hover(
+        //On mouse hovering over
         () => {
-          circ.animate({'r':2*nodeRadius}, 100)
+          circ.animate({'r':1.5*nodeRadius}, 100)
           if(edgeConnection[circId]){
             for(let edgeId of edgeConnection[circId]) {
-              console.log(edgeId);
-              curves[edgeId].animate({'stroke-width':2*curveWidth},100);
+              curves[edgeId].animate({'stroke-width':1.5*curveWidth},100);
               curves[edgeId].attr({'stroke': '#000'});
               curves[edgeId].toFront();
-              circles[edgeId.split("-")[1]].animate({'r': 1.5*nodeRadius},100)
-              circles[edgeId.split("-")[1]].toFront()
+              let circ2Id = edgeId.split("-")[1];
+              if(circ2Id !== circId) {
+                if(!selectedNodesCopy.includes(edgeId.split("-")[1])) {
+                  circles[circ2Id].animate({'r': 1.25*nodeRadius}, 100)
+                }
+              }
+              circles[circ2Id].toFront()
             }
           }
           circ.toFront()
         },
+        //On mouse leaving hover
         () => {
           circ.animate({'r':nodeRadius}, 100)
           if(edgeConnection[circId]){
             for(let edgeId of edgeConnection[circId]) {
               curves[edgeId].animate({'stroke-width':curveWidth},100);
-              curves[edgeId].attr({'stroke': '#20A4F3'});
+              curves[edgeId].attr({'stroke': strokeColor});
               curves[edgeId].toBack();
-              circles[edgeId.split("-")[1]].animate({'r': nodeRadius},100)
+              if(!selectedNodesCopy.includes(edgeId.split("-")[1])) {
+                circles[edgeId.split("-")[1]].animate({'r': nodeRadius},100)
+              }
             }
           }
-
         }
       )
     }
   },[])
-
-
-  useEffect(() => {
-
-  }, [])
-  
-
-
-
-
-
-
 
   return (
     <div width={width} height={height}>
@@ -130,8 +234,6 @@ function ThreadArcs({ width, height, ordering, edges, nodes, nodeNameDisplay, ed
       </TransformWrapper>
     </div>
   );
-
-
 }
 
 export default ThreadArcs;
