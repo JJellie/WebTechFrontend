@@ -733,8 +733,8 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                       let newColumnData = {};
                       const columnNames = Object.keys(rowExample);
                       newColumnData.date = columnNames.indexOf(columnData.date);
-                      newColumnData.fromId = columnNames.indexOf(columnData.fromId) ? columnNames.indexOf(columnData.fromId)  : null;
-                      newColumnData.toId = columnNames.indexOf(columnData.toId) ? columnNames.indexOf(columnData.toId) : null;
+                      newColumnData.fromId = columnNames.indexOf(columnData.fromId) >= 0 ? columnNames.indexOf(columnData.fromId)  : null;
+                      newColumnData.toId = columnNames.indexOf(columnData.toId) >= 0 ? columnNames.indexOf(columnData.toId) : null;
                       newColumnData.edgeAttr = columnData.edgeAttr.map((Attr) => columnNames.indexOf(Attr));
                       let nodeAttr = {}
                       Object.keys(columnData.nodeAttr).map((Attr) => nodeAttr[Attr] = [columnNames.indexOf(columnData["nodeAttr"][Attr][0]), columnNames.indexOf(columnData["nodeAttr"][Attr][1])]);
