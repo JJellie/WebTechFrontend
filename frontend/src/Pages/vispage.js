@@ -1,5 +1,3 @@
-import ThreadArcs from './ThreadArcs.js';
-import AdjacencyMatrix from './AdjacencyMatrix.js';
 import '../Css/visual.css';
 import React, {useState, useMemo, useEffect, useCallback} from 'react';
 import * as d3 from "d3";
