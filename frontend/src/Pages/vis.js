@@ -234,35 +234,51 @@ function EdgesOfNodeTable({ dataSet, nodeId, closeFunction }) {
   let edgesFrom = [];
   let edgesTo = [];
 
+  let exEdge;
+  let edgeAttrs = [];
+
+  // Find the edges from/to the selected node
   Object.keys(edges).map(key => {
-    console.log(key);
     let [from, to] = key.split("-");
     if (from == nodeId) edgesFrom.push(edges[key]);
     if (to == nodeId) edgesTo.push(edges[key]);
+
+    if(!exEdge) exEdge = edges[key];
   });
-  console.log("edges:");
-  console.log(edgesFrom, edgesTo);
 
-
-
+  // Store the custom edge attributes to retrieve them later
+  if(exEdge) {
+    for(var key in exEdge) {
+      if(!["count", "edges", "fromId", "toId"].includes(key)) {
+        edgeAttrs.push(key);
+      }
+    }
+  }
 
   return (
     <div className="popTable"> {console.log("edge table")}
       <div className='tablepopup-content'>
-        <table style="width: 100%">
-          <thead>
+        <table style={{ width: "100%" }}>
+          <thead style={{ backgroundColor: "#DDD" }}>
             <tr>
-              <th>Count</th>
               <th>To ID</th>
-              <th>Sentiment</th>
+              <th>Count</th>
+              {
+                edgeAttrs.map(attr => {
+                  return <th>{attr.charAt(0).toUpperCase() + attr.substring(1)}</th>
+                })
+              }
             </tr>
           </thead>  
           <tbody>
             {
-              edgesFrom.map((edge) => {
-                return <tr><td>{edge.count}</td><td>{edge.toId}</td><td>{edge.sentiment}</td></tr>
+              edgesFrom.map(edge => {
+                return <tr className="node-table-row" ><td>{edge.toId}</td><td>{edge.count}</td>{
+                  edgeAttrs.map(attr => {
+                    return <td>{edge[attr]}</td>
+                  })
+                }</tr>
               })
-
             }
           </tbody>
         </table>
