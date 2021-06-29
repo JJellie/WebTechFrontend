@@ -98,37 +98,30 @@ body {
     100% { left: -100%; }
   }
 
+/* Pieces of text layout */
 .GeneralAd {
-    display: block;
-    stroke: black;
-    stroke-width: 10px;
-    border-style: dotted;
-    border-radius: 16px;
-    width: 80vw;
-    height:10/1vw;
-    margin-left: 5vw;
-    margin-top: 5vh;
-    margin-bottom: 1vh;
-    border-color: #20A4F3;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: larger;
+  display: block;
+  stroke: black;
+  stroke-width: 10px;
+  border-style: dotted;
+  border-radius: 16px;
+  width: 80vw;
+  height:auto;
+  min-height: 10vw;
+  margin-left: 5vw;
+  margin-top: 5vh;
+  margin-bottom: 1vh;
+  border-color: #20A4F3;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: larger;
   }
-/* INVERSE SCALING STILL NEEDED....SOMEHOW*/
+
 .GeneralAd img{
-    display:block;
-    float:left;
-    Height: 20%;
-    Max-height: 15vw;
-    Width:20%;
-    Max-width: 15vw;
+  display:block;
+  float:left;
+  max-height:10vw;
+  max-width:10vw;
   }
-.imageHolder{
-    background-image: url(http://localhost:3000/static/media/logo%201.64080741.png);
-    background-size: cover;
-    float:left;
-    width:12vw;
-    height:12vw;
-}
 
 .GeneralAd p{
     padding:10px;
@@ -136,6 +129,7 @@ body {
     vertical-align: middle;
   }
 
+/* THREADARCS */
 .ThreadArcsAd {
     display: block;
     stroke: black;
@@ -143,7 +137,8 @@ body {
     border-style: dotted;
     border-radius: 16px;
     width: 80vw;
-    height:10vw;
+    height:auto;
+    min-height: 10vw;
     margin-left: 15vw;
     margin-top: 5vh;
     margin-bottom: 1vh;
@@ -151,7 +146,7 @@ body {
     font-family: 'Courier New', Courier, monospace;
     font-size: larger;
 }
-/* INVERSE SCALING STILL NEEDED....SOMEHOW*/
+
 .ThreadArcsAd img{
     display:block;
     float:left;
@@ -165,6 +160,7 @@ body {
     vertical-align: middle;
   }
 
+  /* ADJACENCY MATRIX */
 .AdjacencyAd {
     display: block;
     stroke: black;
@@ -172,7 +168,8 @@ body {
     border-style: dotted;
     border-radius: 16px;
     width: 80vw;
-    height:10/1vw;
+    height:auto;
+    min-height: 10vw;
     margin-left: 5vw;
     margin-top: 5vh;
     margin-bottom: 1vh;
@@ -180,7 +177,7 @@ body {
     font-family: 'Courier New', Courier, monospace;
     font-size: larger;
   }
-/* INVERSE SCALING STILL NEEDED....SOMEHOW*/
+
 .AdjacencyAd img{
     display:block;
     float:left;
@@ -194,6 +191,7 @@ body {
     vertical-align: middle;
   }
 
+  /* GENERAL PAGE INFO */
 .PageAd {
     display: block;
     stroke: black;
@@ -201,7 +199,8 @@ body {
     border-style: dotted;
     border-radius: 16px;
     width: 80vw;
-    height:18vw;
+    height:auto;
+    min-height: 10vw;
     margin-left: 15vw;
     margin-top: 5vh;
     margin-bottom: 1vh;
@@ -209,16 +208,17 @@ body {
     font-family: 'Courier New', Courier, monospace;
     font-size: larger;
 }
-/* INVERSE SCALING STILL NEEDED....SOMEHOW*/
+
 .PageAd img{
     display:block;
     float:left;
-    max-height:18vw;
-    max-width:18vw;
+    max-height:10vw;
+    max-width:10vw;
+    margin-top: 10px;
   }
 
 .PageAd p{
     padding:10px;
-    margin-left:20vw;
+    margin-left:12vw;
     vertical-align: middle;
   }

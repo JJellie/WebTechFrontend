@@ -4,6 +4,9 @@ import Banner from "../Images/DBL_Banner.png";
 import BannerNew from "../Images/DBL_banner_new.png";
 import Divider from "../Images/divider.png";
 import Logo from '../Images/logo 1.png';
+import TALogo from '../Images/TA2 logo-image.png';
+import AMLogo from '../Images/AM logo-image.png';
+import MixedLogo from '../Images/Mixed logo-image.png';
 import {
     Link,
   } from "react-router-dom";
@@ -36,9 +39,7 @@ class HomePage extends React.Component {
                 </div>
 
                 <div className = "GeneralAd">
-                    <div className="imageHolder">
-                        {/* <img src={Logo} alt="company logo"></img>  */}
-                    </div>
+                    <img src={Logo} alt="company logo"></img> 
                     <div className = "generalText">
                         <p>
                         On this website you can find 2 beautiful visualisations, carefully programmed by the Amazing Dbl Team. They have put in a grand total of 840 hours, spread over 6 members.
@@ -49,7 +50,7 @@ class HomePage extends React.Component {
                 </div>
 
                 <div className = "ThreadArcsAd">
-                    <img src="https://treevis.net/thumbs200png/Kerr2003.png" alt="company logo"></img>
+                    <img src={TALogo} alt="threadarc logo"></img>
                     <div className = "ThreadText">
                         <p>
                         We will visualise your network data into a "ThreadArc" visualisation. 
@@ -60,7 +61,7 @@ class HomePage extends React.Component {
                 </div>
 
                 <div className = "AdjacencyAd">
-                    <img src="https://i.imgur.com/Ba7GQYL.png" alt="company logo"></img>
+                    <img src={AMLogo} alt="Matrix logo"></img>
                     <div className = "AdjacencyText">
                         <p>
                         We will visualise your network data into a "Adjacency Matrix" visualisation. 
@@ -72,7 +73,7 @@ class HomePage extends React.Component {
                 </div>
 
                 <div className = "PageAd">
-                    <img src="https://64.media.tumblr.com/f7f2ff25655c40deb3314e87e5a70fc1/tumblr_pp4p31ZgrF1t4tgk0_1280.png" alt="froge"></img>
+                    <img src={MixedLogo} alt="company logo"></img> 
                     <div className = "PageText">
                         <p>
                         Our website has 4 pages. 
