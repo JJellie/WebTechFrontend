@@ -282,6 +282,31 @@ function EdgesOfNodeTable({ dataSet, nodeId, closeFunction }) {
             }
           </tbody>
         </table>
+        <br />
+        <table style={{ width: "100%" }}>
+          <thead style={{ backgroundColor: "#DDD" }}>
+            <tr>
+              <th>From ID</th>
+              <th>Count</th>
+              {
+                edgeAttrs.map(attr => {
+                  return <th>{attr.charAt(0).toUpperCase() + attr.substring(1)}</th>
+                })
+              }
+            </tr>
+          </thead>  
+          <tbody>
+            {
+              edgesTo.map(edge => {
+                return <tr className="node-table-row" ><td>{edge.fromId}</td><td>{edge.count}</td>{
+                  edgeAttrs.map(attr => {
+                    return <td>{edge[attr]}</td>
+                  })
+                }</tr>
+              })
+            }
+          </tbody>
+        </table>
         <button onClick={closeFunction}>Wtf</button>
       </div>
     </div>
