@@ -74,10 +74,8 @@ input[type='submit'] {
   border-style: solid;
   border-radius: 16px;
   width: 50%;
-  margin-left: 25%;
   border-color: #20A4F3;
   font-family: 'Courier New', Courier, monospace;
-  margin-top: 1%;
   font-size: larger;
   text-align: center;
 }
@@ -228,6 +226,12 @@ text-align: center;
 .AMContainer {
     grid-area: AM;
 }
+
+.TGContainer {
+    grid-area: TG;
+}
+
+
 .threadArcHeader {
   grid-area: NTA;
   text-align: center;
@@ -238,28 +242,39 @@ text-align: center;
   border-radius: 16px;
   width: 50%;
   height: 100%;
-  margin-left: 25%;
+  margin-left: auto;
+  margin-right: auto;
   border-color: #20A4F3;
   font-family: 'Courier New', Courier, monospace;
 }
-.amHeader {
+.header {
+  margin-top: 5px;
+  color: black;
+  width: 50%;
+  height:1em;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  border: 3px solid #20A4F3;
+  border-radius: 16px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.amHeaderContainer {
   grid-area: NAM;
   text-align: center;
-  display: block;
-  stroke: black;
-  stroke-width: 10px;
-  border-style: solid;
-  border-radius: 16px;
-  width: 50%;
-  height: 100%;
-  margin-left: 25%;
-  border-color: #20A4F3;
-  font-family: 'Courier New', Courier, monospace;
 }
+
+.taHeaderContainer {
+  grid-area: NTA;
+  text-align: center;
+}
+
+
 .visContainer {
     display: grid;
     grid-template-columns: 45vw 35vw 20vw;
-    grid-template-rows: 68vh 2vh 30vh;
+    grid-template-rows: 61vh 4vh 35vh;
     grid-template-areas:
       "AM TA UI"
       "NAM NTA UI"
@@ -323,4 +338,8 @@ text-align: center;
 
 .node-table-row:nth-child(even) {
   background-color: #EEE;
+}
+
+.test {
+  border: 5px solid red;
 }

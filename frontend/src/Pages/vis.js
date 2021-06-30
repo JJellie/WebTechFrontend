@@ -1,5 +1,6 @@
 import ThreadArcs from './ThreadArcs.js';
 import AdjacencyMatrix from './AdjacencyMatrix.js';
+import Timegraph from './Timegraph.js';
 import '../Css/visual.css';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import * as d3 from "d3";
@@ -133,7 +134,9 @@ function Vis({ dataSet }) {
           />
           
         </div>
-        <h3 className="amHeader">Adjacency Matrix</h3>
+        <div className="amHeaderContainer">
+          <h3 className="header">Adjacency Matrix</h3>
+        </div>
         <div className="TAContainer">
 
           <ThreadArcs
@@ -152,7 +155,10 @@ function Vis({ dataSet }) {
             selectedNodes={selectedNodes}
           />
         </div>
-        <h3 className='threadArcHeader'>Threadarcs</h3>
+        <div className="taHeaderContainer">
+          <h3 className='header'>Threadarcs</h3>
+        </div>
+        
         {/* Container for extra info */}
         <div className="UIContainer">
           <div className="infoContainer">
@@ -221,6 +227,15 @@ function Vis({ dataSet }) {
           <div className="cmContainer">
             
           </div>
+        </div>
+        <div className="TGContainer">
+          {useMemo(()=><Timegraph className="test"
+            width={1500}
+            height={250}
+            edges={dataSet.edges}
+            datesSorted={dataSet.datesSorted}
+            countMax={4}
+          />, [])}
         </div>
       </div>
     </>

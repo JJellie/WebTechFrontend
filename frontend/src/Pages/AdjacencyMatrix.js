@@ -35,6 +35,12 @@ function createLocationMapping(ordering) {
 
 let selectedEdgesCopy = [];
 
+// audio
+let positiveAudio = new Audio(positive);
+let negativeAudio = new Audio(negative);
+let neutralAudio = new Audio(neutral);
+
+
 // canvas
 let canvas; 
 let headertop;
@@ -93,7 +99,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
       let ty = headerWidth - headerNodeColorTop;
       let lx = headerWidth - headerNodeColorTop;
       let ly = (location * cellHeight) + .5*cellHeight;
-      // top
+      // top header
       headertopNames[nodeId] = {};
       headertopNames[nodeId]["color"] = headertop.rect(tx - .5*cellWidth, ty, cellWidth, headerNodeColorTop);
       headertopNames[nodeId]["color"].attr({
@@ -106,7 +112,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
         "text-anchor" : "start",
         "transform" : `r-90,${tx},${ty-headerNameColorDistance}` 
       })
-      // left
+      // left header
       headerleftNames[nodeId] = {};
       headerleftNames[nodeId]["color"] = headerleft.rect(lx, ly - .5*cellHeight, headerNodeColorLeft, cellHeight);
       headerleftNames[nodeId]["color"].attr({
@@ -121,6 +127,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
     }
     // loop through all edges
     for( let edgeId of Object.keys(edges) ) {
+      // variable initializations
       const color = valueToColor(edges[edgeId][edgeAttrDisplay],colorPositiveScale, colorNegativeScale, colorNeutral);
       const [fromNode, toNode] = edgeId.split("-");
       const x = locationMapping[toNode]*cellWidth;
@@ -136,6 +143,8 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
       //Hover
       cells[edgeId].hover(
         () => {
+          // make the names in the headers move by hoverHeaderDisplacement 
+          // and the color rectangle to increase by hoverHeaderDisplacement
           headerleftNames[fromNode]["name"].attr({"x":leftNameX-hoverHeaderDisplacement});
           headertopNames[toNode]["name"].attr({"y":topNameY-hoverHeaderDisplacement, transform:`${topNameTransform[0]}${topNameTransform[1]},${topNameTransform[2]},${topNameTransform[3]-hoverHeaderDisplacement}`});
           headerleftNames[fromNode]["color"].attr({"width": leftColorWidth+hoverHeaderDisplacement, "x":leftNameX-hoverHeaderDisplacement+headerNameColorDistance});
@@ -147,6 +156,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
           setHoveredEdge(edgeId);
         },
         () => {
+          // make everything go back to normal
           headerleftNames[fromNode]["name"].attr({"x":leftNameX});
           headertopNames[toNode]["name"].attr({"y":topNameY, transform:`${topNameTransform[0]}${topNameTransform[1]},${topNameTransform[2]},${topNameTransform[3]}`});
           headerleftNames[fromNode]["color"].attr({"width": leftColorWidth,"x":leftNameX+headerNameColorDistance});
@@ -158,8 +168,17 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
       );
       //Click
       cells[edgeId].click((e) =>  {
+        // play sound when clicked and ctrl key pressed
         if(e.ctrlKey) {   
-          //TODO : SOUNDS       
+          let attrValue = edges[edgeId][edgeAttrDisplay];
+          if(attrValue>0){
+            positiveAudio.play();
+          } else if (attrValue<0) {
+            negativeAudio.play();
+          } else {
+            neutralAudio.play();
+          }
+        // if ctrl key not pressed pin the edge
         } else {
           if(selectedEdgesCopy.includes(edgeId)){
             selectedEdgesCopy = selectedEdgesCopy.filter(edge => edge !== edgeId);
@@ -174,6 +193,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
         }
       })
     }
+    // hover highlight element initialization
     highlight.row = canvas.rect(0,0,matrixWidth,cellHeight)
     highlight.column = canvas.rect(0,0,cellWidth,matrixHeight)
     highlight.row.attr({"fill-opacity": 0, "stroke-width": cellBorderSize})
@@ -250,6 +270,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
     }
   }, [zoomScale]);
 
+  // render
   return (
     <div className="visualization" width={width} height={height}>
       <div className="matrix" width={matrixWidth} height={matrixHeight} style={{ top:headerWidth, left:headerWidth }}>
