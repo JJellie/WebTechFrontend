@@ -12,7 +12,7 @@ function Timegraph({width, height, edges, datesSorted, countMax, color}) {
   const innerWidth = width-margin.left-margin.right;
   const innerHeight = height-margin.bottom-margin.top;
   const timeScale = d3.scaleTime().domain([minDate,maxDate]).range([margin.left,width-margin.right]);
-  const countScale = d3.scaleLinear().domain([0,countMax]).range([height-margin.bottom, margin.top]);
+  const countScale = d3.scaleLinear().domain([0,Math.round(countMax+0.15*countMax)]).range([height-margin.bottom, margin.top]);
   const backgroundLineColor = "#8c8c8c";
   const backgroundColor = "#e8e8e8";
   const strokeWidth = 2;

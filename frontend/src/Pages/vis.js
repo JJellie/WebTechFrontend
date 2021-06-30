@@ -232,7 +232,6 @@ function Vis({ dataSet }) {
 
     let matrixDirected = directed;
     let matrixUndirected = undirected;
-
   }, [])
 
 
