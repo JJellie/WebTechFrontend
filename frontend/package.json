@@ -17,6 +17,7 @@
     "react-scripts": "4.0.3",
     "react-svg-pan-zoom": "^3.10.0",
     "react-zoom-pan-pinch": "^1.6.1",
+    "reorder.js": "^2.2.4",
     "svg-pan-zoom": "^3.6.1",
     "web-vitals": "^1.1.1"
   },

@@ -8,6 +8,7 @@ import Banner from "../Images/banner vis.png";
 import Divider from "../Images/divider.png";
 import { Link } from "react-router-dom";
 import { popupShow, DatasetPopup } from "./backend.js";
+const reorder = require("reorder.js");
 
 // Different colorschemes for color blindness 
 const colorSchemes =
@@ -16,7 +17,7 @@ const colorSchemes =
   ["#813405", "#7f0799", "#ff4365", "#058ed9", "#00d9c0", "#e4ff1a", "#b7ad99"], //deut
   ["#693668", "#a74482", "#b9415f", "#ff3562", "#b7986e", "#ee8e2c", "#ffb86f"]] //trit
 
-
+const orderings = ["incremental", "alphabetically", "random", "spectral", "barycenter"];
 
 
 function clickInfoCollapse() {
@@ -73,25 +74,133 @@ function pinnedEdgeCollapse(element) {
   }
 }
 
+function colorCoding(nodeAttrCategorical, colorScheme) {
+  if(!nodeAttrCategorical) {
+    //TODO: return domain range such that colorscale return same color everytime
+  }
+  // nodeAttrCategorical = [{"Attr" : "ceo", "count" : 2}, {"Attr" : "unknown", "count" : 2}]
+  let domain = []
+  let range = []
+  for(let i = 0; i < nodeAttrCategorical.length; i++) {
+    if(i < 5) {
+      domain.push(nodeAttrCategorical[i].Attr)
+      range.push(colorScheme[i])
+    } else {
+      domain.push(nodeAttrCategorical[i].Attr)
+      range.push(colorScheme[5])
+    }
+  }
+  
+  return [domain, range];
+}
+let matrixDirected;
+let matrixUndirected;
+
+function computeSpectral(ordering, matrix){
+  let graph = reorder.mat2graph(matrix, false);
+  let spectral = reorder.spectral_order(graph);
+  console.log(spectral);
+  let spectralOrdering = [];
+  for (let i = 0; i < spectral.length; i++){
+      spectralOrdering.push(spectral[i]+1);
+  }
+  console.log(computeSpectral);
+  return spectralOrdering;
+}
+
+function computeBarycenter(ordering, matrix, network){
+  let val = (network === "undirected") ? false : true;
+  let graph = reorder.mat2graph(matrix, val);
+  let barycenter = reorder.barycenter_order(graph);
+  let improved = reorder.adjacent_exchange(graph, barycenter[0],  barycenter[1]);
+  let barycenterOrdering = [];
+  for (let i = 0; i < improved[0].length; i++){
+      barycenterOrdering.push(improved[0][i]+1);
+  }
+  console.log(barycenterOrdering);
+  return barycenterOrdering;
+}
+
+function sortAlphabetically(ordering, nodes, identifier) { // in JS objects are always passed around by reference, assigning new var changes initial
+  return ordering.sort((a,b) => {
+    if(nodes[a][identifier] < nodes[b][identifier]) { return -1; }
+    if(nodes[a][identifier] > nodes[b][identifier]) { return 1; }
+    return 0;
+  })
+}
+
+function sortRandomly(ordering){
+  for (let i = 0; i < ordering.length; i++) { // uses Fisher-Yates shuffle algorithm for random sorting of array 
+      let x = ordering[i];
+      let y = Math.floor(Math.random() * (i + 1));
+      ordering[i] = ordering[y];
+      ordering[y] = x;
+    }
+  return ordering;
+}
 
 
 function Vis({ dataSet }) {
   //State
-
   const [hoveredEdge, setHoveredEdge] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
-  const [edgeAttrDisplayed, setEdgeAttrDisplayed] = useState(dataSet.attrInfo.edgeAttrOrdinal);
-  const [colorScheme, setColorScheme] = useState(colorSchemes[0]);
   const [selectedNodes, setSelectedNodes] = useState([]);
   const [selectedEdges, setSelectedEdges] = useState([]);
   const [popupNode, setPopupNode] = useState(null);
   const [popupEdge, setPopupEdge] = useState(null);
+  const [customization, setCustom] = useState({
+    "cScheme": 0, 
+    "amValue":dataSet.attrInfo.edgeAttrOrdinal[0], 
+    "ordering": "incremental",
+    "network" : "directed", 
+    "identifier": dataSet.attrInfo.nodeAttrUnique[0], 
+    "colorGrouping": Object.keys(dataSet.attrInfo.nodeAttrCategorical).length !== 0 ? (Object.keys(dataSet.attrInfo.nodeAttrCategorical).find(element => !dataSet.attrInfo.nodeAttrUnique.includes(element)) ? Object.keys(dataSet.attrInfo.nodeAttrCategorical).find(element => !dataSet.attrInfo.nodeAttrUnique.includes(element)) : dataSet.attrInfo.nodeAttrCategorical[0]) : null });
+  const [colorScheme, setColorScheme] = useState(colorSchemes[customization.cScheme]);
   // coloring 
-  let colorSchemeScale = d3.scaleOrdinal().domain(Object.keys(dataSet.attrInfo.nodeColorAttrMapping)).range(Object.values(dataSet.attrInfo.nodeColorAttrMapping).map((colorIndex) => colorScheme[colorIndex]));
-  let colorScalePositive = d3.scaleLinear().domain([0, dataSet.attrInfo.max[edgeAttrDisplayed]]).range(["#7cc6f2", "#20A4F3"]);
-  let colorScaleNegative = d3.scaleLinear().domain([dataSet.attrInfo.min[edgeAttrDisplayed], 0]).range(["#ff1900", "#ff6554"]);
+  let ordering = useMemo(() => {
+    if (customization.ordering === "random") {
+      return sortRandomly([...dataSet.orderings.incremental]);
+    }
+    else if (customization.ordering === "alphabetically") {
+      return sortAlphabetically([...dataSet.orderings.incremental], dataSet.nodes, customization.identifier); //contains the alphabetic order of the nodes
+    }
+    else if (customization.ordering === "incremental") {
+      return dataSet.orderings.incremental;
+    }
+    else if (customization.ordering === "spectral") {
+      return computeSpectral([...dataSet.orderings.incremental], matrixUndirected);
+    }
+    else if (customization.ordering === "barycenter") {
+      return (customization.network === "undirected") ? computeBarycenter([...dataSet.orderings.incremental],matrixUndirected,customization.network) : computeBarycenter([...dataSet.orderings.incremental],matrixDirected,customization.network);
+    }
+  }, [customization.ordering, customization.network])
+  let colorSchemeScale = useMemo(() => {
+    const [domain, range] = colorCoding(dataSet.attrInfo.nodeAttrCategorical[customization.colorGrouping] ? dataSet.attrInfo.nodeAttrCategorical[customization.colorGrouping] : null, colorSchemes[customization.cScheme]);
+    console.log(domain, range);
+    return d3.scaleOrdinal().domain(domain).range(range)}, [customization.cScheme]);
+  let colorScalePositive = d3.scaleLinear().domain([0, dataSet.attrInfo.max[customization.amValue]]).range(["#7cc6f2", "#20A4F3"]);
+  let colorScaleNegative = d3.scaleLinear().domain([dataSet.attrInfo.min[customization.amValue], 0]).range(["#ff1900", "#ff6554"]);
   let colorNeutral = "#f6ff00"
 
+  function identifierChange() {
+    setCustom({...customization, 'identifier': document.getElementById('identifier').value})
+  }
+  function colorGrouping() {
+    setCustom({...customization, 'colorGrouping': document.getElementById('colorGrouping').value})
+  }
+
+  function amValChange() {
+    setCustom({...customization, "amValue": document.getElementById('amValue').value})
+  }
+  function chooseOrdering() {
+
+
+
+    setCustom({...customization, "ordering": document.getElementById('ordering').value})
+  }
+  function colorChange() {
+    setCustom({...customization, "cScheme": document.getElementById('cScheme').value})
+  }
   function showEdgeTable(nodeId) {
     setPopupNode(nodeId);
   }
@@ -104,23 +213,46 @@ function Vis({ dataSet }) {
   function popupEdgeClose() {
     setPopupEdge(null);
   }
+  useEffect(()=>{
+    let directed = [];
+    let undirected = [];
+    for(let y in dataSet.orderings.incremental) {
+      directed.push([]);
+      undirected.push([]);
+      for(let x in dataSet.orderings.incremental) {
+        let edgeId = `${y}-${x}`;
+        let edgeIdOther = `${x}-${y}`;
+        let directedValue = dataSet.edgeInfo[edgeId] ? dataSet.edgeInfo[edgeId][customization.amValue]:0;
+        let undirectedValue = dataSet.edgeInfo[edgeIdOther] ? (dataSet.edgeInfo[edgeIdOther][customization.amValue]+directed)/2 : directed/2
+
+        directed[y][x] = directedValue;
+        undirected[y][x] = undirectedValue;
+      }
+    }
+
+    let matrixDirected = directed;
+    let matrixUndirected = undirected;
+
+  }, [])
+
+
 
   return (
     <>
       {/* Visualization */}
-      <div className="visContainer">
+      <div className="visContainer" >
         {/* AdjacencyMatrix */}
-        <div className="AMContainer">
+        <div className="AMContainer" id='amContainer'>
 
           <AdjacencyMatrix
-            width={550}
-            height={550}
-            headerWidth={100}
-            ordering={dataSet.orderings.incremental}
+            width={Math.min(window.innerHeight*0.61, window.innerWidth*0.45)}
+            height={Math.min(window.innerHeight*0.61, window.innerWidth*0.45)}
+            headerWidth={0.2*Math.min(window.innerHeight*0.61, window.innerWidth*0.45)}
+            ordering={ordering}
             edges={dataSet.edgeInfo}
             nodes={dataSet.nodes}
-            nodeAttrDisplay={dataSet.attrInfo.nodeNameDisplay}
-            edgeAttrDisplay={edgeAttrDisplayed}
+            nodeAttrDisplay={customization.identifier}
+            edgeAttrDisplay={customization.amValue}
             hoveredNode={hoveredNode}
             setHoveredEdge={setHoveredEdge}
             setSelectedEdges={setSelectedEdges}
@@ -129,8 +261,9 @@ function Vis({ dataSet }) {
             colorNegativeScale={colorScaleNegative}
             colorNeutral={colorNeutral}
             nodeAttrColorCoding={dataSet.attrInfo.nodeColorAttrMapping}
-            nodeColorAttr={dataSet.attrInfo.nodeColorAttr}
+            nodeColorAttr={customization.colorGrouping}
             colorSchemeScale={colorSchemeScale}
+            cust={customization}
           />
           
         </div>
@@ -140,19 +273,20 @@ function Vis({ dataSet }) {
         <div className="TAContainer">
 
           <ThreadArcs
-            width={450}
-            height={600}
-            ordering={dataSet.orderings.incremental}
+            width={window.innerWidth*0.35}
+            height={window.innerHeight*0.61}
+            ordering={ordering}
             edges={dataSet.edgeInfo}
             nodes={dataSet.nodes}
             nodeNameDisplay={dataSet.attrInfo.nodeNameDisplay}
-            edgeAttr={edgeAttrDisplayed}
+            edgeAttr={customization.amValue}
             colorSchemeScale={colorSchemeScale}
-            nodeColorAttr={dataSet.attrInfo.nodeColorAttr}
+            nodeColorAttr={customization.colorGrouping}
             setHoveredNode={setHoveredNode}
             hoveredEdge={hoveredEdge}
             setSelectedNodes={setSelectedNodes}
             selectedNodes={selectedNodes}
+            cust={customization}
           />
         </div>
         <div className="taHeaderContainer">
@@ -168,7 +302,7 @@ function Vis({ dataSet }) {
             <div className="hoverInfo"></div>
             <button className="clickInfoCollaps" onClick={hoverInfoCollapse}>Hover info<span className="PlusButton" id='plusButtonHover'>-</span></button>
             <div id="hoverInfoContent" className="hoverInfoContent" style={{ display: "block", minHeight: "5vh" }}>
-              {hoveredEdge ? (<>
+              {hoveredEdge  ? (<>
                 <div>From: {dataSet.nodes[hoveredEdge.split("-")[0]].Email}</div>
                 <div>To: {dataSet.nodes[hoveredEdge.split("-")[1]].Email}</div>
                 {dataSet.attrInfo.edgeAttrOrdinal.map((j) => {
@@ -225,17 +359,45 @@ function Vis({ dataSet }) {
             </div>
           </div>
           <div className="cmContainer">
+            <label htmlFor="cScheme">Choose a colorscheme for color defficiency: </label>
+            <select id="cScheme" className='custDropdown' onChange={() => colorChange()}>
+              <option value={0}>Default</option>
+              <option value={2}>Deuteranopia</option>
+              <option value={3}>Tritanopia</option>
+              <option value={1}>Protanopia</option>
+            </select>
+            <label htmlFor="cScheme">Choose a value to be presented in the Adjacency matrix: </label>
+            <select id="amValue" className='custDropdown' onChange={() => amValChange()}>
+              {dataSet.attrInfo.edgeAttrOrdinal.map((i) => { 
+              return(<option value={i}>{i}</option>)})}
+            </select>
+            <label htmlFor="cScheme">Select an ordering: </label>
+            <select id="ordering" className='custDropdown' onChange={() => chooseOrdering()}>
+              {orderings.map((i) => { 
+              return(<option value={i}>{i}</option>)})}
+            </select>
+            <label htmlFor="cScheme">Choose a value to be presented in the Adjacency matrix: </label>
+            <select id="identifier" className='custDropdown' onChange={() => identifierChange()}>
+              {dataSet.attrInfo.nodeAttrUnique.map((i) => { 
+              return(<option value={i}>{i}</option>)})}
+            </select>
             
+            <label htmlFor="cScheme">Choose an attribute for the color coding: </label>
+            <select id="colorGrouping" className='custDropdown' onChange={() => colorGrouping()}>
+              {Object.keys(dataSet.attrInfo.nodeAttrCategorical).map((i) => { 
+              return(<option value={i}>{i}</option>)})}
+            </select>
           </div>
         </div>
         <div className="TGContainer">
           {useMemo(()=><Timegraph className="test"
-            width={1500}
-            height={250}
+            width={window.innerWidth*0.8}
+            height={window.innerHeight*0.35}
             edges={dataSet.edges}
             datesSorted={dataSet.datesSorted}
-            countMax={4}
-          />, [])}
+            countMax={dataSet.attrInfo.maxCount}
+            color={colorSchemes[customization.cScheme][0]}
+          />, [dataSet, customization])}
         </div>
       </div>
     </>

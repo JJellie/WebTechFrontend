@@ -53,10 +53,10 @@ let headerleftNames = {};
 
 let locationMapping;
 
-function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, hoveredNode, setSelectedEdges, selectedEdges, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorSchemeScale}) {
+function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, hoveredNode, setSelectedEdges, selectedEdges, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorSchemeScale, cust}) {
   const matrixWidth = width-headerWidth;
   const matrixHeight = height-headerWidth;
-  const cellWidth = (matrixHeight)/ordering.length;
+  const cellWidth = (matrixWidth)/ordering.length;
   const cellHeight = (matrixHeight)/ordering.length;
   const headerNodeColorTop = cellHeight/5;
   const headerNodeColorLeft = cellWidth/5;
@@ -66,13 +66,14 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
 
   let fontsizeTop = (9.0/16.0)*cellWidth;
   let fontsizeLeft = (9.0/16.0)*cellHeight;
-  let fontsizeMax = 10;
+  let fontsizeMax = 7.5;
   locationMapping = useMemo(() => createLocationMapping(ordering), [ordering]);
 
   const [zoomScale, setZoomScale] = useState(1); 
 
 
   useEffect(() => {
+    console.log("redraw vis");
     try {
       canvas.clear();
       headertop.clear();
@@ -82,7 +83,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
     }
     
     // create canvas
-    canvas = Raphael(document.getElementById("matrix") ,width, height);
+    canvas = Raphael(document.getElementById("matrix") ,matrixWidth, matrixHeight);
     headertop = Raphael(document.getElementById("headerTop") ,width, headerWidth);
     headerleft = Raphael(document.getElementById("headerLeft") ,headerWidth, height);
 
@@ -152,7 +153,9 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
           highlight.row.attr({"y":y});
           highlight.column.attr({"x":x});
           highlight.row.show();
-          highlight.column.show(); 
+          highlight.column.show();
+          highlight.row.toFront();
+          highlight.column.toFront(); 
           setHoveredEdge(edgeId);
         },
         () => {
@@ -202,7 +205,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
     highlight.column.toFront();
     highlight.row.hide();
     highlight.column.hide();
-  }, [])
+  }, [cust])
 
   // Cross Hover
   useEffect(() => {
@@ -268,11 +271,11 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
         }
       }
     }
-  }, [zoomScale]);
+  }, [zoomScale, cust]);
 
   // render
   return (
-    <div className="visualization" width={width} height={height}>
+    <div className="visualization" width={width} height={height} style= {{marginLeft:headerWidth, marginTop:headerWidth}}>
       <div className="matrix" width={matrixWidth} height={matrixHeight} style={{ top:headerWidth, left:headerWidth }}>
       <TransformWrapper
         pan = {{

@@ -119,7 +119,7 @@ const clickEvent = (clickInfo, curveWidth, nodeRadius, strokeColor, nodeStrokeWi
 }
 
 
-function ThreadArcs({ width, height, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setSelectedEdges, setHoveredNode, hoveredEdge, setSelectedNodes, selectedNodes, colorSchemeScale, nodeColorAttr }) {
+function ThreadArcs({ width, height, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setSelectedEdges, setHoveredNode, hoveredEdge, setSelectedNodes, selectedNodes, colorSchemeScale, nodeColorAttr, cust }) {
   const distanceBetweenNodes = height / ordering.length
   const nodeStrokeWidth = distanceBetweenNodes / 12;
   const nodeRadius = Math.min((distanceBetweenNodes / 2) - (nodeStrokeWidth / 2), 20);
@@ -130,6 +130,7 @@ function ThreadArcs({ width, height, ordering, edges, nodes, nodeNameDisplay, ed
 
   // initialize vis
   useEffect(() => {
+    console.log("redraw vis");
     try {
       canvas.clear()
     } catch {
@@ -209,7 +210,7 @@ function ThreadArcs({ width, height, ordering, edges, nodes, nodeNameDisplay, ed
         }
       )
     }
-  }, [])
+  }, [cust])
 
   // cross hover 
   useEffect(() => {

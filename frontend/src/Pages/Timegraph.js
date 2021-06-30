@@ -3,33 +3,26 @@ import Raphael from 'raphael';
 import * as d3 from "d3";
 import "../Css/Timegraph.css";
 
+const oneDay = 1000*3600*24;
 
-function Timegraph({width, height, edges, datesSorted, countMax}) {
-  const minDate = datesSorted[datesSorted.length-1];
-  const maxDate = datesSorted[0];
-  console.log(datesSorted);
+function Timegraph({width, height, edges, datesSorted, countMax, color}) {
+  const minDate = datesSorted[0];
+  const maxDate = datesSorted[datesSorted.length-1];
   const margin = {top:0.1*height , right:0.1*width, bottom:0.1*height, left:0.1*width}
   const innerWidth = width-margin.left-margin.right;
   const innerHeight = height-margin.bottom-margin.top;
-  const timeScale = d3.scaleTime().domain([minDate,maxDate]).range([width-margin.right,margin.left]);
+  const timeScale = d3.scaleTime().domain([minDate,maxDate]).range([margin.left,width-margin.right]);
   const countScale = d3.scaleLinear().domain([0,countMax]).range([height-margin.bottom, margin.top]);
   const backgroundLineColor = "#8c8c8c";
   const backgroundColor = "#e8e8e8";
   const strokeWidth = 2;
   const textOffsetBottom = 15;
   const textOffsetLeft = 10;
-  const timegraph = d3.select("#timegraph");
   const timeFormat = d3.timeFormat("%d %b %Y");
 
-  let date = minDate;
-  let nextDate = null
-  while (date <= maxDate) {
-    console.log(timeFormat(date));
-    nextDate = new Date(date);
-    nextDate.setDate(nextDate.getDate() + 1);
-    date = nextDate
-  }
-  
+
+
+
   return(
     <svg id="timegraph" width={width} height={height} className="timegraph">
       <rect x={margin.left} y={margin.top} width={innerWidth} height={innerHeight} 
@@ -55,6 +48,34 @@ function Timegraph({width, height, edges, datesSorted, countMax}) {
         </g>
       ))
       }
+      {datesSorted.slice(1).map((date, index) => {
+        let currentDate = new Date(parseFloat(date));
+        let previousDate = new Date(parseFloat(datesSorted[index]));
+        if(currentDate.getTime() - previousDate.getTime() === oneDay) {
+          return( <line x1={timeScale(datesSorted[index])} x2={timeScale(date)} y1={countScale(edges[datesSorted[index]])} y2={countScale(edges[date])}
+                        style={{strokeWidth: 1.3*strokeWidth, stroke: color}}
+                  ></line>)
+        } else {
+          let currentDatePreviousDay = new Date(currentDate);
+          let previousDateNextDay = new Date(previousDate);
+          currentDatePreviousDay = currentDatePreviousDay.setDate(currentDatePreviousDay.getDate() - 1);
+          previousDateNextDay = previousDateNextDay.setDate(previousDateNextDay.getDate() + 1);
+         
+          return(
+            <>
+            <line x1={timeScale(previousDate)} x2={timeScale(previousDateNextDay)} y1={countScale(edges[datesSorted[index]].count)} y2={countScale(0)}
+                  style={{strokeWidth: 1.3*strokeWidth, stroke: color}}
+            ></line>
+            <line x1={timeScale(previousDateNextDay)} x2={currentDatePreviousDay} y1={countScale(countScale(0))} y2={countScale(0)}
+                  style={{strokeWidth: 1.3*strokeWidth, stroke: color}}
+            ></line>
+            <line x1={timeScale(currentDatePreviousDay)} x2={timeScale(currentDate)} y1={countScale(0)} y2={countScale(edges[date].count)}
+                  style={{strokeWidth: 1.3*strokeWidth, stroke: color}}
+            ></line>
+            </>
+          )
+        }
+      })}
 
 
 
