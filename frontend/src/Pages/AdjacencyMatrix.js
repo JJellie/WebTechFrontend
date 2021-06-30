@@ -53,7 +53,7 @@ let headerleftNames = {};
 
 let locationMapping;
 
-function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, hoveredNode, setSelectedEdges, selectedEdges, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorSchemeScale, cust}) {
+function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, hoveredNode, setSelectedEdges, selectedEdges, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorSchemeScale, cust, network}) {
   const matrixWidth = width-headerWidth;
   const matrixHeight = height-headerWidth;
   const cellWidth = (matrixWidth)/ordering.length;
@@ -127,10 +127,19 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
       })
     }
     // loop through all edges
-    for( let edgeId of Object.keys(edges) ) {
+    let edgeIds = [...Object.keys(edges)];
+    for( let edgeId of edgeIds ) {
       // variable initializations
-      const color = valueToColor(edges[edgeId][edgeAttrDisplay],colorPositiveScale, colorNegativeScale, colorNeutral);
       const [fromNode, toNode] = edgeId.split("-");
+      let color;
+      if(edges[edgeId]){
+        color = network === "undirected" && edges[`${toNode}-${fromNode}`] ? valueToColor((edges[edgeId][edgeAttrDisplay]+edges[`${toNode}-${fromNode}`][edgeAttrDisplay])/2,colorPositiveScale, colorNegativeScale, colorNeutral):valueToColor(edges[edgeId][edgeAttrDisplay],colorPositiveScale, colorNegativeScale, colorNeutral); 
+      } else {
+        color = valueToColor(edges[`${toNode}-${fromNode}`][edgeAttrDisplay],colorPositiveScale, colorNegativeScale, colorNeutral);
+      }
+      if(!edges[`${toNode}-${fromNode}`] && network === "undirected") {
+        edgeIds.push(`${toNode}-${fromNode}`);
+      }
       const x = locationMapping[toNode]*cellWidth;
       const y = locationMapping[fromNode]*cellHeight;
       const leftNameX = headerleftNames[fromNode]["name"].attr("x");
@@ -205,7 +214,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
     highlight.column.toFront();
     highlight.row.hide();
     highlight.column.hide();
-  }, [cust])
+  }, [cust, network])
 
   // Cross Hover
   useEffect(() => {

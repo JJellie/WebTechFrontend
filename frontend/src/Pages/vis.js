@@ -17,7 +17,7 @@ const colorSchemes =
   ["#813405", "#7f0799", "#ff4365", "#058ed9", "#00d9c0", "#e4ff1a", "#b7ad99"], //deut
   ["#693668", "#a74482", "#b9415f", "#ff3562", "#b7986e", "#ee8e2c", "#ffb86f"]] //trit
 
-const orderings = ["incremental", "alphabetically", "random", "spectral", "barycenter"];
+const orderings = ["incremental", "alphabetically", "random", "spectral", "barycenter","reverse cuthill mckee"];
 
 
 function clickInfoCollapse() {
@@ -109,10 +109,13 @@ function computeSpectral(ordering, matrix){
 }
 
 function computeBarycenter(ordering, matrix, network){
+  console.log(matrix);
   let val = (network === "undirected") ? false : true;
   let graph = reorder.mat2graph(matrix, val);
   let barycenter = reorder.barycenter_order(graph);
+  console.log(barycenter);
   let improved = reorder.adjacent_exchange(graph, barycenter[0],  barycenter[1]);
+  console.log(improved);
   let barycenterOrdering = [];
   for (let i = 0; i < improved[0].length; i++){
       barycenterOrdering.push(improved[0][i]+1);
@@ -120,6 +123,17 @@ function computeBarycenter(ordering, matrix, network){
   console.log(barycenterOrdering);
   return barycenterOrdering;
 }
+
+function computeRCM(ordering, matrix){ // bandwith reduction: reverse cuthill-mckee
+  let graph = reorder.mat2graph(matrix, false);
+  let rcm = reorder.reverse_cuthill_mckee_order(graph);
+  let rcmOrder = [];
+  for (let i = 0; i < rcm.length; i++){
+      rcmOrder.push(rcm[i]+1);
+  }
+  return rcmOrder;
+}
+
 
 function sortAlphabetically(ordering, nodes, identifier) { // in JS objects are always passed around by reference, assigning new var changes initial
   return ordering.sort((a,b) => {
@@ -168,10 +182,15 @@ function Vis({ dataSet }) {
       return dataSet.orderings.incremental;
     }
     else if (customization.ordering === "spectral") {
+      setCustom({...customization, 'network': "undirected"});
       return computeSpectral([...dataSet.orderings.incremental], matrixUndirected);
     }
     else if (customization.ordering === "barycenter") {
       return (customization.network === "undirected") ? computeBarycenter([...dataSet.orderings.incremental],matrixUndirected,customization.network) : computeBarycenter([...dataSet.orderings.incremental],matrixDirected,customization.network);
+    }
+    else if (customization.ordering === "reverse cuthill mckee") {
+      setCustom({...customization, 'network': "undirected"});
+      return computeRCM([...dataSet.orderings.incremental], matrixUndirected);
     }
   }, [customization.ordering, customization.network])
   let colorSchemeScale = useMemo(() => {
@@ -181,7 +200,12 @@ function Vis({ dataSet }) {
   let colorScalePositive = d3.scaleLinear().domain([0, dataSet.attrInfo.max[customization.amValue]]).range(["#7cc6f2", "#20A4F3"]);
   let colorScaleNegative = d3.scaleLinear().domain([dataSet.attrInfo.min[customization.amValue], 0]).range(["#ff1900", "#ff6554"]);
   let colorNeutral = "#f6ff00"
+  
+  function networkChange() {
+    setCustom({...customization, 'network': document.getElementById('network').value})
+  }
 
+  
   function identifierChange() {
     setCustom({...customization, 'identifier': document.getElementById('identifier').value})
   }
@@ -220,18 +244,18 @@ function Vis({ dataSet }) {
       directed.push([]);
       undirected.push([]);
       for(let x in dataSet.orderings.incremental) {
-        let edgeId = `${y}-${x}`;
-        let edgeIdOther = `${x}-${y}`;
-        let directedValue = dataSet.edgeInfo[edgeId] ? dataSet.edgeInfo[edgeId][customization.amValue]:0;
-        let undirectedValue = dataSet.edgeInfo[edgeIdOther] ? (dataSet.edgeInfo[edgeIdOther][customization.amValue]+directed)/2 : directed/2
+        let edgeId = `${dataSet.orderings.incremental[y]}-${dataSet.orderings.incremental[x]}`;
+        let edgeIdOther = `${dataSet.orderings.incremental[x]}-${dataSet.orderings.incremental[y]}`;
+        let directedValue = dataSet.edgeInfo[edgeId] ? 1:0;
+        let undirectedValue = dataSet.edgeInfo[edgeIdOther] || directedValue ? 1 : 0;
 
         directed[y][x] = directedValue;
         undirected[y][x] = undirectedValue;
       }
     }
 
-    let matrixDirected = directed;
-    let matrixUndirected = undirected;
+    matrixDirected = directed;
+    matrixUndirected = undirected;
   }, [])
 
 
@@ -263,6 +287,7 @@ function Vis({ dataSet }) {
             nodeColorAttr={customization.colorGrouping}
             colorSchemeScale={colorSchemeScale}
             cust={customization}
+            network={customization.network}
           />
           
         </div>
@@ -385,6 +410,12 @@ function Vis({ dataSet }) {
             <select id="colorGrouping" className='custDropdown' onChange={() => colorGrouping()}>
               {Object.keys(dataSet.attrInfo.nodeAttrCategorical).map((i) => { 
               return(<option value={i}>{i}</option>)})}
+            </select>
+
+            <label htmlFor="cScheme">Undirected or directed network: </label>
+            <select id="network" className='custDropdown' onChange={() => networkChange()}>
+              {customization.ordering !== "spectral" && customization.ordering !== "reverse cuthill mckee" ? <option value={"directed"}>{"directed"}</option> : ""}
+              <option value={"undirected"}>{"undirected"}</option>
             </select>
           </div>
         </div>
