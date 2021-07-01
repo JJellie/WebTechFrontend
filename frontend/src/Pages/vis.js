@@ -470,6 +470,7 @@ function EdgesOfNodeTable({ dataSet, nodeId, closeFunction }) {
   return (
     <div className="popTable"> {console.log("edge table")}
       <div className='tablepopup-content'>
+        <h3 style={{ marginTop: "5px" }}>Edges from ID {nodeId}</h3>
         <table style={{ width: "100%" }}>
           <thead style={{ backgroundColor: "#DDD" }}>
             <tr>
@@ -495,6 +496,8 @@ function EdgesOfNodeTable({ dataSet, nodeId, closeFunction }) {
           </tbody>
         </table>
         <br />
+        
+        <h3>Edges to ID {nodeId}</h3>
         <table style={{ width: "100%" }}>
           <thead style={{ backgroundColor: "#DDD" }}>
             <tr>
@@ -518,8 +521,9 @@ function EdgesOfNodeTable({ dataSet, nodeId, closeFunction }) {
               })
             }
           </tbody>
+          <br />
         </table>
-        <button onClick={closeFunction}>Wtf</button>
+        <button onClick={closeFunction}>Close</button>
       </div>
     </div>
   )
@@ -529,6 +533,8 @@ function EdgesOfNodeTable({ dataSet, nodeId, closeFunction }) {
 const timeFormat = d3.timeFormat("%d %b %Y");
 
 function EdgeTable({ dataSet, edgeId, closeFunction }) {
+
+  let [fromId, toId] = edgeId.split("-");
 
   let edgeInfo = dataSet.edgeInfo[edgeId];
   console.log(edgeId);
@@ -543,6 +549,7 @@ function EdgeTable({ dataSet, edgeId, closeFunction }) {
   return (
     <div className="popTable">
       <div className='tablepopup-content'>
+        <h3 style={{ marginTop: "5px" }}>Edges between ID {fromId} and {toId}</h3>
         <table style={{ width: "100%" }}>
           <thead style={{ backgroundColor: "#DDD" }}>
             <tr>
@@ -557,7 +564,7 @@ function EdgeTable({ dataSet, edgeId, closeFunction }) {
           </thead>
           <tbody>
             {
-              edgeDates.map(date => { counter++;
+              edgeDates.sort((a, b) => parseInt(a) - parseInt(b)).map(date => { counter++;
                 return <><tr className="node-table-row" style={{backgroundColor: (counter % 2 === 0 ? "#EEE" : "#FFF")}}><td rowSpan={edges[date].length}>{timeFormat(date)}</td><td rowSpan={edges[date].length}>{edges[date].length}</td> {[edges[date][0]].map(edge => {
                   return edgeAttrs.map(attr => {
                     return <td>{edge[attr]}</td>
@@ -576,7 +583,7 @@ function EdgeTable({ dataSet, edgeId, closeFunction }) {
           </tbody>
         </table>
 
-        <button onClick={closeFunction}>Wtf</button>
+        <button onClick={closeFunction}>Close</button>
       </div>
       
     </div>
