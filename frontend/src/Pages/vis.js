@@ -168,7 +168,7 @@ function Vis({ dataSet }) {
     "amValue":dataSet.attrInfo.edgeAttrOrdinal[0], 
     "ordering": "incremental",
     "network" : "directed", 
-    "identifier": !dataSet.attrInfo.nodeAttrUnique[0] ? !dataSet.attrInfo.nodeAttrUnique[0] : null, 
+    "identifier": dataSet.attrInfo.nodeAttrUnique[0] ? dataSet.attrInfo.nodeAttrUnique[0] : null, 
     "colorGrouping": Object.keys(dataSet.attrInfo.nodeAttrCategorical).length !== 0 ? (Object.keys(dataSet.attrInfo.nodeAttrCategorical).find(element => !dataSet.attrInfo.nodeAttrUnique.includes(element)) ? Object.keys(dataSet.attrInfo.nodeAttrCategorical).find(element => !dataSet.attrInfo.nodeAttrUnique.includes(element)) : dataSet.attrInfo.nodeAttrCategorical[0]) : null });
   const [colorScheme, setColorScheme] = useState(colorSchemes[customization.cScheme]);
   console.log(customization);
