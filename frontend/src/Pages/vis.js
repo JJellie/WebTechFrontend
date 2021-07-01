@@ -387,36 +387,39 @@ function Vis({ dataSet }) {
             </div>
           </div>
           <div className="cmContainer">
-            <label htmlFor="cScheme">Choose a colorscheme for color defficiency: </label>
+            <label htmlFor="cScheme">Colorscheme for color defficiency: </label>
             <select id="cScheme" className='custDropdown' onChange={() => colorChange()}>
               <option value={0}>Default</option>
               <option value={2}>Deuteranopia</option>
               <option value={3}>Tritanopia</option>
               <option value={1}>Protanopia</option>
             </select>
-            <label htmlFor="cScheme">Choose a value to be presented in the Adjacency matrix: </label>
+            <br />
+            <label htmlFor="cScheme">Value for in the Adjacency Matrix: </label>
             <select id="amValue" className='custDropdown' onChange={() => amValChange()}>
               {dataSet.attrInfo.edgeAttrOrdinal.map((i) => { 
               return(<option value={i}>{i}</option>)})}
             </select>
-            <label htmlFor="cScheme">Select an ordering: </label>
+            <br />
+            <label htmlFor="cScheme">Ordering: </label>
             <select id="ordering" className='custDropdown' onChange={() => chooseOrdering()}>
               {orderings.map((i) => { 
               return(<option value={i}>{i}</option>)})}
             </select>
-            <label htmlFor="cScheme">Choose a value to be presented in the Adjacency matrix: </label>
+            <br />
+            <label htmlFor="cScheme">Headers in the Adjacency matrix: </label>
             <select id="identifier" className='custDropdown' onChange={() => identifierChange()}>
               {dataSet.attrInfo.nodeAttrUnique.map((i) => { 
               return(<option value={i}>{i}</option>)})}
               <option value={null}>{"id"}</option>
             </select>
-            
-            <label htmlFor="cScheme">Choose an attribute for the color coding: </label>
+            <br />
+            <label htmlFor="cScheme">Attribute for the color coding: </label>
             <select id="colorGrouping" className='custDropdown' onChange={() => colorGrouping()}>
               {Object.keys(dataSet.attrInfo.nodeAttrCategorical).map((i) => { 
               return(<option value={i}>{i}</option>)})}
             </select>
-
+            <br />
             <label htmlFor="cScheme">Undirected or directed network: </label>
             <select id="network" className='custDropdown' onChange={() => networkChange()}>
               {customization.ordering !== "spectral" && customization.ordering !== "reverse cuthill mckee" ? <option value={"directed"}>{"directed"}</option> : ""}
