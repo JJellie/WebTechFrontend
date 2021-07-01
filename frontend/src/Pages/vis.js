@@ -382,7 +382,7 @@ function Vis({ dataSet }) {
                     </div>
                   </>
                 )}
-                {popupEdge ? <EdgeTable dataSet={dataSet} nodeId={popupNode} closeFunction={() => popupEdgeClose()} /> : ""}
+                {popupEdge ? <EdgeTable dataSet={dataSet} edgeId={popupEdge} closeFunction={() => popupEdgeClose()} /> : ""}
               </div>
             </div>
           </div>
@@ -528,10 +528,57 @@ function EdgesOfNodeTable({ dataSet, nodeId, closeFunction }) {
 
 const timeFormat = d3.timeFormat("%d %b %Y");
 
-function EdgeTable({ dataSet, nodeId, closeFunction }) {
+function EdgeTable({ dataSet, edgeId, closeFunction }) {
+
+  let edgeInfo = dataSet.edgeInfo[edgeId];
+  console.log(edgeId);
+  console.log(edgeInfo);
+
+  let edges = edgeInfo.edges;
+  let edgeDates = Object.keys(edges);
+  let edgeAttrs = Object.keys(edges[edgeDates[0]][0]);
+
+  let counter = 0;
+
   return (
     <div className="popTable">
-      <button className="tableClose" onClick={closeFunction}>Wtf</button>
+      <div className='tablepopup-content'>
+        <table style={{ width: "100%" }}>
+          <thead style={{ backgroundColor: "#DDD" }}>
+            <tr>
+              <th>Date</th>
+              <th>Count</th>
+              {
+                edgeAttrs.map(attr => {
+                  return <th>{attr.charAt(0).toUpperCase() + attr.substring(1)}</th>
+                })
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {
+              edgeDates.map(date => { counter++;
+                return <><tr className="node-table-row" style={{backgroundColor: (counter % 2 === 0 ? "#EEE" : "#FFF")}}><td rowSpan={edges[date].length}>{timeFormat(date)}</td><td rowSpan={edges[date].length}>{edges[date].length}</td> {[edges[date][0]].map(edge => {
+                  return edgeAttrs.map(attr => {
+                    return <td>{edge[attr]}</td>
+                  })
+                })}</tr>
+                {
+                  [...edges[date]].splice(1).map(edge => {
+                    return <tr style={{backgroundColor: (counter % 2 === 0 ? "#EEE" : "#FFF")}}>{edgeAttrs.map(attr => {
+                      return <td>{edge[attr]}</td>
+                    })}</tr>
+                  })
+                }
+                </>
+              })
+            }
+          </tbody>
+        </table>
+
+        <button onClick={closeFunction}>Wtf</button>
+      </div>
+      
     </div>
   )
 }
