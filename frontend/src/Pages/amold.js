@@ -273,66 +273,53 @@ class AdjacencyMatrix extends React.Component {
     }
 
     computeSpectral(matrix){
-        let graph = reorder.mat2graph(matrix, false);
-        let spectral = reorder.spectral_order(graph);
-        console.log(spectral);
-        let spectralOrdering = [];
-        for (let i = 0; i < spectral.length; i++){
-            spectralOrdering.push(spectral[i]+1);
-        }
-        return spectralOrdering;
-    
+      let graph = reorder.mat2graph(matrix, false);
+      let spectral = reorder.spectral_order(graph);
+      console.log(spectral);
+      let spectralOrdering = [];
+      for (let i = 0; i < spectral.length; i++){
+          spectralOrdering.push(spectral[i]+1);
+      }
+      return spectralOrdering;
     }
 
     computeBarycenter(matrix){
-        let val = (this.state.currentGraphType === "undirected") ? false : true;
-        let graph = reorder.mat2graph(matrix, false);
-        let barycenter = reorder.barycenter_order(graph);
-        let improved = reorder.adjacent_exchange(graph, barycenter[0],  barycenter[1]);
-        console.log(improved);
-        let barycenterOrdering = [];
-        for (let i = 0; i < improved[0].length; i++){
-            barycenterOrdering.push(improved[0][i]+1);
-        }
-        return barycenterOrdering;
-
+      let val = (this.state.currentGraphType === "undirected") ? false : true;
+      let graph = reorder.mat2graph(matrix, false);
+      let barycenter = reorder.barycenter_order(graph);
+      let improved = reorder.adjacent_exchange(graph, barycenter[0],  barycenter[1]);
+      console.log(improved);
+      let barycenterOrdering = [];
+      for (let i = 0; i < improved[0].length; i++){
+          barycenterOrdering.push(improved[0][i]+1);
+      }
+      return barycenterOrdering;
     }
     
-
-
-    sortAlphabetically(nodeOrdering, nodeHash){ // in JS objects are always passed around by reference, assigning new var changes initial
-        let nodeOrderingAlph = [];
-        let nodeHashAlph = Object.assign([], nodeHash);
-    
-        nodeHashAlph = nodeHashAlph.slice(1);
-        console.log(nodeHashAlph);
-        nodeHashAlph.sort(dynamicSort("lastName"));
-        nodeHashAlph.sort(dynamicSort("firstName"));
-    
-        for (let i = 0; i < nodeOrdering.length; i++){
-          nodeOrderingAlph.push(nodeHashAlph[i]['id']);
-        }
-
-        return nodeOrderingAlph;
+    sortAlphabetically(ordering, nodes, identifier){ // in JS objects are always passed around by reference, assigning new var changes initial
+      return ordering.sort((a,b) => {
+        if(nodes[a][identifier] < nodes[b][identifier]) { return -1; }
+        if(nodes[a][identifier] > nodes[b][identifier]) { return 1; }
+        return 0;
+      })
     }
 
     sortRandomly(nodeOrdering, nodeHash){
-        let nodeOrderingRand = [];
-        let nodeHashRand = Object.assign([], nodeHash);
-        nodeHashRand = nodeHashRand.slice(1);
+      let nodeOrderingRand = [];
+      let nodeHashRand = Object.assign([], nodeHash);
+      nodeHashRand = nodeHashRand.slice(1);
 
-        nodeHashRand = randomSort(nodeHashRand);
-    
-        for (let i = 0; i < nodeOrdering.length; i++){
-          nodeOrderingRand.push(nodeHashRand[i]['id']);
-        }
-        return nodeOrderingRand;
+      nodeHashRand = randomSort(nodeHashRand);
+  
+      for (let i = 0; i < nodeOrdering.length; i++){
+        nodeOrderingRand.push(nodeHashRand[i]['id']);
+      }
+      return nodeOrderingRand;
     }
 
 
 
     drawMatrix(nodeOrderingRow, nodeOrderingCol, edgeHash, nodeHash, MAXWIDTH, MAXHEIGHT, MATRIXHEADERWIDTH) {
-
         let positiveAudio = new Audio(positive);
         let negativeAudio = new Audio(negative);
         let neutralAudio = new Audio(neutral);

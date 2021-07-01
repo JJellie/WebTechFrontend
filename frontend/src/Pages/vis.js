@@ -76,7 +76,7 @@ function pinnedEdgeCollapse(element) {
 
 function colorCoding(nodeAttrCategorical, colorScheme) {
   if(!nodeAttrCategorical) {
-    //TODO: return domain range such that colorscale return same color everytime
+    return [[], [colorScheme[0]]];
   }
   // nodeAttrCategorical = [{"Attr" : "ceo", "count" : 2}, {"Attr" : "unknown", "count" : 2}]
   let domain = []
@@ -155,6 +155,7 @@ function sortRandomly(ordering){
 
 
 function Vis({ dataSet }) {
+  console.log(dataSet);
   //State
   const [hoveredEdge, setHoveredEdge] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
@@ -167,9 +168,10 @@ function Vis({ dataSet }) {
     "amValue":dataSet.attrInfo.edgeAttrOrdinal[0], 
     "ordering": "incremental",
     "network" : "directed", 
-    "identifier": dataSet.attrInfo.nodeAttrUnique[0], 
+    "identifier": !dataSet.attrInfo.nodeAttrUnique[0] ? !dataSet.attrInfo.nodeAttrUnique[0] : null, 
     "colorGrouping": Object.keys(dataSet.attrInfo.nodeAttrCategorical).length !== 0 ? (Object.keys(dataSet.attrInfo.nodeAttrCategorical).find(element => !dataSet.attrInfo.nodeAttrUnique.includes(element)) ? Object.keys(dataSet.attrInfo.nodeAttrCategorical).find(element => !dataSet.attrInfo.nodeAttrUnique.includes(element)) : dataSet.attrInfo.nodeAttrCategorical[0]) : null });
   const [colorScheme, setColorScheme] = useState(colorSchemes[customization.cScheme]);
+  console.log(customization);
   // coloring 
   let ordering = useMemo(() => {
     if (customization.ordering === "random") {
@@ -268,6 +270,7 @@ function Vis({ dataSet }) {
         <div className="AMContainer" id='amContainer'>
 
           <AdjacencyMatrix
+            dataSet={dataSet}
             width={Math.min(window.innerHeight*0.61, window.innerWidth*0.45)}
             height={Math.min(window.innerHeight*0.61, window.innerWidth*0.45)}
             headerWidth={0.2*Math.min(window.innerHeight*0.61, window.innerWidth*0.45)}
@@ -297,6 +300,7 @@ function Vis({ dataSet }) {
         <div className="TAContainer">
 
           <ThreadArcs
+            dataSet={dataSet}
             width={window.innerWidth*0.35}
             height={window.innerHeight*0.61}
             ordering={ordering}
@@ -404,6 +408,7 @@ function Vis({ dataSet }) {
             <select id="identifier" className='custDropdown' onChange={() => identifierChange()}>
               {dataSet.attrInfo.nodeAttrUnique.map((i) => { 
               return(<option value={i}>{i}</option>)})}
+              <option value={null}>{"id"}</option>
             </select>
             
             <label htmlFor="cScheme">Choose an attribute for the color coding: </label>
@@ -521,6 +526,7 @@ function EdgesOfNodeTable({ dataSet, nodeId, closeFunction }) {
 }
 
 
+const timeFormat = d3.timeFormat("%d %b %Y");
 
 function EdgeTable({ dataSet, nodeId, closeFunction }) {
   return (

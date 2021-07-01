@@ -12,7 +12,7 @@ function Timegraph({width, height, edges, datesSorted, countMax, color}) {
   const innerWidth = width-margin.left-margin.right;
   const innerHeight = height-margin.bottom-margin.top;
   const timeScale = d3.scaleTime().domain([minDate,maxDate]).range([margin.left,width-margin.right]);
-  const countScale = d3.scaleLinear().domain([0,Math.round(countMax+0.15*countMax)]).range([height-margin.bottom, margin.top]);
+  const countScale = d3.scaleLinear().domain([0,Math.ceil(countMax+0.15*countMax)]).range([height-margin.bottom, margin.top]);
   const backgroundLineColor = "#8c8c8c";
   const backgroundColor = "#e8e8e8";
   const strokeWidth = 2;
@@ -52,7 +52,7 @@ function Timegraph({width, height, edges, datesSorted, countMax, color}) {
         let currentDate = new Date(parseFloat(date));
         let previousDate = new Date(parseFloat(datesSorted[index]));
         if(currentDate.getTime() - previousDate.getTime() === oneDay) {
-          return( <line x1={timeScale(datesSorted[index])} x2={timeScale(date)} y1={countScale(edges[datesSorted[index]])} y2={countScale(edges[date])}
+          return( <line x1={timeScale(datesSorted[index])} x2={timeScale(date)} y1={countScale(edges[datesSorted[index]].count)} y2={countScale(edges[date].count)}
                         style={{strokeWidth: 1.3*strokeWidth, stroke: color}}
                   ></line>)
         } else {
@@ -60,13 +60,9 @@ function Timegraph({width, height, edges, datesSorted, countMax, color}) {
           let previousDateNextDay = new Date(previousDate);
           currentDatePreviousDay = currentDatePreviousDay.setDate(currentDatePreviousDay.getDate() - 1);
           previousDateNextDay = previousDateNextDay.setDate(previousDateNextDay.getDate() + 1);
-         
           return(
             <>
             <line x1={timeScale(previousDate)} x2={timeScale(previousDateNextDay)} y1={countScale(edges[datesSorted[index]].count)} y2={countScale(0)}
-                  style={{strokeWidth: 1.3*strokeWidth, stroke: color}}
-            ></line>
-            <line x1={timeScale(previousDateNextDay)} x2={currentDatePreviousDay} y1={countScale(countScale(0))} y2={countScale(0)}
                   style={{strokeWidth: 1.3*strokeWidth, stroke: color}}
             ></line>
             <line x1={timeScale(currentDatePreviousDay)} x2={timeScale(currentDate)} y1={countScale(0)} y2={countScale(edges[date].count)}

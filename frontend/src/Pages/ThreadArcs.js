@@ -119,7 +119,7 @@ const clickEvent = (clickInfo, curveWidth, nodeRadius, strokeColor, nodeStrokeWi
 }
 
 
-function ThreadArcs({ width, height, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setSelectedEdges, setHoveredNode, hoveredEdge, setSelectedNodes, selectedNodes, colorSchemeScale, nodeColorAttr, cust }) {
+function ThreadArcs({dataSet, width, height, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setSelectedEdges, setHoveredNode, hoveredEdge, setSelectedNodes, selectedNodes, colorSchemeScale, nodeColorAttr, cust }) {
   const distanceBetweenNodes = height / ordering.length
   const nodeStrokeWidth = distanceBetweenNodes / 12;
   const nodeRadius = Math.min((distanceBetweenNodes / 2) - (nodeStrokeWidth / 2), 20);
@@ -210,7 +210,7 @@ function ThreadArcs({ width, height, ordering, edges, nodes, nodeNameDisplay, ed
         }
       )
     }
-  }, [cust])
+  }, [cust, dataSet])
 
   // cross hover 
   useEffect(() => {

@@ -53,7 +53,8 @@ let headerleftNames = {};
 
 let locationMapping;
 
-function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, hoveredNode, setSelectedEdges, selectedEdges, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorSchemeScale, cust, network}) {
+function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, hoveredNode, setSelectedEdges, selectedEdges, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorSchemeScale, cust, network}) {
+  
   const matrixWidth = width-headerWidth;
   const matrixHeight = height-headerWidth;
   const cellWidth = (matrixWidth)/ordering.length;
@@ -66,7 +67,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
 
   let fontsizeTop = (9.0/16.0)*cellWidth;
   let fontsizeLeft = (9.0/16.0)*cellHeight;
-  let fontsizeMax = 7.5;
+  let fontsizeMax = 8;
   locationMapping = useMemo(() => createLocationMapping(ordering), [ordering]);
 
   const [zoomScale, setZoomScale] = useState(1); 
@@ -214,7 +215,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
     highlight.column.toFront();
     highlight.row.hide();
     highlight.column.hide();
-  }, [cust, network])
+  }, [cust, network, dataSet])
 
   // Cross Hover
   useEffect(() => {
@@ -280,7 +281,7 @@ function AdjacencyMatrix({width, height, headerWidth, ordering, edges, nodes, no
         }
       }
     }
-  }, [zoomScale, cust]);
+  }, [zoomScale, cust, dataSet]);
 
   // render
   return (
