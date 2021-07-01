@@ -727,7 +727,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                       setMenuCount(menuCount - 1);
                     }}>Back</button>
                     <button className="columnSortingButtonEnabled" onClick={async () => {
-                      //TODO: SEND DATA TO BACKEND + LOADING THING
+                      //TODO: Loading icon
 
                       // convert columnData column from values to indexes
                       let newColumnData = {};
@@ -741,8 +741,12 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                       newColumnData.nodeAttr = nodeAttr;
 
                       // Send columndata and get parsed dataset
+                      let time0 = new Date();
                       await sendOrderedColumns(newColumnData, file.name);
+
                       setDataSet(await getDataset(file.name));
+                      let time1 = new Date();
+                      console.log("BACKEND TIME PROCESSING STUFF:", time1-time0);
                       closePopup();
                     }}>Confirm</button>
                   </div>
