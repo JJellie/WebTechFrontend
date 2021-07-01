@@ -5,19 +5,6 @@ import * as d3 from 'd3';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 
-
-const nodeStrokeWidth = 3;
-let nodePosition = {}
-
-
-function createNodeInfo(ordering, distanceBetweenNodes) {
-  let nodePositionTemp = {}
-  for (let index in ordering) {
-    nodePositionTemp[ordering[index]] = (index * distanceBetweenNodes) + ((1 / 2) * distanceBetweenNodes)
-  }
-  return nodePositionTemp;
-}
-
 let canvas;
 let clickInfo = {};
 let circles = {};
@@ -119,24 +106,33 @@ const clickEvent = (clickInfo, curveWidth, nodeRadius, strokeColor, nodeStrokeWi
 }
 
 
-function ThreadArcs({dataSet, width, height, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setSelectedEdges, setHoveredNode, hoveredEdge, setSelectedNodes, selectedNodes, colorSchemeScale, nodeColorAttr, cust }) {
+function ThreadArcs({dataSet, width, height, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setSelectedEdges, setHoveredNode, hoveredEdge, setSelectedNodes, selectedNodes, colorSchemeScale, nodeColorAttr, cust, unpinNode, setUnpinNode }) {
   const distanceBetweenNodes = height / ordering.length
   const nodeStrokeWidth = distanceBetweenNodes / 12;
   const nodeRadius = Math.min((distanceBetweenNodes / 2) - (nodeStrokeWidth / 2), 20);
   const curveWidth = nodeRadius / 5;
   const strokeColor = "#20A4F3";
+  
 
-  nodePosition = useMemo(() => createNodeInfo(ordering, distanceBetweenNodes), []);
+
+  useEffect(()=> {
+    canvas = Raphael(document.getElementById("TA"), width, height);
+  }, [])
 
   // initialize vis
   useEffect(() => {
-    console.log("redraw vis");
     try {
       canvas.clear()
     } catch {
     }
+    clickInfo = {};
+    circles = {};
+    curves = {};
+    nodeInfo = {};
+    edgeConnection = {}
+    selectedNodesCopy = [];
+    previousHoveredEdge = null;
 
-    canvas = Raphael(document.getElementById("TA"), width, height);
     //Draw nodes
     for (let nodeIdIndex in ordering) {
       let x = width / 2;
@@ -210,7 +206,29 @@ function ThreadArcs({dataSet, width, height, ordering, edges, nodes, nodeNameDis
         }
       )
     }
-  }, [cust, dataSet])
+  }, [cust, dataSet, edges])
+
+  useEffect(() => {
+    if(unpinNode) {
+      selectedNodesCopy.splice(selectedNodesCopy.indexOf(unpinNode), 1);
+      setSelectedNodes([...selectedNodesCopy]);
+      clickEvent({ 'nodeId': unpinNode, 'mode': false }, curveWidth, nodeRadius, strokeColor, nodeStrokeWidth, setHoveredNode);
+      circles[unpinNode].animate({ 'r': nodeRadius }, 100)
+      if (edgeConnection[unpinNode]) {
+        for (let edgeId of edgeConnection[unpinNode]) {
+          curves[edgeId].animate({ 'stroke-width': curveWidth }, 100);
+          curves[edgeId].attr({ 'stroke': strokeColor });
+          curves[edgeId].toBack();
+          if (!selectedNodesCopy.includes(edgeId.split("-")[1])) {
+            circles[edgeId.split("-")[1]].animate({ 'r': nodeRadius }, 100)
+          }
+        }
+      }
+      setUnpinNode(null);
+    }
+  }, [unpinNode])
+
+
 
   // cross hover 
   useEffect(() => {

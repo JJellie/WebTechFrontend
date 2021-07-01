@@ -8,10 +8,7 @@ import negative from "../Audio/negative.mp3"
 import neutral from "../Audio/neutral.mp3"
 
 
-// array containing cells which don't have edges
-let noEdgeCells = [];
-// dictionary containing cells as keys and location in x and y as value
-let locationCells = {};
+
 // previous hovered node in the thread arcs for cross hover
 let previousHoveredNode = null;
 let highlight = {row: null, column: null}
@@ -53,7 +50,7 @@ let headerleftNames = {};
 
 let locationMapping;
 
-function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, hoveredNode, setSelectedEdges, selectedEdges, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorSchemeScale, cust, network}) {
+function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, hoveredNode, setSelectedEdges, selectedEdges, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorSchemeScale, cust, network, unpinEdge, setUnpinEdge}) {
   
   const matrixWidth = width-headerWidth;
   const matrixHeight = height-headerWidth;
@@ -71,10 +68,13 @@ function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, 
   locationMapping = useMemo(() => createLocationMapping(ordering), [ordering]);
 
   const [zoomScale, setZoomScale] = useState(1); 
-
+  useEffect(() => {
+    canvas = Raphael(document.getElementById("matrix") ,matrixWidth, matrixHeight);
+    headertop = Raphael(document.getElementById("headerTop") ,width, headerWidth);
+    headerleft = Raphael(document.getElementById("headerLeft") ,headerWidth, height);
+  }, [])
 
   useEffect(() => {
-    console.log("redraw vis");
     try {
       canvas.clear();
       headertop.clear();
@@ -82,17 +82,15 @@ function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, 
     } catch {
 
     }
+    cells = {};
+    headertopNames = {};
+    headerleftNames = {};
+    selectedEdgesCopy = [];
+    previousHoveredNode = null;
+    highlight = {row: null, column: null}
     
-    // create canvas
-    canvas = Raphael(document.getElementById("matrix") ,matrixWidth, matrixHeight);
-    headertop = Raphael(document.getElementById("headerTop") ,width, headerWidth);
-    headerleft = Raphael(document.getElementById("headerLeft") ,headerWidth, height);
-
     // background of matrix
     canvas.rect(0,0,matrixWidth,matrixHeight).attr({"fill" : noEdgeCellColor, "stroke-width" : 0});
-
-    
-
 
     // matrix headers
     for( let nodeId of ordering) {
@@ -132,15 +130,7 @@ function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, 
     for( let edgeId of edgeIds ) {
       // variable initializations
       const [fromNode, toNode] = edgeId.split("-");
-      let color;
-      if(edges[edgeId]){
-        color = network === "undirected" && edges[`${toNode}-${fromNode}`] ? valueToColor((edges[edgeId][edgeAttrDisplay]+edges[`${toNode}-${fromNode}`][edgeAttrDisplay])/2,colorPositiveScale, colorNegativeScale, colorNeutral):valueToColor(edges[edgeId][edgeAttrDisplay],colorPositiveScale, colorNegativeScale, colorNeutral); 
-      } else {
-        color = valueToColor(edges[`${toNode}-${fromNode}`][edgeAttrDisplay],colorPositiveScale, colorNegativeScale, colorNeutral);
-      }
-      if(!edges[`${toNode}-${fromNode}`] && network === "undirected") {
-        edgeIds.push(`${toNode}-${fromNode}`);
-      }
+      let color = valueToColor(edges[edgeId][edgeAttrDisplay],colorPositiveScale, colorNegativeScale, colorNeutral);
       const x = locationMapping[toNode]*cellWidth;
       const y = locationMapping[fromNode]*cellHeight;
       const leftNameX = headerleftNames[fromNode]["name"].attr("x");
@@ -215,7 +205,7 @@ function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, 
     highlight.column.toFront();
     highlight.row.hide();
     highlight.column.hide();
-  }, [cust, network, dataSet])
+  }, [cust, network, dataSet, edges])
 
   // Cross Hover
   useEffect(() => {
@@ -265,6 +255,17 @@ function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, 
 
   }, [hoveredNode])
 
+  useEffect(() => {
+    if(unpinEdge) {
+      selectedEdgesCopy = selectedEdgesCopy.filter(edge => edge !== unpinEdge);
+      setSelectedEdges(edges => selectedEdgesCopy);
+      cells[unpinEdge].attr({"stroke-width": 0})
+      setUnpinEdge(null);
+    }
+  }, [unpinEdge])
+
+
+
   // resize header fontsize
   useEffect(()=>{
     if(Object.entries(headertopNames).length !== 0) {
@@ -281,7 +282,7 @@ function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, 
         }
       }
     }
-  }, [zoomScale, cust, dataSet]);
+  }, [zoomScale, cust, dataSet, edges]);
 
   // render
   return (

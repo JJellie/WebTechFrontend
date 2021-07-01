@@ -1,11 +1,12 @@
-import React, {useState, useEffect, useMemo} from 'react';
+import React, {useState, useEffect, useMemo, useRef} from 'react';
 import Raphael from 'raphael';
 import * as d3 from "d3";
+import {event} from "d3";
 import "../Css/Timegraph.css";
 
 const oneDay = 1000*3600*24;
 
-function Timegraph({width, height, edges, datesSorted, countMax, color}) {
+function Timegraph({width, height, edges, datesSorted, countMax, color, setTimePeriod}) {
   const minDate = datesSorted[0];
   const maxDate = datesSorted[datesSorted.length-1];
   const margin = {top:0.1*height , right:0.1*width, bottom:0.1*height, left:0.1*width}
@@ -19,9 +20,14 @@ function Timegraph({width, height, edges, datesSorted, countMax, color}) {
   const textOffsetBottom = 15;
   const textOffsetLeft = 10;
   const timeFormat = d3.timeFormat("%d %b %Y");
-
-
-
+  const brushRef = useRef();
+  useEffect(() => {
+    const brush = d3.brushX().extent([[margin.left,margin.top],[width-margin.right,height-margin.bottom]]);
+    brush.on('end', (event) => {
+      setTimePeriod(event.selection ? [Date.parse(timeScale.invert(event.selection[0])),Date.parse(timeScale.invert(event.selection[1]))] : null);
+    });
+    brush(d3.select(brushRef.current));
+  }, [])
 
   return(
     <svg id="timegraph" width={width} height={height} className="timegraph">
@@ -73,10 +79,9 @@ function Timegraph({width, height, edges, datesSorted, countMax, color}) {
         }
       })}
 
-
-
       <rect x={margin.left} y={margin.top} width={innerWidth} height={innerHeight} 
       style={{stroke: "black", "stroke-width": 1.3*strokeWidth, fillOpacity:0}}></rect>
+      <g ref={brushRef} />
     </svg>
   )
 }

@@ -42,6 +42,18 @@ function edgeInfoCollapse() {
     content.style.display = "block";
   }
 }
+function legendInfoCollapse() {
+  let content = document.getElementById('legend')
+  let plus = document.getElementById('plusButtonLegend')
+  if (content.style.display === "block") {
+    plus.textContent = "+"
+    content.style.display = "none";
+  } else {
+    plus.textContent = '-'
+    content.style.display = "block";
+  }
+}
+
 function hoverInfoCollapse() {
   let content = document.getElementById('hoverInfoContent')
   let plus = document.getElementById('plusButtonHover')
@@ -105,28 +117,22 @@ let matrixUndirected;
 function computeSpectral(ordering, matrix){
   let graph = reorder.mat2graph(matrix, false);
   let spectral = reorder.spectral_order(graph);
-  console.log(spectral);
   let spectralOrdering = [];
   for (let i = 0; i < spectral.length; i++){
-      spectralOrdering.push(spectral[i]+1);
+    spectralOrdering.push(ordering[spectral[i]]);
   }
-  console.log(computeSpectral);
   return spectralOrdering;
 }
 
 function computeBarycenter(ordering, matrix, network){
-  console.log(matrix);
   let val = (network === "undirected") ? false : true;
   let graph = reorder.mat2graph(matrix, val);
   let barycenter = reorder.barycenter_order(graph);
-  console.log(barycenter);
   let improved = reorder.adjacent_exchange(graph, barycenter[0],  barycenter[1]);
-  console.log(improved);
   let barycenterOrdering = [];
   for (let i = 0; i < improved[0].length; i++){
-      barycenterOrdering.push(improved[0][i]+1);
+    barycenterOrdering.push(ordering[improved[0][i]]);
   }
-  console.log(barycenterOrdering);
   return barycenterOrdering;
 }
 
@@ -135,7 +141,7 @@ function computeRCM(ordering, matrix){ // bandwith reduction: reverse cuthill-mc
   let rcm = reorder.reverse_cuthill_mckee_order(graph);
   let rcmOrder = [];
   for (let i = 0; i < rcm.length; i++){
-      rcmOrder.push(rcm[i]+1);
+    rcmOrder.push(ordering[rcm[i]]);
   }
   return rcmOrder;
 }
@@ -160,8 +166,40 @@ function sortRandomly(ordering){
 }
 
 
+
+function dateBinarySearch(dates, date, begin){
+  let max = dates.length-1;
+  let min = 0;
+  let mid = Math.round((max+min)/2);
+  while(max-min > 1){
+    if(date > dates[mid]){
+      min = mid;
+    } else if (date < dates[mid]) {
+      max = mid;
+    } else {
+      return mid;
+    }
+    mid = Math.round((max+min)/2);
+  }
+  if(begin) {
+    return max
+  } else {
+    return min
+  }
+}
+
+function reverseEdgeId(edgeId) {
+  const [fromNode, toNode] = edgeId.split("-");
+  return `${toNode}-${fromNode}`;
+}
+
+let edgeInfoDirected;
+let edgeInfoUndirected;
+let previousTimePeriod = null;
+
 function Vis({ dataSet }) {
-  console.log(dataSet);
+  console.log(dataSet.edgeInfoUndirected);
+  
   //State
   const [hoveredEdge, setHoveredEdge] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
@@ -176,9 +214,123 @@ function Vis({ dataSet }) {
     "network" : "directed", 
     "identifier": dataSet.attrInfo.nodeAttrUnique[0] ? dataSet.attrInfo.nodeAttrUnique[0] : null, 
     "colorGrouping": Object.keys(dataSet.attrInfo.nodeAttrCategorical).length !== 0 ? (Object.keys(dataSet.attrInfo.nodeAttrCategorical).find(element => !dataSet.attrInfo.nodeAttrUnique.includes(element)) ? Object.keys(dataSet.attrInfo.nodeAttrCategorical).find(element => !dataSet.attrInfo.nodeAttrUnique.includes(element)) : dataSet.attrInfo.nodeAttrCategorical[0]) : null });
-  const [colorScheme, setColorScheme] = useState(colorSchemes[customization.cScheme]);
-  console.log(customization);
-  // coloring 
+  const [unpinNode, setUnpinNode] = useState(null);
+  const [unpinEdge, setUnpinEdge] = useState(null);
+  const [timePeriod, setTimePeriod] = useState(null);
+  
+  
+
+
+  // date filter
+  if(timePeriod) {
+    if(previousTimePeriod ? !(timePeriod[0] == previousTimePeriod[0] && timePeriod[1] == previousTimePeriod[1]) : true) {
+      previousTimePeriod = [...timePeriod];
+      const datesSorted = dataSet.datesSorted;
+      const edges = dataSet.edges;
+      const beginIndex = dateBinarySearch(datesSorted, timePeriod[0], true);
+      const endIndex = dateBinarySearch(datesSorted, timePeriod[1], false);
+      edgeInfoDirected = JSON.parse(JSON.stringify(dataSet.edgeInfo));
+      edgeInfoUndirected = JSON.parse(JSON.stringify(dataSet.edgeInfoUndirected));
+      // ijdf
+      if(endIndex-beginIndex > datesSorted.length/2) {
+        for(let edgeId of Object.keys(edgeInfoUndirected)) {
+          for(let attr of dataSet.attrInfo.edgeAttrOrdinal) {
+            edgeInfoUndirected[edgeId][attr] = edgeInfoUndirected[edgeId][attr]*edgeInfoUndirected[edgeId].count;
+            if(edgeInfoDirected[edgeId]) {edgeInfoDirected[edgeId][attr] = edgeInfoDirected[edgeId][attr]*edgeInfoDirected[edgeId].count}
+          }
+        }
+        let date;
+        for(let i = 0; i<beginIndex; i++) {
+          date = datesSorted[i];
+          for(let edgeId of Object.keys(edges[date].edges)){
+            for(let edgeIndex in edges[date].edges[edgeId]){
+              for(let attr of dataSet.attrInfo.edgeAttrOrdinal) {
+                let attrValue = edges[date].edges[edgeId][edgeIndex][attr]
+                edgeInfoUndirected[edgeId][attr] -= attrValue;
+                edgeInfoUndirected[reverseEdgeId(edgeId)][attr] -= attrValue;
+                edgeInfoDirected[edgeId][attr] -= attrValue;
+              }
+              edgeInfoUndirected[edgeId].count--
+              edgeInfoUndirected[reverseEdgeId(edgeId)].count--
+              edgeInfoDirected[edgeId].count--
+            }
+          }
+        }
+        for(let i = endIndex+1; i<datesSorted.length; i++) {
+          date = datesSorted[i];
+          for(let edgeId of Object.keys(edges[date].edges)){
+            for(let edgeIndex in edges[date].edges[edgeId]){
+              for(let attr of dataSet.attrInfo.edgeAttrOrdinal) {
+                let attrValue = edges[date].edges[edgeId][edgeIndex][attr]
+                edgeInfoUndirected[edgeId][attr] -= attrValue;
+                edgeInfoUndirected[reverseEdgeId(edgeId)][attr] -= attrValue;
+                edgeInfoDirected[edgeId][attr] -= attrValue;
+              }
+              edgeInfoUndirected[edgeId].count--
+              edgeInfoUndirected[reverseEdgeId(edgeId)].count--
+              edgeInfoDirected[edgeId].count--
+            }
+          }
+        }
+        for(let edgeId of Object.keys(edgeInfoUndirected)) {
+          if(edgeInfoUndirected[edgeId].count === 0){
+            delete edgeInfoUndirected[edgeId];
+            if(edgeInfoDirected[edgeId]) {delete edgeInfoDirected[edgeId]}
+          } else {
+            for(let attr of dataSet.attrInfo.edgeAttrOrdinal) {
+              edgeInfoUndirected[edgeId][attr] = edgeInfoUndirected[edgeId][attr]/edgeInfoUndirected[edgeId].count;
+              if(edgeInfoDirected[edgeId]) {edgeInfoDirected[edgeId][attr] = edgeInfoDirected[edgeId][attr]/edgeInfoDirected[edgeId].count}
+            }
+          }
+        }
+      // else
+      } else {
+        for(let edgeId of Object.keys(edgeInfoUndirected)) {
+          for(let attr of dataSet.attrInfo.edgeAttrOrdinal) {
+            edgeInfoUndirected[edgeId][attr] = 0;
+            edgeInfoUndirected[edgeId].count = 0;
+            if(edgeInfoDirected[edgeId]) {
+              edgeInfoDirected[edgeId][attr] = 0;
+              edgeInfoDirected[edgeId].count = 0;
+            }
+          }
+        }
+        let date;
+        for(let i = beginIndex; i<=endIndex; i++) {
+          date = datesSorted[i];
+          for(let edgeId of Object.keys(edges[date].edges)){
+            for(let edgeIndex in edges[date].edges[edgeId]){
+              for(let attr of dataSet.attrInfo.edgeAttrOrdinal) {
+                let attrValue = edges[date].edges[edgeId][edgeIndex][attr]
+                console.log("attrbalue", attrValue);
+                console.log(typeof(attrValue));
+                edgeInfoUndirected[edgeId][attr] += attrValue;
+                edgeInfoUndirected[reverseEdgeId(edgeId)][attr] += attrValue;
+                edgeInfoDirected[edgeId][attr] += attrValue;
+                console.log("edge", edgeInfoDirected[edgeId][attr]);
+              }
+              edgeInfoUndirected[edgeId].count++
+              edgeInfoUndirected[reverseEdgeId(edgeId)].count++
+              edgeInfoDirected[edgeId].count++
+            }
+          }
+        }
+        for(let edgeId of Object.keys(edgeInfoUndirected)) {
+          if(edgeInfoUndirected[edgeId].count === 0) {
+            delete edgeInfoUndirected[edgeId];
+            if(edgeInfoDirected[edgeId]) {delete edgeInfoDirected[edgeId]}
+          } else {
+            for(let attr of dataSet.attrInfo.edgeAttrOrdinal) {
+              edgeInfoUndirected[edgeId][attr] = edgeInfoUndirected[edgeId][attr]/edgeInfoUndirected[edgeId].count;
+              if(edgeInfoDirected[edgeId]) {edgeInfoDirected[edgeId][attr] = edgeInfoDirected[edgeId][attr]/edgeInfoDirected[edgeId].count}
+            }
+          }
+        }
+      }
+    }
+  } 
+
+  // ordering
   let ordering = useMemo(() => {
     if (customization.ordering === "random") {
       return sortRandomly([...dataSet.orderings.incremental]);
@@ -201,19 +353,25 @@ function Vis({ dataSet }) {
       return computeRCM([...dataSet.orderings.incremental], matrixUndirected);
     }
   }, [customization.ordering, customization.network])
+
+  // coloring
   let colorSchemeScale = useMemo(() => {
     const [domain, range] = colorCoding(dataSet.attrInfo.nodeAttrCategorical[customization.colorGrouping] ? dataSet.attrInfo.nodeAttrCategorical[customization.colorGrouping] : null, colorSchemes[customization.cScheme]);
-    console.log(domain, range);
     return d3.scaleOrdinal().domain(domain).range(range)}, [customization.cScheme]);
   let colorScalePositive = d3.scaleLinear().domain([0, dataSet.attrInfo.max[customization.amValue]]).range(["#7cc6f2", "#20A4F3"]);
   let colorScaleNegative = d3.scaleLinear().domain([dataSet.attrInfo.min[customization.amValue], 0]).range(["#ff1900", "#ff6554"]);
   let colorNeutral = "#f6ff00"
   
+  function unPinNode(circId) {
+    setUnpinNode(circId)
+  }
+  function unPinEdge(edgeId) {
+    setUnpinEdge(edgeId)
+  }
+  
   function networkChange() {
     setCustom({...customization, 'network': document.getElementById('network').value})
   }
-
-  
   function identifierChange() {
     setCustom({...customization, 'identifier': document.getElementById('identifier').value})
   }
@@ -225,9 +383,6 @@ function Vis({ dataSet }) {
     setCustom({...customization, "amValue": document.getElementById('amValue').value})
   }
   function chooseOrdering() {
-
-
-
     setCustom({...customization, "ordering": document.getElementById('ordering').value})
   }
   function colorChange() {
@@ -281,7 +436,7 @@ function Vis({ dataSet }) {
             height={Math.min(window.innerHeight*0.61, window.innerWidth*0.45)}
             headerWidth={0.2*Math.min(window.innerHeight*0.61, window.innerWidth*0.45)}
             ordering={ordering}
-            edges={dataSet.edgeInfo}
+            edges={timePeriod ? (customization.network === "directed" ? edgeInfoDirected : edgeInfoUndirected) : (customization.network === "directed" ? dataSet.edgeInfo : dataSet.edgeInfoUndirected)}
             nodes={dataSet.nodes}
             nodeAttrDisplay={customization.identifier}
             edgeAttrDisplay={customization.amValue}
@@ -297,6 +452,8 @@ function Vis({ dataSet }) {
             colorSchemeScale={colorSchemeScale}
             cust={customization}
             network={customization.network}
+            unpinEdge={unpinEdge}
+            setUnpinEdge={setUnpinEdge}
           />
           
         </div>
@@ -310,7 +467,7 @@ function Vis({ dataSet }) {
             width={window.innerWidth*0.35}
             height={window.innerHeight*0.61}
             ordering={ordering}
-            edges={dataSet.edgeInfo}
+            edges={timePeriod ? (customization.network === "directed" ? edgeInfoDirected : edgeInfoUndirected) : (customization.network === "directed" ? dataSet.edgeInfo : dataSet.edgeInfoUndirected)}
             nodes={dataSet.nodes}
             nodeNameDisplay={dataSet.attrInfo.nodeNameDisplay}
             edgeAttr={customization.amValue}
@@ -321,6 +478,8 @@ function Vis({ dataSet }) {
             setSelectedNodes={setSelectedNodes}
             selectedNodes={selectedNodes}
             cust={customization}
+            unpinNode={unpinNode}
+            setUnpinNode={setUnpinNode}
           />
         </div>
         <div className="taHeaderContainer">
@@ -329,9 +488,40 @@ function Vis({ dataSet }) {
         
         {/* Container for extra info */}
         <div className="UIContainer">
+          
+
+
           <div className="infoContainer">
+          
             {/* Container for legend */}
-            <div className="legend"></div>
+            {customization.colorGrouping ?
+            <> 
+            
+            <button className="clickInfoCollaps" onClick={legendInfoCollapse}>Legend<span className="PlusButton" id='plusButtonLegend'>-</span></button>
+            <div id="legend" className="legend" style={{ display: "block" }}>
+              <svg width="100%" height="100%">
+              {d3.range(6).map(i=>{
+                if(i === 5){
+                  return (
+                    <>
+                    <circle cx={`15%`} cy={`${(i*15)+12}%`} r={`3.5%`} fill={colorSchemeScale.range()[i]} />
+                    <text x={`22%`} y={`${(i*15)+14.5}%`}>{"Other"}</text>
+                    </>
+                  )
+                }
+                return (
+                  <>
+                  <circle cx={`15%`} cy={`${(i*15)+12}%`} r={`3.5%`} fill={colorSchemeScale.range()[i]} />
+                  <text x={`22%`} y={`${(i*15)+13.5}%`}>{colorSchemeScale.domain()[i]}</text>
+                  </>
+                )
+              })}
+              </svg>
+            </div>
+            
+            
+            </>
+            :""}
             {/* Container for hover info */}
             <div className="hoverInfo"></div>
             <button className="clickInfoCollaps" onClick={hoverInfoCollapse}>Hover info<span className="PlusButton" id='plusButtonHover'>-</span></button>
@@ -362,6 +552,7 @@ function Vis({ dataSet }) {
                       }
                       )}
                       <button onClick={() => showEdgeTable(i)}>More info</button>
+                      <button onClick={() => unPinNode(i)}>Unpin</button>
 
                     </div>
 
@@ -385,6 +576,9 @@ function Vis({ dataSet }) {
                         return <div className="attrInfo">Average {j}: {dataSet.edgeInfo[i][j]}</div>
                       })}
                       <button onClick={() => showEdgyTable(i)}>More info</button>
+                      <button onClick={() => unPinEdge(i)}>Unpin</button>
+
+
                     </div>
                   </>
                 )}
@@ -441,6 +635,7 @@ function Vis({ dataSet }) {
             datesSorted={dataSet.datesSorted}
             countMax={dataSet.attrInfo.maxCount}
             color={colorSchemes[customization.cScheme][0]}
+            setTimePeriod={setTimePeriod}
           />, [dataSet, customization])}
         </div>
       </div>

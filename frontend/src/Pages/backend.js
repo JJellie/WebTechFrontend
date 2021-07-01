@@ -162,8 +162,8 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
               <label htmlFor='Submit' id='SubmitBut' className='submitButton submitButtonLoading'><span></span></label>
             }
             <label className='testSetText' id='testSet' onClick={async () => {
-              await sendOrderedColumns({date: 0, edgeAttr: [8, 7], fromId: 1, nodeAttr: {Email: [2, 5], Jobtitle: [3, 6]} ,toId: 4}, "enron-v1.csv");
-              setDataSet(await getDataset("enron-v1.csv"));
+              await sendOrderedColumns({date: 0, edgeAttr: [8, 7], fromId: 1, nodeAttr: {Email: [2, 5], Jobtitle: [3, 6]} ,toId: 4}, "enron-v1-small.csv");
+              setDataSet(await getDataset("enron-v1-small.csv"));
               closePopup();
             }}>Or click here to use a test data set</label>
           </>
