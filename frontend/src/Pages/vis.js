@@ -55,22 +55,28 @@ function hoverInfoCollapse() {
 }
 
 function pinnedCollapse(element) {
-  let content = document.getElementById("pinnedNode" + element).nextElementSibling
+  let btn = document.getElementById("pinnedNode" + element);
+  let content = btn.nextElementSibling;
 
   if (content.style.display === "block") {
     content.style.display = "none";
+    btn.style.backgroundColor = "inherit";
   } else {
     content.style.display = "block";
+    btn.style.backgroundColor = "#CCCCCCAA";
   }
 }
 
 function pinnedEdgeCollapse(element) {
-  let content = document.getElementById("pinnedEdge" + element).nextElementSibling
+  let btn = document.getElementById("pinnedEdge" + element);
+  let content = btn.nextElementSibling;
 
   if (content.style.display === "block") {
     content.style.display = "none";
+    btn.style.backgroundColor = "inherit";
   } else {
     content.style.display = "block";
+    btn.style.backgroundColor = "#CCCCCCAA";
   }
 }
 
