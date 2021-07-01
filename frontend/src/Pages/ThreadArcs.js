@@ -218,8 +218,8 @@ function ThreadArcs({dataSet, width, height, ordering, edges, nodes, nodeNameDis
       const [fromNode, toNode] = hoveredEdge.split("-");
       if (previousHoveredEdge) {
         const [previousFromNode, previousToNode] = previousHoveredEdge.split("-");
-        if(!((selectedNodes.includes(previousFromNode) && edgeConnection[previousFromNode].includes(`${previousFromNode}-${previousToNode}`))||
-          (selectedNodes.includes(previousToNode) && edgeConnection[previousToNode].includes(`${previousToNode}-${previousFromNode}`)))) {
+        if(!((selectedNodes.includes(previousFromNode) && (edgeConnection[previousFromNode]?(edgeConnection[previousFromNode].includes(`${previousFromNode}-${previousToNode}`)):false))||
+            (selectedNodes.includes(previousToNode) && (edgeConnection[previousToNode]?(edgeConnection[previousToNode].includes(`${previousToNode}-${previousFromNode}`)): false)))) {
             curves[previousHoveredEdge].animate({ 'stroke-width': curveWidth }, 100);
             curves[previousHoveredEdge].attr({ 'stroke': strokeColor });
             curves[previousHoveredEdge].toBack();
@@ -239,8 +239,8 @@ function ThreadArcs({dataSet, width, height, ordering, edges, nodes, nodeNameDis
       circles[toNode].toFront();
     } else if (previousHoveredEdge) {
       const [previousFromNode, previousToNode] = previousHoveredEdge.split("-");
-      if(!((selectedNodes.includes(previousFromNode) && edgeConnection[previousFromNode].includes(`${previousFromNode}-${previousToNode}`))||
-          (selectedNodes.includes(previousToNode) && edgeConnection[previousToNode].includes(`${previousToNode}-${previousFromNode}`)))) {
+      if(!((selectedNodes.includes(previousFromNode) && (edgeConnection[previousFromNode]?(edgeConnection[previousFromNode].includes(`${previousFromNode}-${previousToNode}`)):false))||
+          (selectedNodes.includes(previousToNode) && (edgeConnection[previousToNode]?(edgeConnection[previousToNode].includes(`${previousToNode}-${previousFromNode}`)): false)))) {
             curves[previousHoveredEdge].animate({ 'stroke-width': curveWidth }, 100);
             curves[previousHoveredEdge].attr({ 'stroke': strokeColor });
             curves[previousHoveredEdge].toBack();
