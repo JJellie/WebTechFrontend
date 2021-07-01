@@ -78,6 +78,9 @@ input[type='submit'] {
   font-family: 'Courier New', Courier, monospace;
   font-size: larger;
   text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 16px;
 }
 .visHeader h1 {
   text-align: center;
@@ -261,10 +264,8 @@ text-align: center;
   font-family: 'Courier New', Courier, monospace;
 }
 .header {
-  margin-top: 5px;
   color: black;
   width: 50%;
-  height:1em;
   text-align: center;
   margin-left: auto;
   margin-right: auto;

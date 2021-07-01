@@ -790,7 +790,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                     nodeAttrNamePopupClose();
                   }
                 }}
-              >Comfirm</button>
+              >Confirm</button>
             </div>
           </div>
         </div>
