@@ -101,25 +101,25 @@ input[type='submit'] {
 
 /*  properties of the divider lines */
 .line{
-  width: 36vw;
+  width: 42vw;
   border-bottom: 4px double #7e7b7c;
   position: absolute;
-  margin-left:10vw;
-  margin-top: 2%
+  margin-left:3vw;
+  margin-top: 2.1%
   }
 .symbol img{
   position: absolute;
-  margin-left: 47.5vw;
-  width: 5vw;
-  height: 2.8vh;
+  margin-left: 47vw;
+  width: 6vw;
+  height: 3vh;
   margin-top:1.5%;
 }
 .line2{
-  width: 36vw;
+  width: 42vw;
   border-bottom: 4px double #7e7b7c;
   position: absolute;
-  margin-left: 54vw;
-  margin-top: 2%
+  margin-left: 55vw;
+  margin-top: 2.1%
   }
  
 /* properties of the text between the lines */
@@ -129,7 +129,8 @@ input[type='submit'] {
   stroke: black;
   stroke-width: 10px;
   border-radius: 16px;
-  width: 100%;
+  width: 90vw;
+  margin-left: 5vw;
   margin-top: 4%;
   font-family: 'Courier New', Courier, monospace;
 }

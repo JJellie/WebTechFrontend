@@ -6,7 +6,29 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import positive from "../Audio/positive.mp3"
 import negative from "../Audio/negative.mp3"
 import neutral from "../Audio/neutral.mp3"
+import Select from 'react-select';
 
+const firstDropdown = [
+    {value: "undirected", label: "undirected"},
+    {value: "directed", label: "directed"}
+];
+
+const secondDropdownUndirected = [
+    {value: "sorted in ascending order by id", label: "sorted in ascending order by id"},
+    {value: "alphabetically", label: "alphabetically"},
+    {value: "shuffle randomly", label: "shuffle randomly"},
+    {value: "spectral", label: "spectral"},
+    {value: "barycenter", label: "barycenter"},
+    {value: "rcm", label: "bandwidth reduction"},
+    //{value: "by frequency", label: "by frequency"}
+];
+
+const secondDropdownDirected = [
+    {value: "sorted in ascending order by id", label: "sorted in ascending order by id"},
+    {value: "alphabetically", label: "alphabetically"},
+    {value: "shuffle randomly", label: "shuffle randomly"},
+    {value: "barycenter", label: "barycenter"}
+];
 
 
 // previous hovered node in the thread arcs for cross hover
