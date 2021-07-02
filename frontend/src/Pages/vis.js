@@ -408,18 +408,14 @@ function Vis({ dataSet }) {
       undirected.push([]);
       for(let x in dataSet.orderings.incremental) {
         let edgeId = `${dataSet.orderings.incremental[y]}-${dataSet.orderings.incremental[x]}`;
-        let edgeIdOther = `${dataSet.orderings.incremental[x]}-${dataSet.orderings.incremental[y]}`;
-        let directedValue = dataSet.edgeInfo[edgeId] ? 1:0;
-        let undirectedValue = dataSet.edgeInfo[edgeIdOther] || directedValue ? 1 : 0;
-
-        directed[y][x] = directedValue;
-        undirected[y][x] = undirectedValue;
+        directed[y][x] = (timePeriod ? (edgeInfoDirected[edgeId] ? 1 : 0) : (dataSet.edgeInfo[edgeId] ? 1 : 0));
+        undirected[y][x] = (timePeriod ? (edgeInfoUndirected[edgeId] ? 1 : 0) : (dataSet.edgeInfoUndirected[edgeId] ? 1 : 0));
       }
     }
 
     matrixDirected = directed;
     matrixUndirected = undirected;
-  }, [])
+  }, [customization.ordering])
 
 
 
@@ -521,6 +517,7 @@ function Vis({ dataSet }) {
             
             
             </>
+            
             :""}
             {/* Container for hover info */}
             <div className="hoverInfo"></div>
@@ -530,7 +527,7 @@ function Vis({ dataSet }) {
                 <div>From: {dataSet.nodes[hoveredEdge.split("-")[0]].Email}</div>
                 <div>To: {dataSet.nodes[hoveredEdge.split("-")[1]].Email}</div>
                 {dataSet.attrInfo.edgeAttrOrdinal.map((j) => {
-                  return <div className="attrInfo">Average {j}: {dataSet.edgeInfo[hoveredEdge][j]}</div>
+                  return <div className="attrInfo">Average {j}: {timePeriod ? (customization.network === "directed" ? edgeInfoDirected[hoveredEdge][j] : edgeInfoUndirected[hoveredEdge][j]) : (customization.network === "directed" ? dataSet.edgeInfo[hoveredEdge][j] : dataSet.edgeInfoUndirected[hoveredEdge][j])}</div>
                 })}</>)
                 : (hoveredNode ? (dataSet.attrInfo.nodeAttr.map((j) => {
                   return <div className="attrInfo">{j}: {dataSet.nodes[hoveredNode][j]} </div>
@@ -558,7 +555,7 @@ function Vis({ dataSet }) {
 
                   </>
                 )}
-                {popupNode ? <EdgesOfNodeTable dataSet={dataSet} nodeId={popupNode} closeFunction={() => popupNodeClose()} /> : ""}
+                {popupNode ? <EdgesOfNodeTable dataSet={dataSet} nodeId={popupNode} closeFunction={() => popupNodeClose()} timePeriod={timePeriod} customization={customization} /> : ""}
               </div>
             </div>
             <div className="ClickInfo" id='clickInfo'>
@@ -573,7 +570,8 @@ function Vis({ dataSet }) {
                       <div>From: {dataSet.nodes[i.split("-")[0]].Email}</div>
                       <div>To: {dataSet.nodes[i.split("-")[1]].Email}</div>
                       {dataSet.attrInfo.edgeAttrOrdinal.map((j) => {
-                        return <div className="attrInfo">Average {j}: {dataSet.edgeInfo[i][j]}</div>
+                        
+                        return <div className="attrInfo">Average {j}: {timePeriod ? (customization.network === "directed" ? edgeInfoDirected[i][j] : edgeInfoUndirected[i][j]) : (customization.network === "directed" ? dataSet.edgeInfo[i][j] : dataSet.edgeInfoUndirected[i][j])}</div>
                       })}
                       <button onClick={() => showEdgyTable(i)}>More info</button>
                       <button onClick={() => unPinEdge(i)}>Unpin</button>
@@ -582,7 +580,7 @@ function Vis({ dataSet }) {
                     </div>
                   </>
                 )}
-                {popupEdge ? <EdgeTable dataSet={dataSet} edgeId={popupEdge} closeFunction={() => popupEdgeClose()} /> : ""}
+                {popupEdge ? <EdgeTable dataSet={dataSet} edgeId={popupEdge} closeFunction={() => popupEdgeClose()} timePeriod={timePeriod} customization={customization} /> : ""}
               </div>
             </div>
           </div>
@@ -644,9 +642,8 @@ function Vis({ dataSet }) {
 }
 export default Vis;
 
-function EdgesOfNodeTable({ dataSet, nodeId, closeFunction }) {
-
-  let edges = dataSet.edgeInfo;
+function EdgesOfNodeTable({ dataSet, nodeId, closeFunction, timePeriod, customization }) {
+  let edges = (timePeriod ? (customization.network === "directed" ? edgeInfoDirected: edgeInfoUndirected) : (customization.network === "directed" ? dataSet.edgeInfo : dataSet.edgeInfoUndirected));
   let edgesFrom = [];
   let edgesTo = [];
 
@@ -736,11 +733,11 @@ function EdgesOfNodeTable({ dataSet, nodeId, closeFunction }) {
 
 const timeFormat = d3.timeFormat("%d %b %Y");
 
-function EdgeTable({ dataSet, edgeId, closeFunction }) {
+function EdgeTable({ dataSet, edgeId, closeFunction, timePeriod, customization }) {
 
   let [fromId, toId] = edgeId.split("-");
 
-  let edgeInfo = dataSet.edgeInfo[edgeId];
+  let edgeInfo = (timePeriod ? (customization.network === "directed" ? edgeInfoDirected: edgeInfoUndirected) : (customization.network === "directed" ? dataSet.edgeInfo : dataSet.edgeInfoUndirected));
   console.log(edgeId);
   console.log(edgeInfo);
 
