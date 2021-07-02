@@ -21,9 +21,14 @@ class About extends React.Component {
                 use Graphify. The first requirements is the filetype, this should be a CSV. Secondly is the structure of your dataset:
                 Each line in the csv should represent and connection between two network nodes. For example an email send between two 
                 adresses or an internet connection between two. This edge is only required to have a date, but more attributes can be added.</p>
-                <p><h3>Visually impaired mode</h3>
+                <p><h3>Customization options</h3>
                 Graphify has designed with visually impaired people taken into account. The color scheme of the visualizations can be adjusted
-                to be usable by colorblind people, there are different color schemes for normal vision, Protanopia, Deuteranopia and Tritanopia.</p></div>
+                to be usable by colorblind people, there are different color schemes for normal vision, Protanopia, Deuteranopia and Tritanopia.
+                You can also reorder the dataset and thus the Adjacency Matrix and Thread Arcs. The current identifier(What identifies the nodes) can
+                be changed and the attribute for color coding can be altered.</p>
+                <p><h3>Timegraph</h3>
+                A timegraph is also included showing the connections in comparison to time. You can click and drag on this graph. This selects 
+                a time period and only the data in between this selected time will be used.</p></div>
                 <div className = 'threadArcs'><h1>Threadarcs</h1><p>The Threadarcs visualization is a designed to display email threads, but we
                 modified it so that it can work for any network dataset(that follows the previously stated requirements). It displays the network
                 nodes in a vertical line and draws the connections as arcs between them. On small datasets this works like a charm while on bigger datasets
