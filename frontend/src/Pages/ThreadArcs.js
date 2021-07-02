@@ -105,7 +105,7 @@ const clickEvent = (clickInfo, curveWidth, nodeRadius, strokeColor, nodeStrokeWi
   }
 }
 
-
+// Thread Arcs react class
 function ThreadArcs({dataSet, width, height, ordering, edges, nodes, nodeNameDisplay, edgeAttr, setSelectedEdges, setHoveredNode, hoveredEdge, setSelectedNodes, selectedNodes, colorSchemeScale, nodeColorAttr, cust, unpinNode, setUnpinNode }) {
   const distanceBetweenNodes = height / ordering.length
   const nodeStrokeWidth = distanceBetweenNodes / 12;
@@ -114,7 +114,7 @@ function ThreadArcs({dataSet, width, height, ordering, edges, nodes, nodeNameDis
   const strokeColor = "#20A4F3";
   
 
-
+  // Initialise the raphael canvas
   useEffect(()=> {
     canvas = Raphael(document.getElementById("TA"), width, height);
   }, [])
@@ -208,6 +208,7 @@ function ThreadArcs({dataSet, width, height, ordering, edges, nodes, nodeNameDis
     }
   }, [cust, dataSet, edges])
 
+  // Unpinning nodes
   useEffect(() => {
     if(unpinNode) {
       selectedNodesCopy.splice(selectedNodesCopy.indexOf(unpinNode), 1);
@@ -286,7 +287,7 @@ function ThreadArcs({dataSet, width, height, ordering, edges, nodes, nodeNameDis
           limitToBounds: false,
           limitToWrapper: true,
           minScale: 0.3,
-          maxScale: 2,
+          maxScale: 3,
         }}
         doubleClick={{
           mode: 'reset'

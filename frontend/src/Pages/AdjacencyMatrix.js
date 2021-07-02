@@ -16,12 +16,14 @@ let highlight = {row: null, column: null}
 const borderSize = 0;
 const noEdgeCellColor = "#e8e8e8";
 
+// Return a color value based on the given value and scales
 function valueToColor(value, colorPositiveScale, colorNegativeScale, colorNeutral)  {
   if( value > 0 ) return colorPositiveScale(value);
   else if( value < 0 ) return colorNegativeScale(value);
   else return colorNeutral;
 }
 
+// Return a location mapping based on the ordering
 function createLocationMapping(ordering) {
   let locationMapping = {};
   for(let i in ordering) {
@@ -50,6 +52,7 @@ let headerleftNames = {};
 
 let locationMapping;
 
+// Adjacency Matrix react class
 function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, nodes, nodeAttrDisplay, edgeAttrDisplay, setHoveredEdge, hoveredNode, setSelectedEdges, selectedEdges, colorPositiveScale, colorNegativeScale, colorNeutral, nodeAttrColorCoding, nodeColorAttr,  colorSchemeScale, cust, network, unpinEdge, setUnpinEdge}) {
   
   const matrixWidth = width-headerWidth;
@@ -58,8 +61,8 @@ function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, 
   const cellHeight = (matrixHeight)/ordering.length;
   const headerNodeColorTop = cellHeight/5;
   const headerNodeColorLeft = cellWidth/5;
-  const hoverHeaderDisplacement = 5;
-  const headerNameColorDistance = 3;
+  const hoverHeaderDisplacement = headerNodeColorTop;
+  const headerNameColorDistance = headerNodeColorTop/2;
   const cellBorderSize = ((cellWidth+cellHeight)/2)/20;
 
   let fontsizeTop = (9.0/16.0)*cellWidth;
@@ -106,7 +109,7 @@ function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, 
         "stroke-width" : 0,
         "fill" : colorSchemeScale(nodes[nodeId][nodeColorAttr])
       })
-      headertopNames[nodeId]["name"] = headertop.text(tx, ty-headerNameColorDistance, nodes[nodeId][nodeAttrDisplay]);
+      headertopNames[nodeId]["name"] = headertop.text(tx, ty-headerNameColorDistance, nodeAttrDisplay === 'id' ? nodeId : nodes[nodeId][nodeAttrDisplay]);
       headertopNames[nodeId]["name"].attr({
         "font-size": fontsizeTop,
         "text-anchor" : "start",
@@ -119,7 +122,7 @@ function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, 
         "stroke-width" : 0,
         "fill" : colorSchemeScale(nodes[nodeId][nodeColorAttr])
       })
-      headerleftNames[nodeId]["name"] = headerleft.text(lx-headerNameColorDistance, ly, nodes[nodeId][nodeAttrDisplay]);
+      headerleftNames[nodeId]["name"] = headerleft.text(lx-headerNameColorDistance, ly, nodeAttrDisplay === 'id' ? nodeId : nodes[nodeId][nodeAttrDisplay]);
       headerleftNames[nodeId]["name"].attr({
         "font-size": fontsizeTop,
         "text-anchor" : "end",
@@ -255,6 +258,7 @@ function AdjacencyMatrix({dataSet, width, height, headerWidth, ordering, edges, 
 
   }, [hoveredNode])
 
+  // Unpinning selected edges
   useEffect(() => {
     if(unpinEdge) {
       selectedEdgesCopy = selectedEdgesCopy.filter(edge => edge !== unpinEdge);

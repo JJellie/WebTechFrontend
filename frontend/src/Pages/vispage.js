@@ -18,9 +18,12 @@ function VisPage({update}) {
       <DatasetPopup setDataSet={setDataSet} colorScheme={["#FFBA49", "#57A773", "#F06C9B", "#5B2A86", "#FB3640", "#CE98F5"]} />
       <div>
         {/* ~~~~  This is the main title ~~~~  */}
-        <div className="visHeader">
+        {!dataSet ?<div className="visHeader">
           <h1>Visualisation</h1>
-        </div>
+        </div> :
+        <div className="visHeader" style={{marginBottom: "2.5%"}}>
+          <h1>Visualisation</h1>
+        </div> }
         {!dataSet ? 
           <>
             {/* ~~~~  This is the top divider  ~~~~  */} 
@@ -50,9 +53,10 @@ function VisPage({update}) {
           </>: ""}
         
         {/* ~~~~  This is the upload button which opens the popup ~~~~  */}
-        <div className="uploadbutton">
+        {!dataSet ? <div className="uploadbutton">
           <button id='openPopup' onClick={() => popupShow()}>Upload your data here!</button>
-        </div>
+        </div> :""}
+
         {/* ~~~~  Banner ~~~~  */}
         {!dataSet ?
           <div className="banner" id='banner'>
@@ -60,7 +64,7 @@ function VisPage({update}) {
           </div> : ""
         }
       </div>
-      {dataSet ? <Vis dataSet={dataSet}/> : ""}
+      {dataSet ? <Vis dataSet={dataSet} /> : ""}
     </>
   )
 }

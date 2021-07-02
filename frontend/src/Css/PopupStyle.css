@@ -321,10 +321,11 @@
 
 .columnOverviewColumn {
     display: inline-block;
+    vertical-align:top;
 }
 
 .columnOverviewRow {
-
+  margin-top: 1.5rem;
 }
 
 .columnOverviewRow span {
