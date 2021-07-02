@@ -222,6 +222,7 @@ text-align: center;
 }
 
 .UIContainer {
+    height: 100vh;
     grid-area: UI;
     border-left: solid;
     border-top: solid;
@@ -294,8 +295,11 @@ text-align: center;
       "NAM NTA UI"
       "TG TG UI"; 
 }
+:root {
+  --dropdownheight: 10vh
+}
 .clickInfoContent{
-  max-height: 25vh;
+  max-height: var(--dropdownheight);
   overflow: scroll;
 }
 

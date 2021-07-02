@@ -16,9 +16,35 @@ const colorSchemes =
   ['#3b1f2b', '#a23b72', '#c73e1d', '#f18f01', '#2e86ab', '#00ffc5', '#4acee0'], //prot
   ["#813405", "#7f0799", "#ff4365", "#058ed9", "#00d9c0", "#e4ff1a", "#b7ad99"], //deut
   ["#693668", "#a74482", "#b9415f", "#ff3562", "#b7986e", "#ee8e2c", "#ffb86f"]] //trit
+let height = 10;
 
 const orderings = ["incremental", "alphabetically", "random", "spectral", "barycenter","reverse cuthill mckee"];
 
+function updateCss(collaps, mode) {
+  // if (collaps === 'edge' || collaps === "node") {
+  //   if(mode) {
+  //     height = .5*height;
+  //   } else {
+  //     height = 2*height;
+  //   }
+  // }
+  // if (collaps === 'legend') {
+  //   if(mode) {
+  //     height = height- 15;
+  //   } else {
+  //     height = height+ 15;
+  //   }
+  // }
+  // if (collaps === 'hover') {
+  //   if(mode) {
+  //     height = height- 5;
+  //   } else {
+  //     height = height+ 5;
+  //   }
+  // }
+  // console.log(height)
+  // document.documentElement.style.setProperty('--dropdownheight', ""+ height+ "vh")
+}
 
 function clickInfoCollapse() {
   let content = document.getElementById('clickInfoContent')
@@ -26,9 +52,11 @@ function clickInfoCollapse() {
   if (content.style.display === "block") {
     plus.textContent = "+"
     content.style.display = "none";
+    updateCss('node', false)
   } else {
     plus.textContent = '-'
     content.style.display = "block";
+    updateCss('node', true)
   }
 }
 function edgeInfoCollapse() {
@@ -37,9 +65,12 @@ function edgeInfoCollapse() {
   if (content.style.display === "block") {
     plus.textContent = "+"
     content.style.display = "none";
+    updateCss('edge', false)
   } else {
     plus.textContent = '-'
     content.style.display = "block";
+    updateCss('edge', true)
+
   }
 }
 function legendInfoCollapse() {
@@ -48,9 +79,11 @@ function legendInfoCollapse() {
   if (content.style.display === "block") {
     plus.textContent = "+"
     content.style.display = "none";
+    updateCss('legend', false)
   } else {
     plus.textContent = '-'
     content.style.display = "block";
+    updateCss('legend', true)
   }
 }
 
@@ -60,9 +93,11 @@ function hoverInfoCollapse() {
   if (content.style.display === "block") {
     plus.textContent = "+"
     content.style.display = "none";
+    updateCss('hover', false)
   } else {
     plus.textContent = '-'
     content.style.display = "block";
+    updateCss('hover', true)
   }
 }
 
@@ -585,7 +620,8 @@ function Vis({ dataSet }) {
             </div>
           </div>
           <div className="cmContainer">
-            <label htmlFor="cScheme">Colorscheme for color defficiency: </label>
+            <div><h3>Customization options:</h3></div>
+            <label htmlFor="cScheme">Choose colorscheme: </label>
             <select id="cScheme" className='custDropdown' onChange={() => colorChange()}>
               <option value={0}>Default</option>
               <option value={2}>Deuteranopia</option>
@@ -593,7 +629,7 @@ function Vis({ dataSet }) {
               <option value={1}>Protanopia</option>
             </select>
             <br />
-            <label htmlFor="cScheme">Value for in the Adjacency Matrix: </label>
+            <label htmlFor="cScheme">Displayed edge attribute: </label>
             <select id="amValue" className='custDropdown' onChange={() => amValChange()}>
               {dataSet.attrInfo.edgeAttrOrdinal.map((i) => { 
               return(<option value={i}>{i}</option>)})}
@@ -605,20 +641,22 @@ function Vis({ dataSet }) {
               return(<option value={i}>{i}</option>)})}
             </select>
             <br />
-            <label htmlFor="cScheme">Headers in the Adjacency matrix: </label>
+            <label htmlFor="cScheme">Node identifier: </label>
             <select id="identifier" className='custDropdown' onChange={() => identifierChange()}>
               {dataSet.attrInfo.nodeAttrUnique.map((i) => { 
               return(<option value={i}>{i}</option>)})}
               <option value={null}>{"id"}</option>
             </select>
             <br />
-            <label htmlFor="cScheme">Attribute for the color coding: </label>
+            <label htmlFor="cScheme">Attribute for color coding: </label>
             <select id="colorGrouping" className='custDropdown' onChange={() => colorGrouping()}>
               {Object.keys(dataSet.attrInfo.nodeAttrCategorical).map((i) => { 
-              return(<option value={i}>{i}</option>)})}
+              return(   i===customization.colorGrouping ?
+              (<option value={i} selected>{i}</option>): 
+              (<option value={i} >{i}</option>))} )}
             </select>
             <br />
-            <label htmlFor="cScheme">Undirected or directed network: </label>
+            <label htmlFor="cScheme">Network type: </label>
             <select id="network" className='custDropdown' onChange={() => networkChange()}>
               {customization.ordering !== "spectral" && customization.ordering !== "reverse cuthill mckee" ? <option value={"directed"}>{"directed"}</option> : ""}
               <option value={"undirected"}>{"undirected"}</option>
