@@ -72,6 +72,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
   const initialError = 0;
   const initialNodeAttrSelection = false;
   const initialNodeAttrName = "";
+  const initialConfirmButtonLoading = false;
   const [file, setFile] = useState({name: null});
   const [popupState, setPopupState] = useState(initialPopupState);
   const [menuCount, setMenuCount] = useState(initialMenuCount);
@@ -79,11 +80,14 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
   const [error, setError] = useState(initialError);
   const [nodeAttrSelection, setNodeAttrSelection] = useState(initialNodeAttrSelection);
   const [nodeAttrName, setNodeAttrName] = useState(initialNodeAttrName)
+  const [confirmButtonLoading, setConfirmButtonLoading] = useState(initialConfirmButtonLoading);
 
+  // Get and set the dataset for the given filename
   function dataPassing(filename) {
     setDataSet(getDataset(filename))
   }
 
+  // Show the submit button after a file has been uploaded
   function ShowSubmit() {
     try {
       setFile(document.getElementById('UploadedFile').files[0]);
@@ -92,13 +96,16 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
       //TODO
     }
   }
+
+  // Close the note attribute name popup
   function nodeAttrNamePopupClose() {
-    document.getElementById('NameTakenMessage').style.visibility = 'hidden';
+    document.getElementById('AttrNameErrorMessage').style.visibility = 'hidden';
     nodeAttrNameActice = false;
     document.getElementById("nodeAttrNamePopup").style.display = "none";
     setNodeAttrName(initialNodeAttrName);
   }
 
+  // Close the popup and reset all variables
   function closePopup() {
     document.getElementById("popup").style.display = "none";
     setPopupState(initialPopupState);
@@ -107,6 +114,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
     setColumnSelected(initialColumnSelected);
     setNodeAttrSelection(initialNodeAttrSelection);
     setNodeAttrName(initialNodeAttrName);
+    setConfirmButtonLoading(initialConfirmButtonLoading);
     nodeAttrSelectionData = { colors: {}, columnInfo: {} };
     edgeAttrSelectionData = { colors: {}, columnInfo: {} };
     nodeAttrSelectionColor = 0;
@@ -118,6 +126,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
     nodeAttrNameActice = false;
   }
 
+  // Add onclick event for popup clicks
   window.onclick = function (event) {
     if (event.target === document.getElementById("popup")) {
       if (nodeAttrNameActice) {
@@ -132,6 +141,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
     }
   }
 
+  // The popup page itself
   function popupPage(popupState, menuCount) {
     const elementsInLine = 5;
 
@@ -187,12 +197,11 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
             )
           // Selecting the date column popup screen
           case 1:
-            // TODO: CHANGE ERROR MESSAGE
-            errorMessage = ["Select a column", "Don't click next without selecting anything you idiot"];
+            errorMessage = ["Select a column", "This application requires you to fill in a date column, please select a date column"];
             return (
               <div className="columnSortingMenu">
                 <h1>Date</h1>
-                <p>Select the column which represents the date</p>
+                <p>Select the <b>column</b> which represents the <b>date</b></p>
                 <div className="columnSelection">
                   {[...Array(Math.ceil(columns[0].length / elementsInLine)).keys()].map((i) => {
                     return (
@@ -276,10 +285,10 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
               <div className="columnSortingMenu">
                 <h1>Node ID</h1>
                 {columnSelected[0] === null && columnSelected[1] === null ?
-                  <p>Select the column which represents the ID of the sending node <br></br> or click next if there is no node ID</p> :
+                  <p>Select the <b>column</b> which represents the <b>ID</b> of the <b>sending node</b> <br></br> or click next if there is no node ID</p> :
                   columnSelected[1] === null ?
-                    <p>Select the column which represents the ID of the receiving node</p> :
-                    <p>Click next to proceed or click on the selected column to reset</p>
+                    <p>Select the <b>column</b> which represents the <b>ID</b> of the <b>receiving node</b></p> :
+                    <p>Click <b>next</b> to proceed or click on the selected column to reset</p>
                 }
                 <div className="columnSelection">
                   {[...Array(Math.ceil(columns[1].length / elementsInLine)).keys()].map((i) => {
@@ -401,7 +410,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
             return (
               <div className="columnSortingMenu">
                 <h1>Edge Attributes</h1>
-                <p>Select the columns which represents the edge attributes or click next if there aren't any</p>
+                <p>Select the <b>columns</b> which represents the <b>edge attributes</b> or click next if there aren't any</p>
                 <div className="columnSelection">
                   {[...Array(Math.ceil((Object.keys(columns[2].columnInfo)).length / elementsInLine)).keys()].map((i) => {
                     return (
@@ -498,11 +507,11 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                 <h1>Node Attributes</h1>
                 {
                   !nodeAttrSelection ?
-                    <p>Click create node attribute to create a node attribute or click next if there aren't any</p> :
+                    <p>Click <b>create node</b> attribute to create a <b>node attribute</b> or click <b>next</b> if there aren't any</p> :
                     columnSelected[0] === null && columnSelected[1] === null ?
-                      <p>Select a column which represents a node attribute of a sending node</p> :
+                      <p>Select a <b>column</b> which represents a <b>node attribute</b> of a <b>sending node</b></p> :
                       columnSelected[1] === null ?
-                        <p>Select the corresponding column which represents the node attribute of a to node</p> :
+                        <p>Select the <b>column</b> which represents the <b>node attribute</b> of the <b>receiving node</b></p> :
                         <p></p>
                 }
                 <div className="createAttrButtonContainer">
@@ -723,12 +732,12 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                 </div>
                 <div className="buttonContainer">
                   <div>
-                    <button className="columnSortingButtonEnabled" onClick={() => {
+                    {!confirmButtonLoading ? <><button className="columnSortingButtonEnabled" onClick={() => {
                       setMenuCount(menuCount - 1);
                     }}>Back</button>
                     <button className="columnSortingButtonEnabled" onClick={async () => {
                       //TODO: Loading icon
-
+                      setConfirmButtonLoading(true);
                       // convert columnData column from values to indexes
                       let newColumnData = {};
                       const columnNames = Object.keys(rowExample);
@@ -748,7 +757,9 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
                       let time1 = new Date();
                       console.log("BACKEND TIME PROCESSING STUFF:", time1-time0);
                       closePopup();
-                    }}>Confirm</button>
+                    }}>Confirm</button></>:
+                    <><button className="columnSortingButtonDisabled">Back</button>
+                    <button className="columnSortingButtonDisabled">Confirm</button></>}
                   </div>
                 </div>
               </div>
@@ -764,16 +775,25 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
         <div id="nodeAttrNamePopup" className="nodeAttrNamePopup">
           <div className="nodeAttrNamePopup-Content">
             <h2>Attribute Name</h2>
-            <p id="NameTakenMessage">This name already exists</p>
+            <p id="AttrNameErrorMessage">This name is taken</p>
             <input type="text" name="nodeAttrName" value={nodeAttrName} onChange={(e) => { setNodeAttrName(e.target.value) }} />
             <div className="comfirmButton">
               <button
                 onClick={() => {
                   if (Object.keys(columns[3].nodeAttr).includes(nodeAttrName)) {
-                    document.getElementById('NameTakenMessage').style.visibility = 'visible';
+                    document.getElementById('AttrNameErrorMessage').innerHTML = "This name is taken";
+                    document.getElementById('AttrNameErrorMessage').style.visibility = 'visible';
+                    setNodeAttrName(initialNodeAttrName);
+                  } else if (nodeAttrName === "") {
+                    document.getElementById('AttrNameErrorMessage').innerHTML = "Fill in a name";
+                    document.getElementById('AttrNameErrorMessage').style.visibility = 'visible';
+                    setNodeAttrName(initialNodeAttrName);
+                  } else if (nodeAttrName === "id") {
+                    document.getElementById('AttrNameErrorMessage').innerHTML = "This name cannot be chosen";
+                    document.getElementById('AttrNameErrorMessage').style.visibility = 'visible';
                     setNodeAttrName(initialNodeAttrName);
                   } else {
-                    document.getElementById('NameTakenMessage').style.visibility = 'hidden';
+                    document.getElementById('AttrNameErrorMessage').style.visibility = 'hidden';
                     columns[3].nodeAttr[nodeAttrName] = columnSelected;
                     columns[3].columnInfo[columnSelected[0]] = [nodeAttrName, nodeAttrSelectionColor];
                     columns[3].columnInfo[columnSelected[1]] = [nodeAttrName, nodeAttrSelectionColor];
@@ -801,6 +821,7 @@ export function DatasetPopup({ setDataSet, colorScheme }) {
   );
 }
 
+// Show the popup
 export function popupShow() {
   let box = document.getElementById('popup');
   box.style.display = "block";

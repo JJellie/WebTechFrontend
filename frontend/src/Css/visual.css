@@ -154,6 +154,7 @@ input[type='submit'] {
 .uploadbutton{
   text-align: center;
   overflow: hidden;
+  margin-top: 2%;
 }
 
 .uploadbutton button {

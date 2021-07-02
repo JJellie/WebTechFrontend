@@ -16,36 +16,40 @@ const colorSchemes =
   ['#3b1f2b', '#a23b72', '#c73e1d', '#f18f01', '#2e86ab', '#00ffc5', '#4acee0'], //prot
   ["#813405", "#7f0799", "#ff4365", "#058ed9", "#00d9c0", "#e4ff1a", "#b7ad99"], //deut
   ["#693668", "#a74482", "#b9415f", "#ff3562", "#b7986e", "#ee8e2c", "#ffb86f"]] //trit
-let height = 10;
 
+//Variable to keep track of collapsable max-height
+  let height = 10;
+
+//All ordering names 
 const orderings = ["incremental", "alphabetically", "random", "spectral", "barycenter","reverse cuthill mckee"];
 
+//Function to change collapsable max-height when collapsing others
 function updateCss(collaps, mode) {
-  // if (collaps === 'edge' || collaps === "node") {
-  //   if(mode) {
-  //     height = .5*height;
-  //   } else {
-  //     height = 2*height;
-  //   }
-  // }
-  // if (collaps === 'legend') {
-  //   if(mode) {
-  //     height = height- 15;
-  //   } else {
-  //     height = height+ 15;
-  //   }
-  // }
-  // if (collaps === 'hover') {
-  //   if(mode) {
-  //     height = height- 5;
-  //   } else {
-  //     height = height+ 5;
-  //   }
-  // }
-  // console.log(height)
-  // document.documentElement.style.setProperty('--dropdownheight', ""+ height+ "vh")
+  if (collaps === 'edge' || collaps === "node") {
+    if(mode) {
+      height = height- 10;
+    } else {
+      height = height+ 10;
+    }
+  }
+  if (collaps === 'legend') {
+    if(mode) {
+      height = height- 15;
+    } else {
+      height = height+ 15;
+    }
+  }
+  if (collaps === 'hover') {
+    if(mode) {
+      height = height- 2;
+    } else {
+      height = height+ 2;
+    }
+  }
+  document.documentElement.style.setProperty('--dropdownheight', ""+ height+ "vh")
 }
 
+//Function to collapse all pinned node info boxes
 function clickInfoCollapse() {
   let content = document.getElementById('clickInfoContent')
   let plus = document.getElementById('plusButton')
@@ -59,6 +63,8 @@ function clickInfoCollapse() {
     updateCss('node', true)
   }
 }
+
+//Function to collapse all pinned edge info boxes
 function edgeInfoCollapse() {
   let content = document.getElementById('edgeInfoContent')
   let plus = document.getElementById('plusButtonEdge')
@@ -73,6 +79,8 @@ function edgeInfoCollapse() {
 
   }
 }
+
+//Function to collapse legend box
 function legendInfoCollapse() {
   let content = document.getElementById('legend')
   let plus = document.getElementById('plusButtonLegend')
@@ -87,6 +95,7 @@ function legendInfoCollapse() {
   }
 }
 
+//Function to collapse hover info
 function hoverInfoCollapse() {
   let content = document.getElementById('hoverInfoContent')
   let plus = document.getElementById('plusButtonHover')
@@ -101,6 +110,7 @@ function hoverInfoCollapse() {
   }
 }
 
+//Function to collapse a pinned nodes info
 function pinnedCollapse(element) {
   let btn = document.getElementById("pinnedNode" + element);
   let content = btn.nextElementSibling;
@@ -114,6 +124,7 @@ function pinnedCollapse(element) {
   }
 }
 
+//Function to collapse a pinned edges info
 function pinnedEdgeCollapse(element) {
   let btn = document.getElementById("pinnedEdge" + element);
   let content = btn.nextElementSibling;
@@ -127,13 +138,14 @@ function pinnedEdgeCollapse(element) {
   }
 }
 
+//Function to calculate color scale for visualisations
 function colorCoding(nodeAttrCategorical, colorScheme) {
   if(!nodeAttrCategorical) {
     return [[], [colorScheme[0]]];
   }
   // nodeAttrCategorical = [{"Attr" : "ceo", "count" : 2}, {"Attr" : "unknown", "count" : 2}]
-  let domain = []
-  let range = []
+  let domain = [];
+  let range = [];
   for(let i = 0; i < nodeAttrCategorical.length; i++) {
     if(i < 5) {
       domain.push(nodeAttrCategorical[i].Attr)
@@ -143,12 +155,13 @@ function colorCoding(nodeAttrCategorical, colorScheme) {
       range.push(colorScheme[5])
     }
   }
-  
   return [domain, range];
 }
-let matrixDirected;
-let matrixUndirected;
 
+let matrixDirected; //2d array for a Directed adjacency matrix
+let matrixUndirected; //2d array for an Undirected adjacency matrix
+
+//Compute spectral reordering
 function computeSpectral(ordering, matrix){
   let graph = reorder.mat2graph(matrix, false);
   let spectral = reorder.spectral_order(graph);
@@ -159,6 +172,7 @@ function computeSpectral(ordering, matrix){
   return spectralOrdering;
 }
 
+//Compute barycenter reordering
 function computeBarycenter(ordering, matrix, network){
   let val = (network === "undirected") ? false : true;
   let graph = reorder.mat2graph(matrix, val);
@@ -171,6 +185,7 @@ function computeBarycenter(ordering, matrix, network){
   return barycenterOrdering;
 }
 
+//Compute RCM reordering
 function computeRCM(ordering, matrix){ // bandwith reduction: reverse cuthill-mckee
   let graph = reorder.mat2graph(matrix, false);
   let rcm = reorder.reverse_cuthill_mckee_order(graph);
@@ -181,15 +196,20 @@ function computeRCM(ordering, matrix){ // bandwith reduction: reverse cuthill-mc
   return rcmOrder;
 }
 
-
+//Compute alphabetical reordering
 function sortAlphabetically(ordering, nodes, identifier) { // in JS objects are always passed around by reference, assigning new var changes initial
-  return ordering.sort((a,b) => {
-    if(nodes[a][identifier] < nodes[b][identifier]) { return -1; }
-    if(nodes[a][identifier] > nodes[b][identifier]) { return 1; }
-    return 0;
-  })
+  if(identifier === 'id'){
+    return ordering.sort((a,b) => a-b)
+  } else {
+    return ordering.sort((a,b) => {
+      if(nodes[a][identifier] < nodes[b][identifier]) { return -1; }
+      if(nodes[a][identifier] > nodes[b][identifier]) { return 1; }
+      return 0;
+    })
+  }
 }
 
+//Compute random reordering
 function sortRandomly(ordering){
   for (let i = 0; i < ordering.length; i++) { // uses Fisher-Yates shuffle algorithm for random sorting of array 
       let x = ordering[i];
@@ -201,7 +221,7 @@ function sortRandomly(ordering){
 }
 
 
-
+//Search through dates
 function dateBinarySearch(dates, date, begin){
   let max = dates.length-1;
   let min = 0;
@@ -223,37 +243,34 @@ function dateBinarySearch(dates, date, begin){
   }
 }
 
+//Reverse edge id from 1-2 to 2-1
 function reverseEdgeId(edgeId) {
   const [fromNode, toNode] = edgeId.split("-");
   return `${toNode}-${fromNode}`;
 }
 
-let edgeInfoDirected;
-let edgeInfoUndirected;
-let previousTimePeriod = null;
+let edgeInfoDirected;     //Timegraph filtered edgeinfo for directed vis
+let edgeInfoUndirected;   //Timegraph filtered edgeinfo for undirected vis
+let previousTimePeriod = null;  //For comparing previousperiod to current to avoid recomputing
 
 function Vis({ dataSet }) {
-  console.log(dataSet.edgeInfoUndirected);
-  
   //State
-  const [hoveredEdge, setHoveredEdge] = useState(null);
-  const [hoveredNode, setHoveredNode] = useState(null);
-  const [selectedNodes, setSelectedNodes] = useState([]);
-  const [selectedEdges, setSelectedEdges] = useState([]);
-  const [popupNode, setPopupNode] = useState(null);
-  const [popupEdge, setPopupEdge] = useState(null);
-  const [customization, setCustom] = useState({
+  const [hoveredEdge, setHoveredEdge] = useState(null);   //Keep track of which edge is hovered for crosshover
+  const [hoveredNode, setHoveredNode] = useState(null);   //Keep track of which node is hovered for crosshover
+  const [selectedNodes, setSelectedNodes] = useState([]); //Keep track of which nodes are pinned
+  const [selectedEdges, setSelectedEdges] = useState([]); //Keep track of which edges are pinned
+  const [popupNode, setPopupNode] = useState(null);       //Keep track of node for more info button
+  const [popupEdge, setPopupEdge] = useState(null);       //Keep track of edge for more info button
+  const [customization, setCustom] = useState({           //Keep track of customization options
     "cScheme": 0, 
     "amValue":dataSet.attrInfo.edgeAttrOrdinal[0], 
     "ordering": "incremental",
     "network" : "directed", 
-    "identifier": dataSet.attrInfo.nodeAttrUnique[0] ? dataSet.attrInfo.nodeAttrUnique[0] : null, 
+    "identifier": dataSet.attrInfo.nodeAttrUnique[0] ? dataSet.attrInfo.nodeAttrUnique[0] : "id", 
     "colorGrouping": Object.keys(dataSet.attrInfo.nodeAttrCategorical).length !== 0 ? (Object.keys(dataSet.attrInfo.nodeAttrCategorical).find(element => !dataSet.attrInfo.nodeAttrUnique.includes(element)) ? Object.keys(dataSet.attrInfo.nodeAttrCategorical).find(element => !dataSet.attrInfo.nodeAttrUnique.includes(element)) : dataSet.attrInfo.nodeAttrCategorical[0]) : null });
-  const [unpinNode, setUnpinNode] = useState(null);
-  const [unpinEdge, setUnpinEdge] = useState(null);
-  const [timePeriod, setTimePeriod] = useState(null);
-  
-  
+  const [unpinNode, setUnpinNode] = useState(null);       //For unpinning a node with the unpin button
+  const [unpinEdge, setUnpinEdge] = useState(null);       //For unpinning an edge with the unpin button
+  const [timePeriod, setTimePeriod] = useState(null);     //For checking edges against time selected time
 
 
   // date filter
@@ -266,7 +283,7 @@ function Vis({ dataSet }) {
       const endIndex = dateBinarySearch(datesSorted, timePeriod[1], false);
       edgeInfoDirected = JSON.parse(JSON.stringify(dataSet.edgeInfo));
       edgeInfoUndirected = JSON.parse(JSON.stringify(dataSet.edgeInfoUndirected));
-      // ijdf
+      
       if(endIndex-beginIndex > datesSorted.length/2) {
         for(let edgeId of Object.keys(edgeInfoUndirected)) {
           for(let attr of dataSet.attrInfo.edgeAttrOrdinal) {
@@ -365,7 +382,7 @@ function Vis({ dataSet }) {
     }
   } 
 
-  // ordering
+  // Change network type if changed to some specific orderings
   let ordering = useMemo(() => {
     if (customization.ordering === "random") {
       return sortRandomly([...dataSet.orderings.incremental]);
@@ -392,11 +409,14 @@ function Vis({ dataSet }) {
   // coloring
   let colorSchemeScale = useMemo(() => {
     const [domain, range] = colorCoding(dataSet.attrInfo.nodeAttrCategorical[customization.colorGrouping] ? dataSet.attrInfo.nodeAttrCategorical[customization.colorGrouping] : null, colorSchemes[customization.cScheme]);
-    return d3.scaleOrdinal().domain(domain).range(range)}, [customization.cScheme]);
+    return d3.scaleOrdinal().domain(domain).range(range)}, [customization.cScheme,customization.colorGrouping]);
   let colorScalePositive = d3.scaleLinear().domain([0, dataSet.attrInfo.max[customization.amValue]]).range(["#7cc6f2", "#20A4F3"]);
   let colorScaleNegative = d3.scaleLinear().domain([dataSet.attrInfo.min[customization.amValue], 0]).range(["#ff1900", "#ff6554"]);
   let colorNeutral = "#f6ff00"
   
+
+
+  //Functions to change state variable
   function unPinNode(circId) {
     setUnpinNode(circId)
   }
@@ -435,6 +455,8 @@ function Vis({ dataSet }) {
   function popupEdgeClose() {
     setPopupEdge(null);
   }
+  
+  //Create undirected and directed sets
   useEffect(()=>{
     let directed = [];
     let undirected = [];
@@ -453,7 +475,7 @@ function Vis({ dataSet }) {
   }, [customization.ordering])
 
 
-
+  //Html for webpage
   return (
     <>
       {/* Visualization */}
@@ -559,8 +581,8 @@ function Vis({ dataSet }) {
             <button className="clickInfoCollaps" onClick={hoverInfoCollapse}>Hover info<span className="PlusButton" id='plusButtonHover'>-</span></button>
             <div id="hoverInfoContent" className="hoverInfoContent" style={{ display: "block", minHeight: "5vh" }}>
               {hoveredEdge  ? (<>
-                <div>From: {dataSet.nodes[hoveredEdge.split("-")[0]].Email}</div>
-                <div>To: {dataSet.nodes[hoveredEdge.split("-")[1]].Email}</div>
+                <div>From: {customization.identifier === "id" ? hoveredEdge.split("-")[0] : dataSet.nodes[hoveredEdge.split("-")[0]][customization.identifier]}</div>
+                <div>To: {customization.identifier === "id" ? hoveredEdge.split("-")[1] : dataSet.nodes[hoveredEdge.split("-")[1]][customization.identifier]}</div>
                 {dataSet.attrInfo.edgeAttrOrdinal.map((j) => {
                   return <div className="attrInfo">Average {j}: {timePeriod ? (customization.network === "directed" ? edgeInfoDirected[hoveredEdge][j] : edgeInfoUndirected[hoveredEdge][j]) : (customization.network === "directed" ? dataSet.edgeInfo[hoveredEdge][j] : dataSet.edgeInfoUndirected[hoveredEdge][j])}</div>
                 })}</>)
@@ -645,7 +667,7 @@ function Vis({ dataSet }) {
             <select id="identifier" className='custDropdown' onChange={() => identifierChange()}>
               {dataSet.attrInfo.nodeAttrUnique.map((i) => { 
               return(<option value={i}>{i}</option>)})}
-              <option value={null}>{"id"}</option>
+              <option value={"id"}>{"id"}</option>
             </select>
             <br />
             <label htmlFor="cScheme">Attribute for color coding: </label>
@@ -680,6 +702,7 @@ function Vis({ dataSet }) {
 }
 export default Vis;
 
+//React component creating the moreinfo table for nodes
 function EdgesOfNodeTable({ dataSet, nodeId, closeFunction, timePeriod, customization }) {
   let edges = (timePeriod ? (customization.network === "directed" ? edgeInfoDirected: edgeInfoUndirected) : (customization.network === "directed" ? dataSet.edgeInfo : dataSet.edgeInfoUndirected));
   let edgesFrom = [];
@@ -771,11 +794,12 @@ function EdgesOfNodeTable({ dataSet, nodeId, closeFunction, timePeriod, customiz
 
 const timeFormat = d3.timeFormat("%d %b %Y");
 
+//React component creating the moreinfo table for edges 
 function EdgeTable({ dataSet, edgeId, closeFunction, timePeriod, customization }) {
 
   let [fromId, toId] = edgeId.split("-");
 
-  let edgeInfo = (timePeriod ? (customization.network === "directed" ? edgeInfoDirected: edgeInfoUndirected) : (customization.network === "directed" ? dataSet.edgeInfo : dataSet.edgeInfoUndirected));
+  let edgeInfo = (timePeriod ? (customization.network === "directed" ? edgeInfoDirected[edgeId]: edgeInfoUndirected[edgeId]) : (customization.network === "directed" ? dataSet.edgeInfo[edgeId] : dataSet.edgeInfoUndirected[edgeId]));
   console.log(edgeId);
   console.log(edgeInfo);
 
